@@ -3,7 +3,7 @@ from django.db import models
 
 from timezones import forms
 
-class LocalizedDateTimeField(models.CharField):
+class LocalizedDateTimeField(models.DateTimeField):
     def formfield(self, **kwargs):
         defaults = {"form_class": forms.LocalizedDateTimeField}
         defaults.update(kwargs)
