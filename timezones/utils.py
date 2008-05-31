@@ -8,8 +8,7 @@ def localtime_for_timezone(value, timezone):
     Given a ``datetime.datetime`` object in UTC and a timezone represented as
     a string, return the localized time for the timezone.
     """
-    tz = pytz.timezone(str(timezone))
-    return pytz.localize(value).astimezone(tz)
+    return adjust_datetime_to_timezone(value, settings.TIME_ZONE, timezone)
 
 def adjust_datetime_to_timezone(value, from_tz, to_tz=None):
     """
@@ -18,4 +17,4 @@ def adjust_datetime_to_timezone(value, from_tz, to_tz=None):
     """
     if to_tz is None:
         to_tz = settings.TIME_ZONE
-    return pytz.timezone(from_tz).localize(value).astimezone(pytz.timezone(to_tz))
+    return pytz.timezone(str(from_tz)).localize(value).astimezone(pytz.timezone(str(to_tz)))
