@@ -2,7 +2,7 @@
 from django.template import Node
 from django.template import Library
 
-from timezones import localtime_for_timezone
+from timezones.utils import localtime_for_timezone
 
 register = Library()
 
