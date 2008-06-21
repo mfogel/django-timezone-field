@@ -1,4 +1,2 @@
-
-import pytz
-
-TIMEZONE_CHOICES = zip(pytz.common_timezones, pytz.common_timezones)
+# for backwards compatability
+from timezones.forms import TIMEZONE_CHOICES

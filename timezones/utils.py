@@ -2,6 +2,7 @@
 import pytz
 
 from django.conf import settings
+from django.utils.encoding import smart_str
 
 def localtime_for_timezone(value, timezone):
     """
@@ -17,4 +18,8 @@ def adjust_datetime_to_timezone(value, from_tz, to_tz=None):
     """
     if to_tz is None:
         to_tz = settings.TIME_ZONE
-    return pytz.timezone(str(from_tz)).localize(value).astimezone(pytz.timezone(str(to_tz)))
+    if value.tzinfo is None:
+        if not hasattr(from_tz, 'localize'):
+            from_tz = pytz.timezone(smart_str(from_tz))
+        value = from_tz.localize(value)
+    return value.astimezone(pytz.timezone(smart_str(to_tz)))
