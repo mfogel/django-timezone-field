@@ -38,7 +38,7 @@ class TimeZoneField(models.CharField):
     def formfield(self, **kwdargs):
         defaults = {"form_class": forms.TimeZoneField}
         defaults.update(kwdargs)
-        return super(TimeZoneField, self).formfield(**defaults)
+        return super(models.CharField, self).formfield(**defaults)
 
 class LocalizedDateTimeField(models.DateTimeField):
     """
