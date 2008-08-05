@@ -19,11 +19,8 @@ assert(reduce(lambda x, y: x and (len(y) <= MAX_TIMEZONE_LENGTH),
 
 class TimeZoneField(models.CharField):
 
-    def __init__(self, max_length=None, *args, **kwdargs):
-        if max_length is None: max_length = MAX_TIMEZONE_LENGTH
-        assert(max_length >= MAX_TIMEZONE_LENGTH,
-               "Max length is too small. Why are you supplying it?")
-        defaults = {'max_length': max_length,
+    def __init__(self, *args, **kwdargs):
+        defaults = {'max_length': MAX_TIMEZONE_LENGTH,
                     'default': settings.TIME_ZONE,
                     'choices': forms.TIMEZONE_CHOICES}
         defaults.update(kwdargs)
@@ -35,7 +32,6 @@ class TimeZoneField(models.CharField):
         return pytz.timezone(value)
 
     def get_db_prep_save(self, value):
-        "Returns field's value prepared for saving into a database."
         # Casts timezone into string format for entry into database.
         if value is not None:
             value = smart_unicode(value)
