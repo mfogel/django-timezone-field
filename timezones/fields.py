@@ -12,13 +12,19 @@ import pytz
 MAX_TIMEZONE_LENGTH = getattr(settings, 'MAX_TIMEZONE_LENGTH', 100)
 default_tz = pytz.timezone(getattr(settings, 'TIME_ZONE', 'UTC'))
 
-assert(all(len(x) <= MAX_TIMEZONE_LENGTH for x in forms.TIMEZONE_CHOICES),
+
+assert(reduce(lambda x, y: y and len(x) <= MAX_TIMEZONE_LENGTH,
+              forms.TIMEZONE_CHOICES, True),
        "timezones.fields.TimeZoneField MAX_TIMEZONE_LENGTH is too small")
 
 class TimeZoneField(models.CharField):
 
-    def __init__(self, *args, **kwdargs):
-        defaults = {'max_length': MAX_TIMEZONE_LENGTH,
+    def __init__(self, max_length=None, min_length=None, *args, **kwdargs):
+        if max_length is None: max_length = MAX_TIMEZONE_LENGTH
+        assert(max_length >= MAX_TIMEZONE_LENGTH,
+               "Max length is too small. Why are you supplying it?")
+        defaults = {'max_length': max_length,
+                    'min_length': min_length,
                     'default': settings.TIME_ZONE,
                     'choices': forms.TIMEZONE_CHOICES}
         defaults.update(kwdargs)
