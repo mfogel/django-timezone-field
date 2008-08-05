@@ -9,7 +9,9 @@ from timezones.utils import adjust_datetime_to_timezone
 TIMEZONE_CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
 class TimeZoneField(forms.ChoiceField):
-    def __init__(self, choices=None, *args, **kwdargs):
+    def __init__(self, choices=None,  max_length=None, min_length=None,
+                 *args, **kwdargs):
+        self.max_length, self.min_length = max_length, min_length
         if choices is not None:
             kwdargs['choices'] = choices
         else:
