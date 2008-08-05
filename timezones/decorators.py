@@ -1,8 +1,8 @@
 from django.utils.encoding import smart_str
-
+from django.conf import settings
 import pytz
 
-utc_tz = pytz.timezone('UTC')
+default_tz = pytz.timezone(getattr(settings, 'TIME_ZONE', 'UTC'))
 
 def localdatetime(fieldname):
     def get_datetime(inst):
@@ -17,7 +17,7 @@ def localdatetime(fieldname):
                 tz = pytz.timezone(smart_str(tz))
             dt = get_datetime(inst)
             if dt.tzinfo is None:
-                dt = utc_tz.localize(dt)
+                dt = default_tz.localize(dt)
             return dt.astimezone(tz)
         def setlocal(inst, dt):
             if dt.tzinfo is None:
@@ -25,7 +25,7 @@ def localdatetime(fieldname):
                 if not hasattr(tz, 'localize'):
                     tz = pytz.timezone(smart_str(tz))
                 dt = tz.localize(dt)
-            dt = dt.astimezone(utc_tz)
+            dt = dt.astimezone(default_tz)
             return set_datetime(inst, dt)
         return property(getlocal, setlocal)
     return make_local_property
