@@ -90,7 +90,7 @@ class LocalizedDateTimeField(models.DateTimeField):
         return super(LocalizedDateTimeField, self
                      ).get_db_prep_lookup(lookup_type, value)
 
-def prep_localized_datetime(sender):
+def prep_localized_datetime(sender, **kwdargs):
     for field in sender._meta.fields:
         if (not isinstance(field, LocalizedDateTimeField)
                 or field.timezone is None):
