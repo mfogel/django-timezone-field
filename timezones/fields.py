@@ -3,7 +3,6 @@ from django.db import models
 from django.conf import settings
 from django.utils.encoding import smart_unicode, smart_str
 from django.db.models import signals
-from django.dispatch import dispatcher
 
 from timezones import forms
 
@@ -139,4 +138,4 @@ def prep_localized_datetime(sender):
 
 ## RED_FLAG: need to add a check at manage.py validation time that
 ##           time_zone value is a valid query keyword (if it is one)
-dispatcher.connect(prep_localized_datetime, signal=signals.class_prepared)
+signals.class_prepared.connect(prep_localized_datetime)
