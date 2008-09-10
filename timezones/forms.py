@@ -10,13 +10,13 @@ TIMEZONE_CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 
 class TimeZoneField(forms.ChoiceField):
     def __init__(self, choices=None,  max_length=None, min_length=None,
-                 *args, **kwdargs):
+                 *args, **kwargs):
         self.max_length, self.min_length = max_length, min_length
         if choices is not None:
-            kwdargs['choices'] = choices
+            kwargs["choices"] = choices
         else:
-            kwdargs['choices'] = TIMEZONE_CHOICES
-        super(TimeZoneField, self).__init__(*args, **kwdargs)
+            kwargs["choices"] = TIMEZONE_CHOICES
+        super(TimeZoneField, self).__init__(*args, **kwargs)
 
     def clean(self, value):
         value = super(TimeZoneField, self).clean(value)
@@ -29,7 +29,7 @@ class LocalizedDateTimeField(forms.DateTimeField):
     def __init__(self, timezone=None, *args, **kwargs):
         super(LocalizedDateTimeField, self).__init__(*args, **kwargs)
         self.timezone = timezone or settings.TIME_ZONE
-
+        
     def clean(self, value):
         value = super(LocalizedDateTimeField, self).clean(value)
         return adjust_datetime_to_timezone(value, from_tz=self.timezone)
