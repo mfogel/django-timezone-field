@@ -10,4 +10,4 @@ Contents:
 
 .. toctree::
 
-   how_to_use.rst
+   how_to_use
