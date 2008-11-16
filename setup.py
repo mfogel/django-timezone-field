@@ -15,7 +15,7 @@ setup(
     ],
     package_dir = {"timezones": "timezones"},
     install_requires = [
-        "pytz>=2008i",
+        "pytz==2008i",
     ],
     classifiers = [
         "Development Status :: 4 - Beta",
