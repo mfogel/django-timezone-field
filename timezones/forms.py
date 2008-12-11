@@ -26,7 +26,10 @@ class TimeZoneField(forms.ChoiceField):
 
     def clean(self, value):
         value = super(TimeZoneField, self).clean(value)
-        return pytz.timezone(value)
+        if value:
+            return pytz.timezone(value)
+        else:
+            return value
 
 class LocalizedDateTimeField(forms.DateTimeField):
     """
