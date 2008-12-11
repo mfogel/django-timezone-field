@@ -13,14 +13,14 @@ default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
 
 
 assert(reduce(lambda x, y: x and (len(y) <= MAX_TIMEZONE_LENGTH),
-              forms.TIMEZONE_CHOICES, True),
+              forms.ALL_TIMEZONE_CHOICES, True),
        "timezones.fields.TimeZoneField MAX_TIMEZONE_LENGTH is too small")
 
 class TimeZoneField(models.CharField):
     def __init__(self, *args, **kwargs):
         defaults = {"max_length": MAX_TIMEZONE_LENGTH,
                     "default": settings.TIME_ZONE,
-                    "choices": forms.TIMEZONE_CHOICES}
+                    "choices": forms.PRETTY_TIMEZONE_CHOICES}
         defaults.update(kwargs)
         return super(TimeZoneField, self).__init__(*args, **defaults)
         

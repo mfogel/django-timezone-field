@@ -7,9 +7,12 @@ __test__ = {"API_TESTS": r"""
 >>> settings.TIME_ZONE = "UTC"
 
 >>> from timezones import forms, decorators
+>>> from timezones.utils import localtime_for_timezone, adjust_datetime_to_timezone
 
-# the default case where no timezone is given explicitly.
-# uses settings.TIME_ZONE.
+>>> localtime_for_timezone(datetime(2008, 6, 25, 18, 0, 0), "America/Denver").strftime("%m/%d/%Y %H:%I:%S")
+'06/25/2008 12:12:00'
+
+# the default case where no timezone is given explicitly. uses settings.TIME_ZONE.
 >>> f = forms.LocalizedDateTimeField()
 >>> f.clean("2008-05-30 14:30:00")
 datetime.datetime(2008, 5, 30, 14, 30, tzinfo=<UTC>)
