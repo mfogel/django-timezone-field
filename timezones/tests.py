@@ -23,6 +23,12 @@ datetime.datetime(2008, 5, 30, 20, 30, tzinfo=<UTC>)
 >>> f.clean('US/Eastern')
 <DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>
 
+>>> f = forms.TimeZoneField(required=False)
+>>> f.clean('')
+u''
+>>> f.clean('US/Eastern')
+<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>
+
 >>> class Foo(object):
 ...     datetime = datetime(2008, 6, 20, 23, 58, 17)
 ...     @decorators.localdatetime('datetime')
