@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name = "timezones",
-    version = "0.1.0-pre",
+    version = __import__("timezones").__version__,
     author = "Brian Rosner",
     author_email = "brosner@gmail.com",
     url = "http://code.google.com/p/django-timezones/",
