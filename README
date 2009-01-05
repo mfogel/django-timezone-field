@@ -1,0 +1,3 @@
+This simple app is for localizing datetimes for the user. Timezone handling
+can be a bit tricky so the goal is to get rid of the guessing game and provide
+a simple interface to localizing datetimes for your users.
