@@ -1,9 +1,7 @@
-#!/usr/bin/env python
-
-from distutils.core import setup
+from setuptools import setup
 
 setup(
-    name = "timezones",
+    name = "django-timezones",
     version = __import__("timezones").__version__,
     author = "Brian Rosner",
     author_email = "brosner@gmail.com",
@@ -15,9 +13,8 @@ setup(
         "timezones",
         "timezones.templatetags",
     ],
-    package_dir = {"timezones": "timezones"},
     install_requires = [
-        "pytz==2008i",
+        "pytz==2009a",
     ],
     classifiers = [
         "Development Status :: 4 - Beta",
