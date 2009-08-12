@@ -7,7 +7,7 @@ setup(
     author_email = "brosner@gmail.com",
     description = "A Django reusable app to deal with timezone localization for users",
     long_description = open("README").read(),
-    url = "http://code.google.com/p/django-timezones/",
+    url = "http://github.com/brosner/django-timezones/",
     license = "BSD",
     packages = [
         "timezones",
