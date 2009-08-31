@@ -1,1 +1,1 @@
-recursive-include docs/ *
+recursive-include docs *
