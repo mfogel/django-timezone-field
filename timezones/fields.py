@@ -23,19 +23,24 @@ class TimeZoneField(models.CharField):
                     "choices": forms.PRETTY_TIMEZONE_CHOICES}
         defaults.update(kwargs)
         return super(TimeZoneField, self).__init__(*args, **defaults)
-        
+    
     def to_python(self, value):
         value = super(TimeZoneField, self).to_python(value)
         if value is None:
             return None # null=True
         return pytz.timezone(value)
-        
-    def get_db_prep_save(self, value):
-        # Casts timezone into string format for entry into database.
+    
+    def get_prep_value(self, value):
         if value is not None:
-            value = smart_unicode(value)
-        return super(TimeZoneField, self).get_db_prep_save(value)
-
+            return smart_unicode(value)
+        return value
+    
+    def get_db_prep_save(self, value, connection=None):
+        """
+        Prepares the given value for insertion into the database.
+        """
+        return self.get_prep_value(value)
+    
     def flatten_data(self, follow, obj=None):
         value = self._get_val_from_obj(obj)
         if value is None:
