@@ -1,3 +1,5 @@
+import re
+
 from datetime import datetime
 
 from django import forms
@@ -5,6 +7,7 @@ from django.conf import settings
 from django.test import TestCase
 
 import timezones.forms
+import timezones.timezones_tests.models as test_models
 
 from timezones.utils import localtime_for_timezone, adjust_datetime_to_timezone
 
@@ -42,7 +45,7 @@ class UtilsTestCase(TimeZoneTestCase):
 
 class TimeZoneFieldTestCase(TimeZoneTestCase):
     
-    def test_clean_required(self):
+    def test_forms_clean_required(self):
         f = timezones.forms.TimeZoneField()
         self.assertEqual(
             repr(f.clean("US/Eastern")),
@@ -50,18 +53,29 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         )
         self.assertRaises(forms.ValidationError, f.clean, "")
     
-    def test_clean_not_required(self):
+    def test_forms_clean_not_required(self):
         f = timezones.forms.TimeZoneField(required=False)
         self.assertEqual(
             repr(f.clean("US/Eastern")),
             "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
         )
         self.assertEqual(f.clean(""), "")
+    
+    def test_models_as_a_form(self):
+        class ProfileForm(forms.ModelForm):
+            class Meta:
+                model = test_models.Profile
+        form = ProfileForm()
+        rendered = form.as_p()
+        self.assert_(
+            bool(re.search(r'<option value="[\w/]+">\([A-Z]+(?:\+|\-)\d{4}\)\s[\w/]+</option>', rendered)),
+            "Did not find pattern in rendered form"
+        )
 
 
 class LocalizedDateTimeFieldTestCase(TimeZoneTestCase):
     
-    def test_clean_required(self):
+    def test_forms_clean_required(self):
         # the default case where no timezone is given explicitly. uses settings.TIME_ZONE.
         f = timezones.forms.LocalizedDateTimeField()
         self.assertEqual(
@@ -70,7 +84,7 @@ class LocalizedDateTimeFieldTestCase(TimeZoneTestCase):
         )
         self.assertRaises(forms.ValidationError, f.clean, "")
     
-    def test_clean_required(self):
+    def test_forms_clean_required(self):
         # the default case where no timezone is given explicitly. uses settings.TIME_ZONE.
         f = timezones.forms.LocalizedDateTimeField(required=False)
         self.assertEqual(
