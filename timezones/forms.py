@@ -41,4 +41,6 @@ class LocalizedDateTimeField(forms.DateTimeField):
         
     def clean(self, value):
         value = super(LocalizedDateTimeField, self).clean(value)
+        if value is None: # field was likely not required
+            return None
         return adjust_datetime_to_timezone(value, from_tz=self.timezone)
