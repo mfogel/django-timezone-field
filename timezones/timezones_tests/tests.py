@@ -2,6 +2,8 @@ import re
 
 from datetime import datetime
 
+import pytz
+
 from django import forms
 from django.conf import settings
 from django.test import TestCase
