@@ -17,6 +17,9 @@ assert reduce(lambda x, y: x and (len(y) <= MAX_TIMEZONE_LENGTH),
     "timezones.fields.TimeZoneField MAX_TIMEZONE_LENGTH is too small"
 
 class TimeZoneField(models.CharField):
+    
+    __metaclass__ = models.SubfieldBase
+    
     def __init__(self, *args, **kwargs):
         defaults = {"max_length": MAX_TIMEZONE_LENGTH,
                     "default": settings.TIME_ZONE,
