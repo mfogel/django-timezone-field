@@ -5,7 +5,7 @@ from django.utils.encoding import smart_unicode, smart_str
 
 import pytz
 
-from timezones import forms
+from timezones import forms, zones
 from timezones.utils import coerce_timezone_value, validate_timezone_max_length
 
 
@@ -23,7 +23,7 @@ class TimeZoneField(models.CharField):
         defaults = {
             "max_length": MAX_TIMEZONE_LENGTH,
             "default": settings.TIME_ZONE,
-            "choices": forms.PRETTY_TIMEZONE_CHOICES
+            "choices": zones.PRETTY_TIMEZONE_CHOICES
         }
         defaults.update(kwargs)
         return super(TimeZoneField, self).__init__(*args, **defaults)
