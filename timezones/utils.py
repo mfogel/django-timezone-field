@@ -1,9 +1,9 @@
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.utils.encoding import smart_str
 
 import pytz
 
-from django.conf import settings
-from django.utils.encoding import smart_str
-from django.core.exceptions import ValidationError
 
 def localtime_for_timezone(value, timezone):
     """
@@ -11,6 +11,7 @@ def localtime_for_timezone(value, timezone):
     a string, return the localized time for the timezone.
     """
     return adjust_datetime_to_timezone(value, settings.TIME_ZONE, timezone)
+
 
 def adjust_datetime_to_timezone(value, from_tz, to_tz=None):
     """
@@ -25,8 +26,16 @@ def adjust_datetime_to_timezone(value, from_tz, to_tz=None):
         value = from_tz.localize(value)
     return value.astimezone(pytz.timezone(smart_str(to_tz)))
 
+
 def coerce_timezone_value(value):
     try:
         return pytz.timezone(value)
     except pytz.UnknownTimeZoneError:
         raise ValidationError("Unknown timezone")
+
+
+def validate_timezone_max_length(max_length, zones):
+    def reducer(x, y):
+        return x and (len(y) <= max_length)
+    if not reduce(reducer, zones, True):
+        raise Exception("timezones.fields.TimeZoneField MAX_TIMEZONE_LENGTH is too small")

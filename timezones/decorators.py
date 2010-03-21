@@ -1,17 +1,19 @@
+from django.conf import settings
+from django.utils.encoding import smart_str
 
 import pytz
 
-from django.utils.encoding import smart_str
-from django.conf import settings
+
 
 default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
+
+
 
 def localdatetime(field_name):
     def get_datetime(instance):
         return getattr(instance, field_name)
     def set_datetime(instance, value):
         return setattr(instance, field_name, value)
-        
     def make_local_property(get_tz):
         def get_local(instance):
             tz = get_tz(instance)

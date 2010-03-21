@@ -1,30 +1,30 @@
-
-from django.db import models
 from django.conf import settings
-from django.utils.encoding import smart_unicode, smart_str
+from django.db import models
 from django.db.models import signals
-
-from timezones import forms
-from timezones.utils import coerce_timezone_value
+from django.utils.encoding import smart_unicode, smart_str
 
 import pytz
+
+from timezones import forms
+from timezones.utils import coerce_timezone_value, validate_timezone_max_length
+
+
 
 MAX_TIMEZONE_LENGTH = getattr(settings, "MAX_TIMEZONE_LENGTH", 100)
 default_tz = pytz.timezone(getattr(settings, "TIME_ZONE", "UTC"))
 
-
-assert reduce(lambda x, y: x and (len(y) <= MAX_TIMEZONE_LENGTH),
-    forms.ALL_TIMEZONE_CHOICES, True), \
-    "timezones.fields.TimeZoneField MAX_TIMEZONE_LENGTH is too small"
 
 class TimeZoneField(models.CharField):
     
     __metaclass__ = models.SubfieldBase
     
     def __init__(self, *args, **kwargs):
-        defaults = {"max_length": MAX_TIMEZONE_LENGTH,
-                    "default": settings.TIME_ZONE,
-                    "choices": forms.PRETTY_TIMEZONE_CHOICES}
+        validate_timezone_max_length(MAX_TIMEZONE_LENGTH, zones.ALL_TIMEZONE_CHOICES)
+        defaults = {
+            "max_length": MAX_TIMEZONE_LENGTH,
+            "default": settings.TIME_ZONE,
+            "choices": forms.PRETTY_TIMEZONE_CHOICES
+        }
         defaults.update(kwargs)
         return super(TimeZoneField, self).__init__(*args, **defaults)
     
@@ -75,16 +75,18 @@ class LocalizedDateTimeField(models.DateTimeField):
         else:
             self.timezone = timezone
         super(LocalizedDateTimeField, self).__init__(verbose_name, name, **kwargs)
-        
+    
     def formfield(self, **kwargs):
         defaults = {"form_class": forms.LocalizedDateTimeField}
         if (not isinstance(self.timezone, basestring) and str(self.timezone) in pytz.all_timezones_set):
             defaults["timezone"] = str(self.timezone)
         defaults.update(kwargs)
         return super(LocalizedDateTimeField, self).formfield(**defaults)
-        
+    
     def get_db_prep_save(self, value):
-        "Returns field's value prepared for saving into a database."
+        """
+        Returns field's value prepared for saving into a database.
+        """
         ## convert to settings.TIME_ZONE
         if value is not None:
             if value.tzinfo is None:
@@ -92,15 +94,18 @@ class LocalizedDateTimeField(models.DateTimeField):
             else:
                 value = value.astimezone(default_tz)
         return super(LocalizedDateTimeField, self).get_db_prep_save(value)
-        
+    
     def get_db_prep_lookup(self, lookup_type, value):
-        "Returns field's value prepared for database lookup."
+        """
+        Returns field's value prepared for database lookup.
+        """
         ## convert to settings.TIME_ZONE
         if value.tzinfo is None:
             value = default_tz.localize(value)
         else:
             value = value.astimezone(default_tz)
         return super(LocalizedDateTimeField, self).get_db_prep_lookup(lookup_type, value)
+
 
 def prep_localized_datetime(sender, **kwargs):
     for field in sender._meta.fields:
