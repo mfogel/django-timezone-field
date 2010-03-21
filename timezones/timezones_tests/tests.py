@@ -71,6 +71,29 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
             bool(re.search(r'<option value="[\w/]+">\([A-Z]+(?:\+|\-)\d{4}\)\s[\w/]+</option>', rendered)),
             "Did not find pattern in rendered form"
         )
+    
+    def test_models_string_value(self):
+        p = test_models.Profile(name="Brian Rosner", timezone="America/Denver")
+        p.save()
+        p = test_models.Profile.objects.get(pk=p.pk)
+        self.assertEqual(p.timezone, pytz.timezone("America/Denver"))
+    
+    def test_models_string_value_lookup(self):
+        test_models.Profile(name="Brian Rosner", timezone="America/Denver").save()
+        qs = test_models.Profile.objects.filter(timezone="America/Denver")
+        self.assertEqual(qs.count(), 1)
+    
+    def test_models_tz_value(self):
+        tz = pytz.timezone("America/Denver")
+        p = test_models.Profile(name="Brian Rosner", timezone=tz)
+        p.save()
+        p = test_models.Profile.objects.get(pk=p.pk)
+        self.assertEqual(p.timezone, tz)
+    
+    def test_models_tz_value_lookup(self):
+        test_models.Profile(name="Brian Rosner", timezone="America/Denver").save()
+        qs = test_models.Profile.objects.filter(timezone=pytz.timezone("America/Denver"))
+        self.assertEqual(qs.count(), 1)
 
 
 class LocalizedDateTimeFieldTestCase(TimeZoneTestCase):
