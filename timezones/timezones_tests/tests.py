@@ -24,6 +24,14 @@ class TimeZoneTestCase(TestCase):
     
     def tearDown(self):
         settings.TIME_ZONE = self.ORIGINAL_TIME_ZONE
+    
+    # little helpers
+    
+    def assertFormIsValid(self, form):
+        is_valid = form.is_valid()
+        self.assert_(is_valid,
+            "Form did not validate (errors=%r, form=%r)" % (form._errors, form)
+        )
 
 
 class UtilsTestCase(TimeZoneTestCase):
@@ -73,6 +81,13 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
             bool(re.search(r'<option value="[\w/]+">\([A-Z]+(?:\+|\-)\d{4}\)\s[\w/]+</option>', rendered)),
             "Did not find pattern in rendered form"
         )
+    
+    def test_models_modelform_data(self):
+        class ProfileForm(forms.ModelForm):
+            class Meta:
+                model = test_models.Profile
+        form = ProfileForm({"name": "Brian Rosner", "timezone": "America/Denver"})
+        self.assertFormIsValid(form)
     
     def test_models_string_value(self):
         p = test_models.Profile(name="Brian Rosner", timezone="America/Denver")
