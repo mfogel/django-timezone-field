@@ -5,6 +5,7 @@ from django.utils.encoding import smart_unicode, smart_str
 from django.db.models import signals
 
 from timezones import forms
+from timezones.utils import coerce_timezone_value
 
 import pytz
 
@@ -27,11 +28,19 @@ class TimeZoneField(models.CharField):
         defaults.update(kwargs)
         return super(TimeZoneField, self).__init__(*args, **defaults)
     
+    def validate(self, value, model_instance):
+        # coerce value back to a string to validate correctly
+        return super(TimeZoneField, self).validate(smart_str(value), model_instance)
+    
+    def run_validators(self, value):
+        # coerce value back to a string to validate correctly
+        return super(TimeZoneField, self).run_validators(smart_str(value))
+    
     def to_python(self, value):
         value = super(TimeZoneField, self).to_python(value)
         if value is None:
             return None # null=True
-        return pytz.timezone(value)
+        return coerce_timezone_value(value)
     
     def get_prep_value(self, value):
         if value is not None:
@@ -50,10 +59,6 @@ class TimeZoneField(models.CharField):
             value = ""
         return {self.attname: smart_unicode(value)}
 
-    def formfield(self, **kwargs):
-        defaults = {"form_class": forms.TimeZoneField}
-        defaults.update(kwargs)
-        return super(TimeZoneField, self).formfield(**defaults)
 
 class LocalizedDateTimeField(models.DateTimeField):
     """

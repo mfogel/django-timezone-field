@@ -71,6 +71,13 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         )
         self.assertEqual(f.clean(""), "")
     
+    def test_forms_clean_bad_value(self):
+        f = timezones.forms.TimeZoneField()
+        try:
+            f.clean("BAD VALUE")
+        except forms.ValidationError, e:
+            self.assertEqual(e.messages, ["Select a valid choice. BAD VALUE is not one of the available choices."])
+    
     def test_models_as_a_form(self):
         class ProfileForm(forms.ModelForm):
             class Meta:
@@ -82,12 +89,20 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
             "Did not find pattern in rendered form"
         )
     
-    def test_models_modelform_data(self):
+    def test_models_modelform_validation(self):
         class ProfileForm(forms.ModelForm):
             class Meta:
                 model = test_models.Profile
         form = ProfileForm({"name": "Brian Rosner", "timezone": "America/Denver"})
         self.assertFormIsValid(form)
+    
+    def test_models_modelform_save(self):
+        class ProfileForm(forms.ModelForm):
+            class Meta:
+                model = test_models.Profile
+        form = ProfileForm({"name": "Brian Rosner", "timezone": "America/Denver"})
+        self.assertFormIsValid(form)
+        p = form.save()
     
     def test_models_string_value(self):
         p = test_models.Profile(name="Brian Rosner", timezone="America/Denver")

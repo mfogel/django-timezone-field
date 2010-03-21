@@ -5,7 +5,7 @@ import datetime
 from django.conf import settings
 from django import forms
 
-from timezones.utils import adjust_datetime_to_timezone
+from timezones.utils import adjust_datetime_to_timezone, coerce_timezone_value
 
 ALL_TIMEZONE_CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
 COMMON_TIMEZONE_CHOICES = tuple(zip(pytz.common_timezones, pytz.common_timezones))
@@ -14,22 +14,13 @@ for tz in pytz.common_timezones:
     now = datetime.datetime.now(pytz.timezone(tz))
     PRETTY_TIMEZONE_CHOICES.append((tz, "(GMT%s) %s" % (now.strftime("%z"), tz)))
 
-class TimeZoneField(forms.ChoiceField):
-    def __init__(self, choices=None,  max_length=None, min_length=None,
-                 *args, **kwargs):
-        self.max_length, self.min_length = max_length, min_length
-        if choices is not None:
-            kwargs["choices"] = choices
-        else:
+class TimeZoneField(forms.TypedChoiceField):
+    def __init__(self, *args, **kwargs):
+        if not "choices" in kwargs:
             kwargs["choices"] = PRETTY_TIMEZONE_CHOICES
+        kwargs["coerce"] = coerce_timezone_value
         super(TimeZoneField, self).__init__(*args, **kwargs)
 
-    def clean(self, value):
-        value = super(TimeZoneField, self).clean(value)
-        if value:
-            return pytz.timezone(value)
-        else:
-            return value
 
 class LocalizedDateTimeField(forms.DateTimeField):
     """
