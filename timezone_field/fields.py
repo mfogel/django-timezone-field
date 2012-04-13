@@ -18,10 +18,11 @@ class TimeZoneField(models.CharField):
     __metaclass__ = models.SubfieldBase
 
     CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+    MAX_LENGTH = 63
 
     def __init__(self, validators=[], **kwargs):
         defaults = {
-            'max_length': 63,
+            'max_length': TimeZoneField.MAX_LENGTH,
             'choices': TimeZoneField.CHOICES,
         }
         defaults.update(kwargs)
@@ -75,3 +76,23 @@ class TimeZoneField(models.CharField):
 
     def value_to_string(self, value):
         return self.get_prep_value(value)
+
+
+# South support
+try:
+    from south.modelsinspector import add_introspection_rules
+except ImportError:
+    pass
+else:
+    add_introspection_rules(
+        rules=[(
+            (TimeZoneField, ),  # Class(es) these apply to
+            [],                 # Positional arguments (not used)
+            {                   # Keyword argument
+                'max_length': [
+                    'max_length', { 'default': TimeZoneField.MAX_LENGTH }
+                ],
+            }
+        )],
+        patterns=['timezones\.fields\.']
+    )
