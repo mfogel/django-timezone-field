@@ -4,18 +4,18 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import smart_unicode, smart_str
 
-from timezone_field import zones
-
 
 class TimeZoneField(models.CharField):
 
     __metaclass__ = models.SubfieldBase
 
+    CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+
     def __init__(self, *args, **kwargs):
         defaults = {
             "max_length": 63,
             "default": settings.TIME_ZONE,
-            "choices": zones.PRETTY_TIMEZONE_CHOICES
+            "choices": TimeZoneField.CHOICES,
         }
         defaults.update(kwargs)
         return super(TimeZoneField, self).__init__(*args, **defaults)

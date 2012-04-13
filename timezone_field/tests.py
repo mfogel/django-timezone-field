@@ -34,17 +34,6 @@ class TimeZoneTestCase(TestCase):
 
 class TimeZoneFieldTestCase(TimeZoneTestCase):
 
-    def test_models_as_a_form(self):
-        class TestModelForm(forms.ModelForm):
-            class Meta:
-                model = TestModel
-        form = TestModelForm()
-        rendered = form.as_p()
-        self.assert_(
-            bool(re.search(r'<option value="[\w/]+">\([A-Z]+(?:\+|\-)\d{4}\)\s[\w/]+</option>', rendered)),
-            "Did not find pattern in rendered form"
-        )
-
     def test_models_modelform_validation(self):
         class TestModelForm(forms.ModelForm):
             class Meta:
