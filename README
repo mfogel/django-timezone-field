@@ -1,6 +1,11 @@
-This app provides a TimeZoneField to save datetime.tzinfo objects.
+This app provides a TimeZoneField to save pytz.tzinfo.DstTzInfo objects.
 
-Input is validated against pytz.all_timezones. Tzinfo objects are stored
-in the database as strings.
+Input can either be a pytz DstTzInfo object, or a string that validates
+successfully against pytz.all_timezones.
 
+Output is a pytz DstTzInfo object.
+
+Objects are stored in the database as strings.
 South support included.
+
+Custom validators should be designed to validate a pytz DstTzInfo.
