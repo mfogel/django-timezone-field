@@ -3,9 +3,7 @@ from django.db import models
 from django.utils.encoding import smart_unicode, smart_str
 
 from timezone_field import zones
-from timezone_field.utils import coerce_timezone_value, validate_timezone_max_length
-
-MAX_TIMEZONE_LENGTH = getattr(settings, "MAX_TIMEZONE_LENGTH", 100)
+from timezone_field.utils import coerce_timezone_value
 
 
 class TimeZoneField(models.CharField):
@@ -13,9 +11,8 @@ class TimeZoneField(models.CharField):
     __metaclass__ = models.SubfieldBase
 
     def __init__(self, *args, **kwargs):
-        validate_timezone_max_length(MAX_TIMEZONE_LENGTH, zones.ALL_TIMEZONE_CHOICES)
         defaults = {
-            "max_length": MAX_TIMEZONE_LENGTH,
+            "max_length": 63,
             "default": settings.TIME_ZONE,
             "choices": zones.PRETTY_TIMEZONE_CHOICES
         }
