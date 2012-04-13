@@ -9,3 +9,6 @@ Objects are stored in the database as strings.
 South support included.
 
 Custom validators should be designed to validate a pytz DstTzInfo.
+
+Originally adapted from Brian Rosner's django-timezones:
+https://github.com/brosner/django-timezones/
