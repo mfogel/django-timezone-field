@@ -1,6 +1,5 @@
 import pytz
 
-from django.conf import settings
 from django.db import models
 from django.utils.encoding import smart_unicode, smart_str
 
@@ -13,11 +12,11 @@ class TimeZoneField(models.CharField):
 
     def __init__(self, *args, **kwargs):
         defaults = {
-            "max_length": 63,
-            "choices": TimeZoneField.CHOICES,
+            'max_length': 63,
+            'choices': TimeZoneField.CHOICES,
         }
         defaults.update(kwargs)
-        return super(TimeZoneField, self).__init__(*args, **defaults)
+        super(TimeZoneField, self).__init__(*args, **defaults)
 
     def validate(self, value, model_instance):
         # coerce value back to a string to validate correctly
@@ -37,14 +36,8 @@ class TimeZoneField(models.CharField):
             return smart_unicode(value)
         return value
 
-    def get_db_prep_save(self, value, connection=None):
-        """
-        Prepares the given value for insertion into the database.
-        """
-        return self.get_prep_value(value)
-
     def flatten_data(self, follow, obj=None):
         value = self._get_val_from_obj(obj)
         if value is None:
-            value = ""
+            value = ''
         return {self.attname: smart_unicode(value)}
