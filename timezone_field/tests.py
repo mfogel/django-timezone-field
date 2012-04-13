@@ -1,7 +1,8 @@
 import pytz
 
 from django import forms
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models, IntegrityError
 from django.test import TestCase
 
 from timezone_field.fields import TimeZoneField
@@ -9,10 +10,12 @@ from timezone_field.fields import TimeZoneField
 
 PST = 'America/Los_Angeles'
 EST = 'America/New_York'
+INVALID_TZ = 'ogga booga'
 
 
 class TestModel(models.Model):
-    timezone = TimeZoneField()
+    tz_not_blank = TimeZoneField()
+    tz_blank = TimeZoneField(blank=True)
 
 
 class TestModelForm(forms.ModelForm):
@@ -20,36 +23,98 @@ class TestModelForm(forms.ModelForm):
         model = TestModel
 
 
-class TimeZoneFieldTestCase(TestCase):
+class TimeZoneFieldModelFormTestCase(TestCase):
 
-    def test_models_modelform_validation(self):
-        form = TestModelForm({'timezone': PST})
-        self.assertTrue(form.is_valid())
-
-    def test_models_modelform_save(self):
-        form = TestModelForm({'timezone': EST})
+    def test_valid1(self):
+        form = TestModelForm({'tz_not_blank': PST})
         self.assertTrue(form.is_valid())
         form.save()
+        self.assertEqual(TestModel.objects.count(), 1)
 
-    def test_models_string_value(self):
-        p = TestModel(timezone=PST)
-        p.save()
-        p = TestModel.objects.get(pk=p.pk)
-        self.assertEqual(p.timezone, pytz.timezone(PST))
+    def test_valid2(self):
+        form = TestModelForm({
+            'tz_not_blank': PST,
+            'tz_blank': EST,
+        })
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertEqual(TestModel.objects.count(), 1)
+
+    def test_invalid_not_blank(self):
+        form = TestModelForm()
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_not_blank2(self):
+        form = TestModelForm({'tz_blank': EST})
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_invalid_str(self):
+        form = TestModelForm({'tz_not_blank': INVALID_TZ})
+        self.assertFalse(form.is_valid())
+
+
+class TimeZoneFieldDBTestCase(TestCase):
+
+    def test_valid_strings(self):
+        m = TestModel.objects.create(
+            tz_not_blank=PST,
+            tz_blank=EST,
+        )
+        m = TestModel.objects.get(pk=m.pk)
+        self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
+        self.assertEqual(m.tz_blank, pytz.timezone(EST))
+
+    def test_valid_tzinfos(self):
+        m = TestModel.objects.create(
+            tz_not_blank=pytz.timezone(PST),
+            tz_blank=pytz.timezone(EST),
+        )
+        m = TestModel.objects.get(pk=m.pk)
+        self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
+        self.assertEqual(m.tz_blank, pytz.timezone(EST))
+
+    def test_valid_blank_str(self):
+        m = TestModel.objects.create(
+            tz_not_blank=PST,
+            tz_blank='',
+        )
+        m = TestModel.objects.get(pk=m.pk)
+        self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
+        self.assertIsNone(m.tz_blank)
+
+    def test_valid_blank_none(self):
+        m = TestModel.objects.create(
+            tz_not_blank=PST,
+            tz_blank=None,
+        )
+        m = TestModel.objects.get(pk=m.pk)
+        self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
+        self.assertIsNone(m.tz_blank)
 
     def test_models_string_value_lookup(self):
-        TestModel(timezone=EST).save()
-        qs = TestModel.objects.filter(timezone=EST)
+        TestModel.objects.create(tz_not_blank=EST)
+        qs = TestModel.objects.filter(tz_not_blank=EST)
         self.assertEqual(qs.count(), 1)
-
-    def test_models_tz_value(self):
-        tz = pytz.timezone(PST)
-        p = TestModel(timezone=tz)
-        p.save()
-        p = TestModel.objects.get(pk=p.pk)
-        self.assertEqual(p.timezone, tz)
 
     def test_models_tz_value_lookup(self):
-        TestModel(timezone=PST).save()
-        qs = TestModel.objects.filter(timezone=pytz.timezone(PST))
+        TestModel.objects.create(tz_not_blank=EST)
+        qs = TestModel.objects.filter(tz_not_blank=pytz.timezone(EST))
         self.assertEqual(qs.count(), 1)
+
+    def test_invalid_blank_str(self):
+        m = TestModel(tz_not_blank='')
+        with self.assertRaises(ValidationError):
+            m.full_clean()
+        with self.assertRaises(IntegrityError):
+            m.save()
+
+    def test_invalid_blank_none(self):
+        m = TestModel(tz_not_blank=None)
+        with self.assertRaises(ValidationError):
+            m.full_clean()
+        with self.assertRaises(IntegrityError):
+            m.save()
+
+    def test_invalid_string(self):
+        with self.assertRaises(ValidationError):
+            TestModel(tz_not_blank=INVALID_TZ)
