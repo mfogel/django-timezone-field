@@ -94,5 +94,5 @@ else:
                 ],
             }
         )],
-        patterns=['timezones\.fields\.']
+        patterns=['timezone_field\.fields\.']
     )
