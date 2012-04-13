@@ -15,7 +15,7 @@ INVALID_TZ = 'ogga booga'
 
 class TestModel(models.Model):
     tz_not_blank = TimeZoneField()
-    tz_blank = TimeZoneField(blank=True)
+    tz_blank = TimeZoneField(blank=True, null=True)
 
 
 class TestModelForm(forms.ModelForm):

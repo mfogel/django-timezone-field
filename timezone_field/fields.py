@@ -15,11 +15,6 @@ class TimeZoneField(models.CharField):
         None                        # if blank == True
         pytz.tzinfo.DstTzInfo       # an instance of
 
-    The 'null' kwarg is tied directly to 'blank'.
-    If you accept blanks, they will be stored in the DB as null's.
-    If you don't accept blanks, the db will be statically typed
-    with NOT NULL.
-
     If you choose to add validators at runtime, they need to accept
     pytz.tzinfo objects as input.
     """
@@ -31,17 +26,10 @@ class TimeZoneField(models.CharField):
     CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
     MAX_LENGTH = 63
 
-    def __init__(self, blank=False, validators=[], **kwargs):
-        # We're not storing strings, we're storing objects.
-        # Tie blank and DB null's together directly.
-        if 'null' in kwargs:
-            raise TypeError("'null' is an invalid keyword argument")
-
+    def __init__(self, validators=[], **kwargs):
         defaults = {
             'max_length': TimeZoneField.MAX_LENGTH,
             'choices': TimeZoneField.CHOICES,
-            'blank': blank,
-            'null': blank,
         }
         defaults.update(kwargs)
 
