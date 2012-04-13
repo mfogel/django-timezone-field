@@ -2,8 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.utils.encoding import smart_unicode, smart_str
 
-from timezones import zones
-from timezones.utils import coerce_timezone_value, validate_timezone_max_length
+from timezone_field import zones
+from timezone_field.utils import coerce_timezone_value, validate_timezone_max_length
 
 MAX_TIMEZONE_LENGTH = getattr(settings, "MAX_TIMEZONE_LENGTH", 100)
 

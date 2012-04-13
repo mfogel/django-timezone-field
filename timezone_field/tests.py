@@ -9,10 +9,10 @@ from django.conf import settings
 from django.db import models
 from django.test import TestCase
 
-import timezones.forms
+import timezone_field.forms
 
-from timezones.fields import TimeZoneField
-from timezones.utils import localtime_for_timezone, adjust_datetime_to_timezone
+from timezone_field.fields import TimeZoneField
+from timezone_field.utils import localtime_for_timezone, adjust_datetime_to_timezone
 
 
 
@@ -63,7 +63,7 @@ class UtilsTestCase(TimeZoneTestCase):
 class TimeZoneFieldTestCase(TimeZoneTestCase):
 
     def test_forms_clean_required(self):
-        f = timezones.forms.TimeZoneField()
+        f = timezone_field.forms.TimeZoneField()
         self.assertEqual(
             repr(f.clean("US/Eastern")),
             "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
@@ -71,7 +71,7 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         self.assertRaises(forms.ValidationError, f.clean, "")
 
     def test_forms_clean_not_required(self):
-        f = timezones.forms.TimeZoneField(required=False)
+        f = timezone_field.forms.TimeZoneField(required=False)
         self.assertEqual(
             repr(f.clean("US/Eastern")),
             "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
@@ -79,7 +79,7 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         self.assertEqual(f.clean(""), "")
 
     def test_forms_clean_bad_value(self):
-        f = timezones.forms.TimeZoneField()
+        f = timezone_field.forms.TimeZoneField()
         try:
             f.clean("BAD VALUE")
         except forms.ValidationError, e:

@@ -1,7 +1,7 @@
 from django import forms
 
-from timezones import zones
-from timezones.utils import coerce_timezone_value
+from timezone_field import zones
+from timezone_field.utils import coerce_timezone_value
 
 
 class TimeZoneField(forms.TypedChoiceField):
