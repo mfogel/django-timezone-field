@@ -1,7 +1,3 @@
-from timezone_field.fields import TimeZoneField
-
-__all__ = ('TimeZoneField',)
-
 # modeled after django's versioning scheme, PEP 386
 VERSION = (0, 2, 0, 'final', 0)
 
