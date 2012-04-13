@@ -155,25 +155,3 @@ class LocalizedDateTimeFieldTestCase(TimeZoneTestCase):
             "datetime.datetime(2008, 5, 30, 14, 30, tzinfo=<UTC>)"
         )
         self.assertEqual(f.clean(""), None)
-
-
-# @@@ old doctests that have not been finished (largely due to needing to
-# better understand how these bits were created and use-cases)
-NOT_USED = {"API_TESTS": r"""
->>> class Foo(object):
-...     datetime = datetime(2008, 6, 20, 23, 58, 17)
-...     @decorators.localdatetime('datetime')
-...     def localdatetime(self):
-...         return 'Australia/Lindeman'
-...
->>> foo = Foo()
->>> foo.datetime
-datetime.datetime(2008, 6, 20, 23, 58, 17)
->>> foo.localdatetime
-datetime.datetime(2008, 6, 21, 9, 58, 17, tzinfo=<DstTzInfo 'Australia/Lindeman' EST+10:00:00 STD>)
->>> foo.localdatetime = datetime(2008, 6, 12, 23, 50, 0)
->>> foo.datetime
-datetime.datetime(2008, 6, 12, 13, 50, tzinfo=<UTC>)
->>> foo.localdatetime
-datetime.datetime(2008, 6, 12, 23, 50, tzinfo=<DstTzInfo 'Australia/Lindeman' EST+10:00:00 STD>)
-"""}
