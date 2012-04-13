@@ -1,13 +1,24 @@
 import pytz
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, IntegrityError
 from django.utils.encoding import smart_unicode
 
 
 class TimeZoneField(models.CharField):
     """
     A TimeZoneField stores pytz DstTzInfo objects to the database.
+
+    Examples of valid inputs:
+        ''                          # if blank == True
+        'America/Los_Angles'        # validated against pytz.all_timezones
+        None                        # if blank == True
+        pytz.tzinfo.DstTzInfo       # an instance of
+
+    The 'null' kwarg is tied directly to 'blank'.
+    If you accept blanks, they will be stored in the DB as null's.
+    If you don't accept blanks, the db will be statically typed
+    with NOT NULL.
 
     If you choose to add validators at runtime, they need to accept
     pytz.tzinfo objects as input.
@@ -20,10 +31,17 @@ class TimeZoneField(models.CharField):
     CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
     MAX_LENGTH = 63
 
-    def __init__(self, validators=[], **kwargs):
+    def __init__(self, blank=False, validators=[], **kwargs):
+        # We're not storing strings, we're storing objects.
+        # Tie blank and DB null's together directly.
+        if 'null' in kwargs:
+            raise TypeError("'null' is an invalid keyword argument")
+
         defaults = {
             'max_length': TimeZoneField.MAX_LENGTH,
             'choices': TimeZoneField.CHOICES,
+            'blank': blank,
+            'null': blank,
         }
         defaults.update(kwargs)
 
@@ -57,7 +75,7 @@ class TimeZoneField(models.CharField):
     def to_python(self, value):
         "Returns pytz.tzinfo objects"
         # inspriation from django's Datetime field
-        if not value:
+        if value is None or value == '':
             return None
         if isinstance(value, pytz.tzinfo.DstTzInfo):
             return value
@@ -70,9 +88,12 @@ class TimeZoneField(models.CharField):
         "Accepts both a pytz.info object or a string representing a timezone"
         # inspriation from django's Datetime field
         value = self.to_python(value)
-        if not value:
+        # doing some validation
+        if isinstance(value, pytz.tzinfo.DstTzInfo):
+            return smart_unicode(value)
+        if value is None or value == '':
             return None
-        return smart_unicode(value)
+        raise IntegrityError("Invalid timezone '{}'".format(value))
 
     def value_to_string(self, value):
         return self.get_prep_value(value)
@@ -92,7 +113,7 @@ else:
                 'max_length': [
                     'max_length', { 'default': TimeZoneField.MAX_LENGTH }
                 ],
-            }
+            },
         )],
-        patterns=['timezones\.fields\.']
+        patterns=['timezone_field\.fields\.']
     )
