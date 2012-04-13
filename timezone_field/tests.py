@@ -1,22 +1,17 @@
-import re
-
-from datetime import datetime
-
 import pytz
+import re
 
 from django import forms
 from django.conf import settings
 from django.db import models
 from django.test import TestCase
 
-import timezone_field.forms
+from timezone_field.forms import TimeZoneField as TimeZoneFormField
+from timezone_field.fields import TimeZoneField as TimeZoneModelField
 
-from timezone_field.fields import TimeZoneField
 
-
-class Profile(models.Model):
-    name = models.CharField(max_length=100)
-    timezone = TimeZoneField()
+class TestModel(models.Model):
+    timezone = TimeZoneModelField()
 
 
 class TimeZoneTestCase(TestCase):
@@ -41,7 +36,7 @@ class TimeZoneTestCase(TestCase):
 class TimeZoneFieldTestCase(TimeZoneTestCase):
 
     def test_forms_clean_required(self):
-        f = timezone_field.forms.TimeZoneField()
+        f = TimeZoneFormField()
         self.assertEqual(
             repr(f.clean("US/Eastern")),
             "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
@@ -49,7 +44,7 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         self.assertRaises(forms.ValidationError, f.clean, "")
 
     def test_forms_clean_not_required(self):
-        f = timezone_field.forms.TimeZoneField(required=False)
+        f = TimeZoneFormField(required=False)
         self.assertEqual(
             repr(f.clean("US/Eastern")),
             "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
@@ -57,17 +52,17 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         self.assertEqual(f.clean(""), "")
 
     def test_forms_clean_bad_value(self):
-        f = timezone_field.forms.TimeZoneField()
+        f = TimeZoneFormField()
         try:
             f.clean("BAD VALUE")
         except forms.ValidationError, e:
             self.assertEqual(e.messages, ["Select a valid choice. BAD VALUE is not one of the available choices."])
 
     def test_models_as_a_form(self):
-        class ProfileForm(forms.ModelForm):
+        class TestModelForm(forms.ModelForm):
             class Meta:
-                model = Profile
-        form = ProfileForm()
+                model = TestModel
+        form = TestModelForm()
         rendered = form.as_p()
         self.assert_(
             bool(re.search(r'<option value="[\w/]+">\([A-Z]+(?:\+|\-)\d{4}\)\s[\w/]+</option>', rendered)),
@@ -75,39 +70,39 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         )
 
     def test_models_modelform_validation(self):
-        class ProfileForm(forms.ModelForm):
+        class TestModelForm(forms.ModelForm):
             class Meta:
-                model = Profile
-        form = ProfileForm({"name": "Brian Rosner", "timezone": "America/Denver"})
+                model = TestModel
+        form = TestModelForm({"timezone": "America/Denver"})
         self.assertFormIsValid(form)
 
     def test_models_modelform_save(self):
-        class ProfileForm(forms.ModelForm):
+        class TestModelForm(forms.ModelForm):
             class Meta:
-                model = Profile
-        form = ProfileForm({"name": "Brian Rosner", "timezone": "America/Denver"})
+                model = TestModel
+        form = TestModelForm({"timezone": "America/Denver"})
         self.assertFormIsValid(form)
         form.save()
 
     def test_models_string_value(self):
-        p = Profile(name="Brian Rosner", timezone="America/Denver")
+        p = TestModel(timezone="America/Denver")
         p.save()
-        p = Profile.objects.get(pk=p.pk)
+        p = TestModel.objects.get(pk=p.pk)
         self.assertEqual(p.timezone, pytz.timezone("America/Denver"))
 
     def test_models_string_value_lookup(self):
-        Profile(name="Brian Rosner", timezone="America/Denver").save()
-        qs = Profile.objects.filter(timezone="America/Denver")
+        TestModel(timezone="America/Denver").save()
+        qs = TestModel.objects.filter(timezone="America/Denver")
         self.assertEqual(qs.count(), 1)
 
     def test_models_tz_value(self):
         tz = pytz.timezone("America/Denver")
-        p = Profile(name="Brian Rosner", timezone=tz)
+        p = TestModel(timezone=tz)
         p.save()
-        p = Profile.objects.get(pk=p.pk)
+        p = TestModel.objects.get(pk=p.pk)
         self.assertEqual(p.timezone, tz)
 
     def test_models_tz_value_lookup(self):
-        Profile(name="Brian Rosner", timezone="America/Denver").save()
-        qs = Profile.objects.filter(timezone=pytz.timezone("America/Denver"))
+        TestModel(timezone="America/Denver").save()
+        qs = TestModel.objects.filter(timezone=pytz.timezone("America/Denver"))
         self.assertEqual(qs.count(), 1)
