@@ -113,7 +113,7 @@ else:
                 'max_length': [
                     'max_length', { 'default': TimeZoneField.MAX_LENGTH }
                 ],
-            }
+            },
         )],
         patterns=['timezone_field\.fields\.']
     )

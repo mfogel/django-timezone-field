@@ -91,12 +91,12 @@ class TimeZoneFieldDBTestCase(TestCase):
         self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
         self.assertIsNone(m.tz_blank)
 
-    def test_models_string_value_lookup(self):
+    def test_string_value_lookup(self):
         TestModel.objects.create(tz_not_blank=EST)
         qs = TestModel.objects.filter(tz_not_blank=EST)
         self.assertEqual(qs.count(), 1)
 
-    def test_models_tz_value_lookup(self):
+    def test_tz_value_lookup(self):
         TestModel.objects.create(tz_not_blank=EST)
         qs = TestModel.objects.filter(tz_not_blank=pytz.timezone(EST))
         self.assertEqual(qs.count(), 1)
