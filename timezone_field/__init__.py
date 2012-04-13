@@ -1,16 +1,22 @@
-VERSION = (0, 2, 0, "f") # following PEP 386
-DEV_N = None
+# modeled after django's versioning scheme, PEP 386
+VERSION = (0, 2, 0, 'final', 0)
 
+# adapted from django's get_version()
+# see django.git/django/__init__.py
+def get_version(version=VERSION):
+    """Derives a PEP386-compliant version number from VERSION."""
+    assert len(version) == 5
+    assert version[3] in ('alpha', 'beta', 'rc', 'final')
 
-def get_version():
-    version = "%s.%s" % (VERSION[0], VERSION[1])
-    if VERSION[2]:
-        version = "%s.%s" % (version, VERSION[2])
-    if VERSION[3] != "f":
-        version = "%s%s%s" % (version, VERSION[3], VERSION[4])
-        if DEV_N:
-            version = "%s.dev%s" % (version, DEV_N)
-    return version
+    main = '.'.join([str(x) for x in version[:3]])
 
+    mapping = {
+        'alpha': 'a',
+        'beta': 'b',
+        'rc': 'c',
+    }
+    sub = mapping[version[3]] + str(version[4]) if version[3] in mapping else ''
+
+    return main + sub
 
 __version__ = get_version()
