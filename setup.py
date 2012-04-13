@@ -12,6 +12,7 @@ setup(
     packages = [
         'timezone_field',
     ],
+    install_requires = ['django', 'pytz'],
     classifiers = [
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
