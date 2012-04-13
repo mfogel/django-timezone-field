@@ -6,12 +6,11 @@ from django.conf import settings
 from django.db import models
 from django.test import TestCase
 
-from timezone_field.forms import TimeZoneField as TimeZoneFormField
-from timezone_field.fields import TimeZoneField as TimeZoneModelField
+from timezone_field.fields import TimeZoneField
 
 
 class TestModel(models.Model):
-    timezone = TimeZoneModelField()
+    timezone = TimeZoneField()
 
 
 class TimeZoneTestCase(TestCase):
@@ -34,29 +33,6 @@ class TimeZoneTestCase(TestCase):
 
 
 class TimeZoneFieldTestCase(TimeZoneTestCase):
-
-    def test_forms_clean_required(self):
-        f = TimeZoneFormField()
-        self.assertEqual(
-            repr(f.clean("US/Eastern")),
-            "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
-        )
-        self.assertRaises(forms.ValidationError, f.clean, "")
-
-    def test_forms_clean_not_required(self):
-        f = TimeZoneFormField(required=False)
-        self.assertEqual(
-            repr(f.clean("US/Eastern")),
-            "<DstTzInfo 'US/Eastern' EST-1 day, 19:00:00 STD>"
-        )
-        self.assertEqual(f.clean(""), "")
-
-    def test_forms_clean_bad_value(self):
-        f = TimeZoneFormField()
-        try:
-            f.clean("BAD VALUE")
-        except forms.ValidationError, e:
-            self.assertEqual(e.messages, ["Select a valid choice. BAD VALUE is not one of the available choices."])
 
     def test_models_as_a_form(self):
         class TestModelForm(forms.ModelForm):
