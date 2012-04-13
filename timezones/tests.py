@@ -134,24 +134,3 @@ class TimeZoneFieldTestCase(TimeZoneTestCase):
         test_models.Profile(name="Brian Rosner", timezone="America/Denver").save()
         qs = test_models.Profile.objects.filter(timezone=pytz.timezone("America/Denver"))
         self.assertEqual(qs.count(), 1)
-
-
-class LocalizedDateTimeFieldTestCase(TimeZoneTestCase):
-
-    def test_forms_clean_required(self):
-        # the default case where no timezone is given explicitly. uses settings.TIME_ZONE.
-        f = timezones.forms.LocalizedDateTimeField()
-        self.assertEqual(
-            repr(f.clean("2008-05-30 14:30:00")),
-            "datetime.datetime(2008, 5, 30, 14, 30, tzinfo=<UTC>)"
-        )
-        self.assertRaises(forms.ValidationError, f.clean, "")
-
-    def test_forms_clean_required(self):
-        # the default case where no timezone is given explicitly. uses settings.TIME_ZONE.
-        f = timezones.forms.LocalizedDateTimeField(required=False)
-        self.assertEqual(
-            repr(f.clean("2008-05-30 14:30:00")),
-            "datetime.datetime(2008, 5, 30, 14, 30, tzinfo=<UTC>)"
-        )
-        self.assertEqual(f.clean(""), None)
