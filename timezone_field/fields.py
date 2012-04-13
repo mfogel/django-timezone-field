@@ -1,3 +1,4 @@
+import datetime
 import pytz
 
 from django.db import models
@@ -5,6 +6,8 @@ from django.utils.encoding import smart_unicode, smart_str
 
 
 class TimeZoneField(models.CharField):
+
+    description = "A datetime.tzinfo object"
 
     __metaclass__ = models.SubfieldBase
 
@@ -27,14 +30,21 @@ class TimeZoneField(models.CharField):
         return super(TimeZoneField, self).run_validators(smart_str(value))
 
     def to_python(self, value):
-        value = super(TimeZoneField, self).to_python(value)
-        # if db is corrupted, will throw a pytz.UnknownTimeZoneError
-        return pytz.timezone(value) if value else None
+        "Returns pytz.tzinfo objects"
+        # inspriation from django's Datetime field
+        if not value:
+            return None
+        if isinstance(value, datetime.tzinfo):
+            return value
+        return pytz.timezone(smart_unicode(value))
 
     def get_prep_value(self, value):
-        if value is not None:
-            return smart_unicode(value)
-        return value
+        "Accepts both a pytz.info object or a string representing a timezone"
+        # inspriation from django's Datetime field
+        value = self.to_python(value)
+        if not value:
+            return None
+        return smart_unicode(value)
 
     def flatten_data(self, follow, obj=None):
         value = self._get_val_from_obj(obj)
