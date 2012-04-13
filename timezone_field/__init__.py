@@ -1,5 +1,5 @@
 # modeled after django's versioning scheme, PEP 386
-VERSION = (0, 2, 0, 'final', 0)
+VERSION = (0, 3, 0, 'alpha', 0)
 
 # adapted from django's get_version()
 # see django.git/django/__init__.py
