@@ -12,14 +12,11 @@ from django.test import TestCase
 import timezone_field.forms
 
 from timezone_field.fields import TimeZoneField
-from timezone_field.utils import localtime_for_timezone, adjust_datetime_to_timezone
-
 
 
 class Profile(models.Model):
     name = models.CharField(max_length=100)
     timezone = TimeZoneField()
-
 
 
 class TimeZoneTestCase(TestCase):
@@ -38,25 +35,6 @@ class TimeZoneTestCase(TestCase):
         is_valid = form.is_valid()
         self.assert_(is_valid,
             "Form did not validate (errors=%r, form=%r)" % (form._errors, form)
-        )
-
-
-class UtilsTestCase(TimeZoneTestCase):
-
-    def test_localtime_for_timezone(self):
-        self.assertEqual(
-            localtime_for_timezone(
-                datetime(2008, 6, 25, 18, 0, 0), "America/Denver"
-            ).strftime("%m/%d/%Y %H:%M:%S"),
-            "06/25/2008 12:00:00"
-        )
-
-    def test_adjust_datetime_to_timezone(self):
-        self.assertEqual(
-            adjust_datetime_to_timezone(
-                datetime(2008, 6, 25, 18, 0, 0), "UTC"
-            ).strftime("%m/%d/%Y %H:%M:%S"),
-            "06/25/2008 18:00:00"
         )
 
 
