@@ -14,7 +14,6 @@ class TimeZoneField(models.CharField):
     def __init__(self, *args, **kwargs):
         defaults = {
             "max_length": 63,
-            "default": settings.TIME_ZONE,
             "choices": TimeZoneField.CHOICES,
         }
         defaults.update(kwargs)
@@ -31,7 +30,7 @@ class TimeZoneField(models.CharField):
     def to_python(self, value):
         value = super(TimeZoneField, self).to_python(value)
         # if db is corrupted, will throw a pytz.UnknownTimeZoneError
-        return pytz.timezone(value)
+        return pytz.timezone(value) if value else None
 
     def get_prep_value(self, value):
         if value is not None:
