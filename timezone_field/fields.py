@@ -15,6 +15,10 @@ class TimeZoneField(models.CharField):
         None                        # if blank == True
         pytz.tzinfo.DstTzInfo       # an instance of
 
+    Note that blank values ('' and None) are stored as an empty string
+    in the db. Specifiying null=True makes your db column not have a NOT
+    NULL constraint, but from the perspective of this field, has no effect.
+
     If you choose to add validators at runtime, they need to accept
     pytz.tzinfo objects as input.
     """
@@ -68,7 +72,7 @@ class TimeZoneField(models.CharField):
         if isinstance(value, pytz.tzinfo.DstTzInfo):
             return value
         try:
-            return pytz.timezone(smart_unicode(value))
+            return pytz.timezone(value)
         except pytz.UnknownTimeZoneError:
             raise ValidationError("Invalid timezone '{}'".format(value))
 
@@ -76,12 +80,10 @@ class TimeZoneField(models.CharField):
         "Accepts both a pytz.info object or a string representing a timezone"
         # inspriation from django's Datetime field
         value = self.to_python(value)
-        # doing some validation
+        if value is None:
+            return ''
         if isinstance(value, pytz.tzinfo.DstTzInfo):
             return smart_unicode(value)
-        if value is None or value == '':
-            return None
-        raise IntegrityError("Invalid timezone '{}'".format(value))
 
     def value_to_string(self, value):
         return self.get_prep_value(value)

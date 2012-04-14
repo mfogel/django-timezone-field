@@ -2,7 +2,7 @@ import pytz
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import models
 from django.test import TestCase
 
 from timezone_field.fields import TimeZoneField
@@ -15,7 +15,8 @@ INVALID_TZ = 'ogga booga'
 
 class TestModel(models.Model):
     tz_not_blank = TimeZoneField()
-    tz_blank = TimeZoneField(blank=True, null=True)
+    tz_blank = TimeZoneField(blank=True)
+    tz_blank_null = TimeZoneField(blank=True, null=True)
 
 
 class TestModelForm(forms.ModelForm):
@@ -35,6 +36,7 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         form = TestModelForm({
             'tz_not_blank': PST,
             'tz_blank': EST,
+            'tz_blank_null': EST,
         })
         self.assertTrue(form.is_valid())
         form.save()
@@ -42,10 +44,6 @@ class TimeZoneFieldModelFormTestCase(TestCase):
 
     def test_invalid_not_blank(self):
         form = TestModelForm()
-        self.assertFalse(form.is_valid())
-
-    def test_invalid_not_blank2(self):
-        form = TestModelForm({'tz_blank': EST})
         self.assertFalse(form.is_valid())
 
     def test_invalid_invalid_str(self):
@@ -59,37 +57,45 @@ class TimeZoneFieldDBTestCase(TestCase):
         m = TestModel.objects.create(
             tz_not_blank=PST,
             tz_blank=EST,
+            tz_blank_null=EST,
         )
         m = TestModel.objects.get(pk=m.pk)
         self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
         self.assertEqual(m.tz_blank, pytz.timezone(EST))
+        self.assertEqual(m.tz_blank_null, pytz.timezone(EST))
 
     def test_valid_tzinfos(self):
         m = TestModel.objects.create(
             tz_not_blank=pytz.timezone(PST),
-            tz_blank=pytz.timezone(EST),
+            tz_blank=pytz.timezone(PST),
+            tz_blank_null=pytz.timezone(EST),
         )
         m = TestModel.objects.get(pk=m.pk)
         self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
-        self.assertEqual(m.tz_blank, pytz.timezone(EST))
+        self.assertEqual(m.tz_blank, pytz.timezone(PST))
+        self.assertEqual(m.tz_blank_null, pytz.timezone(EST))
 
     def test_valid_blank_str(self):
         m = TestModel.objects.create(
             tz_not_blank=PST,
             tz_blank='',
+            tz_blank_null='',
         )
         m = TestModel.objects.get(pk=m.pk)
         self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
         self.assertIsNone(m.tz_blank)
+        self.assertIsNone(m.tz_blank_null)
 
     def test_valid_blank_none(self):
         m = TestModel.objects.create(
             tz_not_blank=PST,
             tz_blank=None,
+            tz_blank_null=None,
         )
         m = TestModel.objects.get(pk=m.pk)
         self.assertEqual(m.tz_not_blank, pytz.timezone(PST))
         self.assertIsNone(m.tz_blank)
+        self.assertIsNone(m.tz_blank_null)
 
     def test_string_value_lookup(self):
         TestModel.objects.create(tz_not_blank=EST)
@@ -105,15 +111,11 @@ class TimeZoneFieldDBTestCase(TestCase):
         m = TestModel(tz_not_blank='')
         with self.assertRaises(ValidationError):
             m.full_clean()
-        with self.assertRaises(IntegrityError):
-            m.save()
 
     def test_invalid_blank_none(self):
         m = TestModel(tz_not_blank=None)
         with self.assertRaises(ValidationError):
             m.full_clean()
-        with self.assertRaises(IntegrityError):
-            m.save()
 
     def test_invalid_string(self):
         with self.assertRaises(ValidationError):
