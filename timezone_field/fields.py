@@ -1,7 +1,7 @@
 import pytz
 
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils.encoding import smart_unicode
 
 
@@ -20,7 +20,7 @@ class TimeZoneField(models.CharField):
     NULL constraint, but from the perspective of this field, has no effect.
 
     If you choose to add validators at runtime, they need to accept
-    pytz.tzinfo objects as input.
+    pytz.tzinfo.DstTzInfo objects as input.
     """
 
     description = "A pytz.tzinfo.DstTzInfo object"
