@@ -1,29 +1,44 @@
 import pytz
 
 from django.core.exceptions import ValidationError
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils.encoding import smart_unicode
 
+from timezone_field.validators import TzMaxLengthValidator
 
-class TimeZoneField(models.CharField):
+
+class TimeZoneField(models.Field):
     """
-    A TimeZoneField stores pytz DstTzInfo objects to the database.
+    Stores pytz timezone objects to the database.
 
-    Examples of valid inputs:
-        ''                          # if blank == True
-        'America/Los_Angles'        # validated against pytz.all_timezones
-        None                        # if blank == True
-        pytz.tzinfo.DstTzInfo       # an instance of
+    Valid inputs:
+        * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
+        * any string that validates against pytz.all_timezones. pytz will
+          be used to build a timezone object from the string.
+        * None and the empty string both represent 'no timezone'
+
+    Outputs:
+        * None
+        * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
+
+    Note that blank values ('' and None) are stored as an empty string
+    in the db. Specifiying null=True makes your db column not have a NOT
+    NULL constraint, but from the perspective of this field, has no effect.
 
     If you choose to add validators at runtime, they need to accept
-    pytz.tzinfo objects as input.
+    pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo objects as input.
+
+    If you choose to override the 'choices' kwarg argument, and you specify
+    choices that can't be consumed by pytz.timezone(unicode(YOUR_NEW_CHOICE)),
+    wierdness will ensue. Don't do this. It's okay to further limit CHOICES,
+    but not expand it.
     """
 
-    description = "A pytz.tzinfo.DstTzInfo object"
+    description = "A pytz timezone object"
 
     __metaclass__ = models.SubfieldBase
 
-    CHOICES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+    CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.all_timezones]
     MAX_LENGTH = 63
 
     def __init__(self, validators=[], **kwargs):
@@ -32,56 +47,38 @@ class TimeZoneField(models.CharField):
             'choices': TimeZoneField.CHOICES,
         }
         defaults.update(kwargs)
-
         super(TimeZoneField, self).__init__(**defaults)
+        self.validators.append(TzMaxLengthValidator(self.max_length))
 
-        # validators our parent (CharField) register aren't going to
-        # work right out of the box. They expect a string, while our
-        # python type is a pytz.tzinfo
-        # So, we'll wrap them in a small conversion object.
-
-        class ValidateTimeZoneAsString(object):
-            def __init__(self, org_validator):
-                self.org_validator = org_validator
-            def __call__(self, timezone):
-                self.org_validator(smart_unicode(timezone))
-
-        self.validators = [
-            ValidateTimeZoneAsString(validator)
-            for validator in self.validators
-        ]
-
-        self.validators += validators
+    def get_internal_type(self):
+        return 'CharField'
 
     def validate(self, value, model_instance):
-        # ensure we can consume the value
         value = self.to_python(value)
-        # parent validation works on strings
-        str_value = smart_unicode(value)
-        return super(TimeZoneField, self).validate(str_value, model_instance)
+        return super(TimeZoneField, self).validate(value, model_instance)
 
     def to_python(self, value):
-        "Returns pytz.tzinfo objects"
+        "Convert to pytz timezone object"
         # inspriation from django's Datetime field
         if value is None or value == '':
             return None
-        if isinstance(value, pytz.tzinfo.DstTzInfo):
+        if isinstance(value, pytz.tzinfo.BaseTzInfo):
             return value
-        try:
-            return pytz.timezone(smart_unicode(value))
-        except pytz.UnknownTimeZoneError:
-            raise ValidationError("Invalid timezone '{}'".format(value))
+        if isinstance(value, basestring):
+            try:
+                return pytz.timezone(value)
+            except pytz.UnknownTimeZoneError:
+                pass
+        raise ValidationError("Invalid timezone '{}'".format(value))
 
     def get_prep_value(self, value):
-        "Accepts both a pytz.info object or a string representing a timezone"
+        "Convert to string describing a valid pytz timezone object"
         # inspriation from django's Datetime field
         value = self.to_python(value)
-        # doing some validation
-        if isinstance(value, pytz.tzinfo.DstTzInfo):
+        if value is None:
+            return ''
+        if isinstance(value, pytz.tzinfo.BaseTzInfo):
             return smart_unicode(value)
-        if value is None or value == '':
-            return None
-        raise IntegrityError("Invalid timezone '{}'".format(value))
 
     def value_to_string(self, value):
         return self.get_prep_value(value)
