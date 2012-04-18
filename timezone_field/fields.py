@@ -9,7 +9,7 @@ from timezone_field.validators import TzMaxLengthValidator
 
 class TimeZoneField(models.Field):
     """
-    Stores pytz timezone objects to the database.
+    Provides database store for pytz timezone objects.
 
     Valid inputs:
         * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
@@ -17,7 +17,7 @@ class TimeZoneField(models.Field):
           be used to build a timezone object from the string.
         * None and the empty string both represent 'no timezone'
 
-    Outputs:
+    Valid outputs:
         * None
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
 
