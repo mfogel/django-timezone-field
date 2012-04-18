@@ -154,3 +154,16 @@ class TimeZoneFieldDBTestCase(TestCase):
             TestModel(tz_blank=INVALID_TZ)
         with self.assertRaises(ValidationError):
             TestModel(tz_blank_null=INVALID_TZ)
+
+    def test_invalid_max_length(self):
+        class TestModelML(models.Model):
+            tz = TimeZoneField(max_length=4)
+        m1 = TestModelML(tz=PST)
+        self.assertRaises(ValidationError, m1.full_clean)
+
+    def test_invalid_choice(self):
+        class TestModelChoice(models.Model):
+            CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+            tz = TimeZoneField(choices=CHOICES)
+        m1 = TestModelChoice(tz='Europe/Nicosia')
+        self.assertRaises(ValidationError, m1.full_clean)
