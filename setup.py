@@ -5,7 +5,9 @@ setup(
     version = __import__('timezone_field').__version__,
     author = 'Mike Fogel',
     author_email = 'mike@fogel.ca',
-    description = 'A Django reusable app to save timezones to a database',
+    description = (
+        'A Django app providing database store for pytz timezone objects.'
+    ),
     long_description = open('README').read(),
     url = 'http://github.com/mfogel/django-timezone-field/',
     license = 'BSD',

@@ -1,14 +1,17 @@
-This app provides a TimeZoneField to save pytz.tzinfo.DstTzInfo objects.
+A Django app providing database store for pytz timezone objects.
 
-Input can either be a pytz DstTzInfo object, or a string that validates
-successfully against pytz.all_timezones.
+Example:
 
-Output is a pytz DstTzInfo object.
+    from timezone_field.fields import TimeZoneField
 
-Objects are stored in the database as strings.
-South support included.
+    class MyClass(models.Model):
+        timezone = TimeZoneField()
 
-Custom validators should be designed to validate a pytz DstTzInfo.
+    my_inst = MyClass(timezone='America/Los_Angeles')
+    my_inst.full_clean()
+    my_inst.save()
+
+For details, see the docstring on timezone_field.fields.TimeZoneField
 
 Originally adapted from Brian Rosner's django-timezones:
 https://github.com/brosner/django-timezones/
