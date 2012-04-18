@@ -58,6 +58,12 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         self.assertFalse(form1.is_valid())
         self.assertFalse(form2.is_valid())
 
+    def test_invalid_type(self):
+        form1 = TestModelForm({'tz': 4})
+        form2 = TestModelForm({'tz_blank_null': object()})
+        self.assertFalse(form1.is_valid())
+        self.assertFalse(form2.is_valid())
+
 
 class TimeZoneFieldDBTestCase(TestCase):
 
@@ -130,6 +136,12 @@ class TimeZoneFieldDBTestCase(TestCase):
     def test_invalid_blank_none(self):
         m1 = TestModel(tz=None)
         m2 = TestModel(tz_null=None)
+        self.assertRaises(ValidationError, m1.full_clean)
+        self.assertRaises(ValidationError, m2.full_clean)
+
+    def test_invalid_type(self):
+        m1 = TestModel(tz=4)
+        m2 = TestModel(tz_null=object())
         self.assertRaises(ValidationError, m1.full_clean)
         self.assertRaises(ValidationError, m2.full_clean)
 
