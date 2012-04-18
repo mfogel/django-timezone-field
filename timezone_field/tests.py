@@ -140,10 +140,10 @@ class TimeZoneFieldDBTestCase(TestCase):
         self.assertRaises(ValidationError, m2.full_clean)
 
     def test_invalid_type(self):
-        m1 = TestModel(tz=4)
-        m2 = TestModel(tz_null=object())
-        self.assertRaises(ValidationError, m1.full_clean)
-        self.assertRaises(ValidationError, m2.full_clean)
+        with self.assertRaises(ValidationError):
+            TestModel(tz=4)
+        with self.assertRaises(ValidationError):
+            TestModel(tz_null=object())
 
     def test_invalid_string(self):
         with self.assertRaises(ValidationError):
