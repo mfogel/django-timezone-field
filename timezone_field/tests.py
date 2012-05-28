@@ -10,6 +10,7 @@ from timezone_field.fields import TimeZoneField
 
 PST = 'America/Los_Angeles'
 EST = 'America/New_York'
+UTC = 'UTC'
 INVALID_TZ = 'ogga booga'
 
 
