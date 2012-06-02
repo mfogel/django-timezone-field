@@ -11,15 +11,22 @@ Example
     from django.db import models
     from timezone_field.fields import TimeZoneField
 
-    class MyClass(models.Model):
+    class MyModel(models.Model):
         timezone = TimeZoneField()
 
-    my_inst = MyClass(timezone='America/Los_Angeles')
+    # valid assignment values include:
+    #   * any string that validates against pytz.all_timezones
+    #   * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
+    #   * the pytz.UTC singleton
+    my_inst = MyModel(timezone='America/Los_Angeles')
     my_inst.full_clean()
+
+    # under the hood, values are stored in the database as strings
     my_inst.save()
 
+    # values read from the field are either instances of pytz.tzinfo.DstTzinfo
+    # or pytz.tzinfo.StaticTzInfo, or the pytz.UTC singleton
     tz = my_inst.timezone
-    str(tz)     # 'America/Los_Angeles'
     repr(tz)    # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
 
 Documentation
