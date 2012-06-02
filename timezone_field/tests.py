@@ -94,10 +94,19 @@ class TimeZoneFieldDBTestCase(TestCase):
         self.assertEqual(m.tz_blank, pytz.timezone(PST))
         self.assertEqual(m.tz_blank_null, pytz.timezone(EST))
 
-    def test_valid_UTC(self):
+    def test_valid_UTC_object(self):
         m = TestModel.objects.create(
             tz=pytz.UTC,
             tz_null=pytz.UTC,
+        )
+        m = TestModel.objects.get(pk=m.pk)
+        self.assertEqual(m.tz, pytz.UTC)
+        self.assertEqual(m.tz_null, pytz.UTC)
+
+    def test_valid_UTC_string(self):
+        m = TestModel.objects.create(
+            tz=UTC,
+            tz_null=UTC,
         )
         m = TestModel.objects.get(pk=m.pk)
         self.assertEqual(m.tz, pytz.UTC)
