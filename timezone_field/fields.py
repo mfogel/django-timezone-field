@@ -62,7 +62,7 @@ class TimeZoneField(models.Field):
         # inspriation from django's Datetime field
         if value is None or value == '':
             return None
-        if isinstance(value, pytz.tzinfo.BaseTzInfo):
+        if isinstance(value, pytz.tzinfo.BaseTzInfo) or isinstance(value, type(pytz.utc)):
             return value
         if isinstance(value, basestring):
             try:
@@ -77,7 +77,7 @@ class TimeZoneField(models.Field):
         value = self.to_python(value)
         if value is None:
             return ''
-        if isinstance(value, pytz.tzinfo.BaseTzInfo):
+        if isinstance(value, pytz.tzinfo.BaseTzInfo) or isinstance(value, type(pytz.utc)):
             return smart_unicode(value)
 
     def value_to_string(self, value):
