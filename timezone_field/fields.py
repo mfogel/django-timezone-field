@@ -13,6 +13,7 @@ class TimeZoneField(models.Field):
 
     Valid inputs:
         * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
+        * the pytz.UTC singleton
         * any string that validates against pytz.all_timezones. pytz will
           be used to build a timezone object from the string.
         * None and the empty string both represent 'no timezone'
@@ -20,9 +21,10 @@ class TimeZoneField(models.Field):
     Valid outputs:
         * None
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
+        * the pytz.UTC signleton
 
     Note that blank values ('' and None) are stored as an empty string
-    in the db. Specifiying null=True makes your db column not have a NOT
+    in the db. Specifying null=True makes your db column not have a NOT
     NULL constraint, but from the perspective of this field, has no effect.
 
     If you choose to add validators at runtime, they need to accept
@@ -30,7 +32,7 @@ class TimeZoneField(models.Field):
 
     If you choose to override the 'choices' kwarg argument, and you specify
     choices that can't be consumed by pytz.timezone(unicode(YOUR_NEW_CHOICE)),
-    wierdness will ensue. Don't do this. It's okay to further limit CHOICES,
+    weirdness will ensue. Don't do this. It's okay to further limit CHOICES,
     but not expand it.
     """
 
@@ -59,10 +61,10 @@ class TimeZoneField(models.Field):
 
     def to_python(self, value):
         "Convert to pytz timezone object"
-        # inspriation from django's Datetime field
+        # inspiration from django's Datetime field
         if value is None or value == '':
             return None
-        if isinstance(value, pytz.tzinfo.BaseTzInfo) or isinstance(value, type(pytz.utc)):
+        if value == pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo):
             return value
         if isinstance(value, basestring):
             try:
@@ -73,11 +75,11 @@ class TimeZoneField(models.Field):
 
     def get_prep_value(self, value):
         "Convert to string describing a valid pytz timezone object"
-        # inspriation from django's Datetime field
+        # inspiration from django's Datetime field
         value = self.to_python(value)
         if value is None:
             return ''
-        if isinstance(value, pytz.tzinfo.BaseTzInfo) or isinstance(value, type(pytz.utc)):
+        if value == pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo):
             return smart_unicode(value)
 
     def value_to_string(self, value):
