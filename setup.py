@@ -8,7 +8,7 @@ setup(
     description = (
         'A Django app providing database store for pytz timezone objects.'
     ),
-    long_description = open('README').read(),
+    long_description = open('README.rst').read(),
     url = 'http://github.com/mfogel/django-timezone-field/',
     license = 'BSD',
     packages = [
