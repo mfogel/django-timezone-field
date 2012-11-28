@@ -1,11 +1,14 @@
-=======================
- django-timezone-field
-=======================
+django-timezone-field
+=====================
+
+.. image:: https://secure.travis-ci.org/mfogel/django-timezone-field.png
+   :alt: Build Status
+   :target: https://secure.travis-ci.org/mfogel/django-timezone-field
 
 A Django app providing database store for `pytz`__ timezone objects.
 
 Example
-=======
+-------
 ::
 
     from django.db import models
@@ -30,17 +33,17 @@ Example
     repr(tz)    # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
 
 Documentation
-=============
+-------------
 
 For details, see the docstring on timezone_field.fields.TimeZoneField.
 
 Found a Bug?
-============
+------------
 
 To file a bug or submit a patch, please head over to the `django-timezone-field repository`__.
 
 Credits
-=======
+-------
 
 Originally adapted from `Brian Rosner's django-timezones`__.
 
