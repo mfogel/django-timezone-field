@@ -71,7 +71,7 @@ class TimeZoneField(models.Field):
                 return pytz.timezone(value)
             except pytz.UnknownTimeZoneError:
                 pass
-        raise ValidationError("Invalid timezone '{}'".format(value))
+        raise ValidationError("Invalid timezone '%s'" % value)
 
     def get_prep_value(self, value):
         "Convert to string describing a valid pytz timezone object"
