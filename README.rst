@@ -9,27 +9,26 @@ A Django app providing database store for `pytz`__ timezone objects.
 
 Example
 -------
-::
+.. code:: python
 
+    import pytz
     from django.db import models
     from timezone_field.fields import TimeZoneField
 
     class MyModel(models.Model):
-        timezone = TimeZoneField()
+        timezone1 = TimeZoneField()
+        timezone2 = TimeZoneField()
+        timezone3 = TimeZoneField()
 
-    # valid assignment values include:
-    #   * any string that validates against pytz.all_timezones
-    #   * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
-    #   * the pytz.UTC singleton
-    my_inst = MyModel(timezone='America/Los_Angeles')
+    my_inst = MyModel(
+        timezone1='America/Los_Angeles',   # assignment of a string
+        timezone2=pytz.timezone('Turkey'), # assignment of a pytz.DstTzInfo
+        timezone3=pytz.UTC,                # assignment of pytz.UTC singleton
+    )
     my_inst.full_clean()
+    my_inst.save() # values stored in DB as strings
 
-    # under the hood, values are stored in the database as strings
-    my_inst.save()
-
-    # values read from the field are either instances of pytz.tzinfo.DstTzinfo
-    # or pytz.tzinfo.StaticTzInfo, or the pytz.UTC singleton
-    tz = my_inst.timezone
+    tz = my_inst.timezone1
     repr(tz)    # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
 
 Documentation
@@ -40,7 +39,7 @@ For details, see the docstring on timezone_field.fields.TimeZoneField.
 Found a Bug?
 ------------
 
-To file a bug or submit a patch, please head over to the `django-timezone-field repository`__.
+To file a bug or submit a patch, please head over to `django-timezone-field on github`__.
 
 Credits
 -------
