@@ -17,21 +17,21 @@ def find_version(*file_paths):
     raise RuntimeError("Unable to find version string.")
 
 setup(
-    name = 'django-timezone-field',
-    version = find_version('timezone_field', '__init__.py'),
-    author = 'Mike Fogel',
-    author_email = 'mike@fogel.ca',
-    description = (
+    name='django-timezone-field',
+    version=find_version('timezone_field', '__init__.py'),
+    author='Mike Fogel',
+    author_email='mike@fogel.ca',
+    description=(
         'A Django app providing database store for pytz timezone objects.'
     ),
-    long_description = read('README.rst'),
-    url = 'http://github.com/mfogel/django-timezone-field/',
-    license = 'BSD',
-    packages = [
+    long_description=read('README.rst'),
+    url='http://github.com/mfogel/django-timezone-field/',
+    license='BSD',
+    packages=[
         'timezone_field',
     ],
-    install_requires = ['django', 'pytz'],
-    classifiers = [
+    install_requires=['django', 'pytz'],
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
@@ -40,5 +40,5 @@ setup(
         'Programming Language :: Python',
         'Topic :: Utilities',
         'Framework :: Django',
-    ]
+    ],
 )
