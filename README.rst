@@ -13,7 +13,7 @@ Example
 
     import pytz
     from django.db import models
-    from timezone_field.fields import TimeZoneField
+    from timezone_field import TimeZoneField
 
     class MyModel(models.Model):
         timezone1 = TimeZoneField()
