@@ -56,9 +56,6 @@ class TimeZoneField(models.Field):
         "Convert to string describing a valid pytz timezone object"
         return self._get_python_and_db_repr(value)[1]
 
-    def value_to_string(self, value):
-        return self.get_prep_value(value)
-
     def _get_python_and_db_repr(self, value):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == '':
