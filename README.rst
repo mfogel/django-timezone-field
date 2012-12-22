@@ -1,9 +1,9 @@
 django-timezone-field
 =====================
 
-.. image:: https://secure.travis-ci.org/mfogel/django-timezone-field.png
+.. image:: https://api.travis-ci.org/mfogel/django-timezone-field.png
    :alt: Build Status
-   :target: https://secure.travis-ci.org/mfogel/django-timezone-field
+   :target: https://travis-ci.org/mfogel/django-timezone-field
 
 A Django app providing database store for `pytz`__ timezone objects.
 
