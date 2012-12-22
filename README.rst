@@ -21,15 +21,20 @@ Example
         timezone3 = TimeZoneField()
 
     my_inst = MyModel(
-        timezone1='America/Los_Angeles',   # assignment of a string
-        timezone2=pytz.timezone('Turkey'), # assignment of a pytz.DstTzInfo
-        timezone3=pytz.UTC,                # assignment of pytz.UTC singleton
+        timezone1='America/Los_Angeles',    # assignment of a string
+        timezone2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
+        timezone3=pytz.UTC,                 # assignment of pytz.UTC singleton
     )
-    my_inst.full_clean()
-    my_inst.save() # values stored in DB as strings
+    my_inst.full_clean()  # validates against pytz.all_timezones
+    my_inst.save()        # values stored in DB as strings
 
-    tz = my_inst.timezone1
-    repr(tz)    # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+    tz = my_inst.timezone1  # values retrieved as pytz objects
+    repr(tz)                # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+
+Installation
+------------
+
+pip install django-timezone-field
 
 Documentation
 -------------
