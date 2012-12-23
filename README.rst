@@ -41,6 +41,18 @@ Documentation
 
 For details, see the docstring on timezone_field.fields.TimeZoneField.
 
+Running the Tests
+-----------------
+
+Using `Doug Hellman's virtualenvwrapper`__:
+
+.. code:: sh
+
+    mktmpenv
+    pip install django-timezone-field
+    export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
+    django-admin.py test timezone_field
+
 Found a Bug?
 ------------
 
@@ -53,5 +65,6 @@ Originally adapted from `Brian Rosner's django-timezones`__.
 
 
 __ http://pypi.python.org/pypi/pytz
+__ http://www.doughellmann.com/projects/virtualenvwrapper/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
