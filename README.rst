@@ -1,9 +1,9 @@
 django-timezone-field
 =====================
 
-.. image:: https://secure.travis-ci.org/mfogel/django-timezone-field.png
+.. image:: https://api.travis-ci.org/mfogel/django-timezone-field.png
    :alt: Build Status
-   :target: https://secure.travis-ci.org/mfogel/django-timezone-field
+   :target: https://travis-ci.org/mfogel/django-timezone-field
 
 A Django app providing database store for `pytz`__ timezone objects.
 
@@ -21,20 +21,37 @@ Example
         timezone3 = TimeZoneField()
 
     my_inst = MyModel(
-        timezone1='America/Los_Angeles',   # assignment of a string
-        timezone2=pytz.timezone('Turkey'), # assignment of a pytz.DstTzInfo
-        timezone3=pytz.UTC,                # assignment of pytz.UTC singleton
+        timezone1='America/Los_Angeles',    # assignment of a string
+        timezone2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
+        timezone3=pytz.UTC,                 # assignment of pytz.UTC singleton
     )
-    my_inst.full_clean()
-    my_inst.save() # values stored in DB as strings
+    my_inst.full_clean()  # validates against pytz.all_timezones
+    my_inst.save()        # values stored in DB as strings
 
-    tz = my_inst.timezone1
-    repr(tz)    # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+    tz = my_inst.timezone1  # values retrieved as pytz objects
+    repr(tz)                # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+
+Installation
+------------
+
+pip install django-timezone-field
 
 Documentation
 -------------
 
 For details, see the docstring on timezone_field.fields.TimeZoneField.
+
+Running the Tests
+-----------------
+
+Using `Doug Hellman's virtualenvwrapper`__:
+
+.. code:: sh
+
+    mktmpenv
+    pip install django-timezone-field
+    export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
+    django-admin.py test timezone_field
 
 Found a Bug?
 ------------
@@ -48,5 +65,6 @@ Originally adapted from `Brian Rosner's django-timezones`__.
 
 
 __ http://pypi.python.org/pypi/pytz
+__ http://www.doughellmann.com/projects/virtualenvwrapper/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
