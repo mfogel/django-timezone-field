@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
 
-from timezone_field.fields import TimeZoneField
+from . import TimeZoneField
 
 
 PST = 'America/Los_Angeles' # instance of pytz.tzinfo.DstTzInfo

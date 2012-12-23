@@ -6,9 +6,6 @@ before_install:
   - export PIP_USE_MIRRORS=true
   - export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
 install:
-  - pip install Django==$DJANGO
   - pip install -e .
 script:
   - django-admin.py test timezone_field
-env:
-  - DJANGO=1.4.3
