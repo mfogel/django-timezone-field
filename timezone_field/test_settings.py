@@ -16,7 +16,7 @@ if test_db == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory',
+            'NAME': ':memory:',
         },
     }
 if test_db == 'postgres':
