@@ -5,11 +5,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
 
-from . import TimeZoneField
+from . import TimeZoneField, TimeZoneFormField
 
 
-PST = 'America/Los_Angeles'  # instance of pytz.tzinfo.DstTzInfo
-GMT = 'Etc/GMT'              # instance of pytz.tzinfo.StaticTzInfo
+PST = 'America/Los_Angeles'  # pytz.tzinfo.DstTzInfo
+GMT = 'Etc/GMT'              # pytz.tzinfo.StaticTzInfo
 UTC = 'UTC'                  # pytz.UTC singleton
 
 INVALID_TZ = 'ogga booga'
@@ -22,9 +22,33 @@ class TestModel(models.Model):
     tz_blank_null = TimeZoneField(blank=True, null=True)
 
 
+class TestForm(forms.Form):
+    tz = TimeZoneFormField()
+    tz2 = TimeZoneFormField(required=False)
+
+
 class TestModelForm(forms.ModelForm):
     class Meta:
         model = TestModel
+
+
+class TimeZoneFormFieldTestCase(TestCase):
+
+    def test_valid1(self):
+        form = TestForm({'tz': PST})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['tz'], pytz.timezone(PST))
+        self.assertEqual(form.cleaned_data['tz2'], None)
+
+    def test_valid2(self):
+        form = TestForm({'tz': GMT, 'tz2': UTC})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['tz'], pytz.timezone(GMT))
+        self.assertEqual(form.cleaned_data['tz2'], pytz.UTC)
+
+    def test_invalid_invalid_str(self):
+        form = TestForm({'tz': INVALID_TZ})
+        self.assertFalse(form.is_valid())
 
 
 class TimeZoneFieldModelFormTestCase(TestCase):

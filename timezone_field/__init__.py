@@ -1,3 +1,4 @@
-from .fields import TimeZoneField  # noqa
+from .fields import TimeZoneField     # noqa
+from .forms import TimeZoneFormField  # noqa
 
 __version__ = '0.3.2'
