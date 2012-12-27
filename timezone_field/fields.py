@@ -59,16 +59,14 @@ class TimeZoneField(models.Field):
     def _get_python_and_db_repr(self, value):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == '':
-            return (None, '')
+            return (None, None)
         if value is pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo):
             return (value, smart_unicode(value))
         if isinstance(value, basestring):
             try:
-                tz_value = pytz.timezone(value)
+                return (pytz.timezone(value), value)
             except pytz.UnknownTimeZoneError:
                 pass
-            else:
-                return (tz_value, value)
         raise ValidationError("Invalid timezone '%s'" % value)
 
 
