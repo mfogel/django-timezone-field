@@ -2,11 +2,14 @@ import re
 from os import path
 from setuptools import setup
 
+
 # read() and find_version() taken from jezdez's python apps, ex:
 # https://github.com/jezdez/django_compressor/blob/develop/setup.py
 
+
 def read(*parts):
     return open(path.join(path.dirname(__file__), *parts)).read()
+
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
@@ -15,6 +18,7 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
 
 setup(
     name='django-timezone-field',

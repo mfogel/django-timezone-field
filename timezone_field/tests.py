@@ -8,9 +8,9 @@ from django.test import TestCase
 from . import TimeZoneField
 
 
-PST = 'America/Los_Angeles' # instance of pytz.tzinfo.DstTzInfo
-GMT = 'Etc/GMT'             # instance of pytz.tzinfo.StaticTzInfo
-UTC = 'UTC'                 # pytz.UTC singleton
+PST = 'America/Los_Angeles'  # instance of pytz.tzinfo.DstTzInfo
+GMT = 'Etc/GMT'              # instance of pytz.tzinfo.StaticTzInfo
+UTC = 'UTC'                  # pytz.UTC singleton
 
 INVALID_TZ = 'ogga booga'
 

@@ -84,7 +84,7 @@ else:
             [],                 # Positional arguments (not used)
             {                   # Keyword argument
                 'max_length': [
-                    'max_length', { 'default': TimeZoneField.MAX_LENGTH }
+                    'max_length', {'default': TimeZoneField.MAX_LENGTH},
                 ],
             },
         )],
