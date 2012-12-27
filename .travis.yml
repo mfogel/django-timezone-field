@@ -10,11 +10,11 @@ before_install:
 install:
   - pip install psycopg2
   - pip install django==$DJANGO
-  - pip install pep8
+  - pip install flake8
   - pip install -e .
 before_script:
   - export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
   - psql -c 'create database timezone_field_test;' -U postgres
-  - pep8 .
+  - flake8 .
 script:
   - django-admin.py test timezone_field
