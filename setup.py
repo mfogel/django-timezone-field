@@ -26,7 +26,8 @@ setup(
     author='Mike Fogel',
     author_email='mike@fogel.ca',
     description=(
-        'A Django app providing database store for pytz timezone objects.'
+        'A Django app providing database and form fields for '
+        'pytz timezone objects.'
     ),
     long_description=read('README.rst'),
     url='http://github.com/mfogel/django-timezone-field/',
