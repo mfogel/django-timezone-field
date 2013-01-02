@@ -2,11 +2,14 @@ import re
 from os import path
 from setuptools import setup
 
+
 # read() and find_version() taken from jezdez's python apps, ex:
 # https://github.com/jezdez/django_compressor/blob/develop/setup.py
 
+
 def read(*parts):
     return open(path.join(path.dirname(__file__), *parts)).read()
+
 
 def find_version(*file_paths):
     version_file = read(*file_paths)
@@ -16,13 +19,15 @@ def find_version(*file_paths):
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
 
+
 setup(
     name='django-timezone-field',
     version=find_version('timezone_field', '__init__.py'),
     author='Mike Fogel',
     author_email='mike@fogel.ca',
     description=(
-        'A Django app providing database store for pytz timezone objects.'
+        'A Django app providing database and form fields for '
+        'pytz timezone objects.'
     ),
     long_description=read('README.rst'),
     url='http://github.com/mfogel/django-timezone-field/',

@@ -1,14 +1,18 @@
 django-timezone-field
 =====================
 
-.. image:: https://api.travis-ci.org/mfogel/django-timezone-field.png
+.. image:: https://api.travis-ci.org/mfogel/django-timezone-field.png?branch=develop
    :alt: Build Status
    :target: https://travis-ci.org/mfogel/django-timezone-field
 
-A Django app providing database store for `pytz`__ timezone objects.
+A Django app providing database and form fields for `pytz`__ timezone objects.
 
-Example
--------
+Examples
+--------
+
+Database Field
+~~~~~~~~~~~~~~
+
 .. code:: python
 
     import pytz
@@ -31,15 +35,35 @@ Example
     tz = my_inst.timezone1  # values retrieved as pytz objects
     repr(tz)                # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
 
+
+Form Field
+~~~~~~~~~~
+
+.. code:: python
+
+    from django import forms
+    from timezone_field import TimeZoneFormField
+
+    class MyForm(forms.Form):
+        timezone = TimeZoneFormField()
+
+    my_form = MyForm({
+        'timezone': 'America/Los_Angeles',
+    })
+    my_form.full_clean()  # validates against pytz.all_timezones
+
+    tz = my_form.cleaned_data['timezone']  # values retrieved as pytz objects
+    repr(tz)                               # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+
+
 Installation
 ------------
 
-pip install django-timezone-field
+Now on `pypi`__!
 
-Documentation
--------------
+.. code:: sh
 
-For details, see the docstring on timezone_field.fields.TimeZoneField.
+    pip install django-timezone-field
 
 Running the Tests
 -----------------
@@ -64,7 +88,8 @@ Credits
 Originally adapted from `Brian Rosner's django-timezones`__.
 
 
-__ http://pypi.python.org/pypi/pytz
+__ http://pypi.python.org/pypi/pytz/
+__ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.doughellmann.com/projects/virtualenvwrapper/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
