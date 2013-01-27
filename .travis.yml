@@ -3,13 +3,13 @@ python:
   - "2.6"
   - "2.7"
 env:
-  - DJANGO=1.4.3 DB=postgres
-  - DJANGO=1.4.3 DB=sqlite
+  - DJANGO='django>=1.4,<1.5' DB='postgres'
+  - DJANGO='django>=1.4,<1.5' DB='sqlite'
 before_install:
   - export PIP_USE_MIRRORS=true
 install:
   - pip install psycopg2
-  - pip install django==$DJANGO
+  - pip install $DJANGO
   - pip install flake8
   - pip install -e .
 before_script:
