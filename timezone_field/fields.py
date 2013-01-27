@@ -6,7 +6,7 @@ from django.utils import six
 from django.utils.encoding import smart_text
 
 
-class TimeZoneField(models.Field):
+class TimeZoneFieldBase(models.Field):
     """
     Provides database store for pytz timezone objects.
 
@@ -33,8 +33,6 @@ class TimeZoneField(models.Field):
 
     description = "A pytz timezone object"
 
-    __metaclass__ = models.SubfieldBase
-
     CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.all_timezones]
     MAX_LENGTH = 63
 
@@ -44,7 +42,7 @@ class TimeZoneField(models.Field):
             'choices': TimeZoneField.CHOICES,
         }
         defaults.update(kwargs)
-        super(TimeZoneField, self).__init__(**defaults)
+        super(TimeZoneFieldBase, self).__init__(**defaults)
 
     def get_internal_type(self):
         return 'CharField'
@@ -69,6 +67,12 @@ class TimeZoneField(models.Field):
             except pytz.UnknownTimeZoneError:
                 pass
         raise ValidationError("Invalid timezone '%s'" % value)
+
+
+# http://packages.python.org/six/#six.with_metaclass
+class TimeZoneField(six.with_metaclass(models.SubfieldBase,
+                                       TimeZoneFieldBase)):
+    pass
 
 
 # South support
