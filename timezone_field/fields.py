@@ -2,7 +2,8 @@ import pytz
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import smart_unicode
+from django.utils import six
+from django.utils.encoding import smart_text
 
 
 class TimeZoneField(models.Field):
@@ -61,8 +62,8 @@ class TimeZoneField(models.Field):
         if value is None or value == '':
             return (None, None)
         if value is pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo):
-            return (value, smart_unicode(value))
-        if isinstance(value, basestring):
+            return (value, smart_text(value))
+        if isinstance(value, six.string_types):
             try:
                 return (pytz.timezone(value), value)
             except pytz.UnknownTimeZoneError:

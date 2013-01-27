@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
+from django.utils import six
 
 from . import TimeZoneField, TimeZoneFormField
 
@@ -61,7 +62,7 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         # http://stackoverflow.com/questions/7399490/
         data = dict(
             (field_name, field.initial)
-            for field_name, field in TestModelForm().fields.iteritems()
+            for field_name, field in six.iteritems(TestModelForm().fields)
         )
         data.update({'tz': GMT})
         form = TestModelForm(data=data)
