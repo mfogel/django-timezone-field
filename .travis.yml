@@ -6,14 +6,14 @@ python:
 env:
   - DJANGO='https://github.com/django/django/tarball/stable/1.5.x' DB='postgres'
   - DJANGO='https://github.com/django/django/tarball/stable/1.5.x' DB='sqlite'
-  - DJANGO='django>=1.4,<1.5' DB='postgres'
-  - DJANGO='django>=1.4,<1.5' DB='sqlite'
+  - DJANGO='django>=1.4.2,<1.5' DB='postgres'
+  - DJANGO='django>=1.4.2,<1.5' DB='sqlite'
 matrix:
   exclude: # python 3 support only for django>=1.5
     - python: 3.2
-      env: DJANGO='django>=1.4,<1.5' DB='postgres'
+      env: DJANGO='django>=1.4.2,<1.5' DB='postgres'
     - python: 3.2
-      env: DJANGO='django>=1.4,<1.5' DB='sqlite'
+      env: DJANGO='django>=1.4.2,<1.5' DB='sqlite'
 before_install:
   - export PIP_USE_MIRRORS=true
 install:
