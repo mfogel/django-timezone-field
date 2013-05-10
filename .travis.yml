@@ -4,8 +4,8 @@ python:
   - 2.7
   - 3.2
 env:
-  - DJANGO='https://github.com/django/django/tarball/stable/1.5.x' DB='postgres'
-  - DJANGO='https://github.com/django/django/tarball/stable/1.5.x' DB='sqlite'
+  - DJANGO='django>=1.5,<1.6' DB='postgres'
+  - DJANGO='django>=1.5,<1.6' DB='sqlite'
   - DJANGO='django>=1.4.2,<1.5' DB='postgres'
   - DJANGO='django>=1.4.2,<1.5' DB='sqlite'
 matrix:
