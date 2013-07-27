@@ -3,6 +3,7 @@ python:
   - 2.6
   - 2.7
   - 3.2
+  - 3.3
 env:
   - DJANGO='django>=1.5,<1.6' DB='postgres'
   - DJANGO='django>=1.5,<1.6' DB='sqlite'
@@ -13,6 +14,10 @@ matrix:
     - python: 3.2
       env: DJANGO='django>=1.4.2,<1.5' DB='postgres'
     - python: 3.2
+      env: DJANGO='django>=1.4.2,<1.5' DB='sqlite'
+    - python: 3.3
+      env: DJANGO='django>=1.4.2,<1.5' DB='postgres'
+    - python: 3.3
       env: DJANGO='django>=1.4.2,<1.5' DB='sqlite'
 before_install:
   - export PIP_USE_MIRRORS=true
