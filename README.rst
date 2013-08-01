@@ -2,8 +2,13 @@ django-timezone-field
 =====================
 
 .. image:: https://api.travis-ci.org/mfogel/django-timezone-field.png?branch=develop
-   :alt: Build Status
    :target: https://travis-ci.org/mfogel/django-timezone-field
+
+.. image:: https://pypip.in/v/django-timezone-field/badge.png
+   :target: https://crate.io/packages/django-timezone-field/
+
+.. image:: https://pypip.in/d/django-timezone-field/badge.png
+   :target: https://crate.io/packages/django-timezone-field/
 
 A Django app providing database and form fields for `pytz`__ timezone objects.
 
