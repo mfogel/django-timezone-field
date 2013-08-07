@@ -67,11 +67,21 @@ Form Field
 Installation
 ------------
 
-Now on `pypi`__!
+#.  From `pypi`__ using `pip`__:
 
-.. code:: sh
+    .. code:: sh
 
-    pip install django-timezone-field
+        pip install django-timezone-field
+
+#.  Add `timezone_field` to your `settings.INSTALLED_APPS`__:
+
+    .. code:: python
+
+        INSTALLED_APPS = (
+            ...
+            timezone_field,
+            ...
+        )
 
 Running the Tests
 -----------------
@@ -98,6 +108,8 @@ Originally adapted from `Brian Rosner's django-timezones`__.
 
 __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
+__ http://www.pip-installer.org/
+__ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 __ http://www.doughellmann.com/projects/virtualenvwrapper/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
