@@ -28,7 +28,7 @@ Database Field
     from timezone_field import TimeZoneField
 
     class MyModel(models.Model):
-        timezone1 = TimeZoneField()
+        timezone1 = TimeZoneField(default='Europe/London') # defaults supported
         timezone2 = TimeZoneField()
         timezone3 = TimeZoneField()
 
