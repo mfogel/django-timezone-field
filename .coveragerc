@@ -1,0 +1,4 @@
+[run]
+source = timezone_field
+omit = *test_settings.py,*tests.py
+branch = 1

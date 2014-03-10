@@ -20,7 +20,7 @@ class TimeZoneFieldBase(models.Field):
     Valid outputs:
         * None
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
-        * the pytz.UTC signleton
+        * the pytz.UTC singleton
 
     Note that blank values ('' and None) are stored as an empty string
     in the db. Specifying null=True makes your db column not have a NOT
