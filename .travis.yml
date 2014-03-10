@@ -31,6 +31,6 @@ before_script:
   - psql -c 'create database timezone_field_test;' -U postgres
   - flake8 .
 script:
-  - coverage run --include='*timezone_field*' --omit='*test_settings.py,*tests.py' $(which django-admin.py) test timezone_field
+  - coverage run setup.py test
 after_success:
   - coveralls
