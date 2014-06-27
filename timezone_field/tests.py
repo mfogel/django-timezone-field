@@ -10,7 +10,7 @@ from . import TimeZoneField, TimeZoneFormField
 
 
 PST = 'America/Los_Angeles'  # pytz.tzinfo.DstTzInfo
-GMT = 'Etc/GMT'              # pytz.tzinfo.StaticTzInfo
+GMT = 'GMT'              # pytz.tzinfo.StaticTzInfo
 UTC = 'UTC'                  # pytz.UTC singleton
 
 PST_tz = pytz.timezone(PST)
