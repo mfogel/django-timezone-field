@@ -3,7 +3,7 @@ import pytz
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import six
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 
 
 class TimeZoneFieldBase(models.Field):
@@ -74,7 +74,7 @@ class TimeZoneField(six.with_metaclass(models.SubfieldBase,
                                        TimeZoneFieldBase)):
     def deconstruct(self):
         return (
-            self.name, 'timezone_field.fields.TimeZoneField',
+            force_text(self.name, strings_only=True), 'timezone_field.fields.TimeZoneField',
             (), {
                 'max_length': TimeZoneField.MAX_LENGTH
             }
