@@ -34,6 +34,7 @@ class TestForm(forms.Form):
 class TestModelForm(forms.ModelForm):
     class Meta:
         model = TestModel
+#        fields = ['tz', 'tz_opt', 'tz_opt_default',]
 
 
 class TimeZoneFormFieldTestCase(TestCase):

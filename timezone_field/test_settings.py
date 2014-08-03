@@ -28,6 +28,11 @@ if test_db == 'postgres':
         },
     }
 
+# The name of the class to use for starting the test suite. Set
+# explicitly to the default value to silence an upgrade path warning
+# on Django 1.7.
+TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
