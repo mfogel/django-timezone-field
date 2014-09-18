@@ -44,6 +44,14 @@ class TimeZoneFieldBase(models.Field):
         defaults.update(kwargs)
         super(TimeZoneFieldBase, self).__init__(**defaults)
 
+    def deconstruct(self, **kwargs):
+        name, path, args, kwargs = super(TimeZoneFieldBase, self).deconstruct()
+        if self.max_length != self.MAX_LENGTH:
+            kwargs['max_length'] = self.max_length
+        if self.choices != TimeZoneField.CHOICES:
+            kwargs['choices'] = self.choices
+        return name, path, args, kwargs
+
     def get_internal_type(self):
         return 'CharField'
 
