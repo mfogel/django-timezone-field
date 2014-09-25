@@ -3,7 +3,7 @@ import pytz
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import six
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 
 
 class TimeZoneFieldBase(models.Field):
@@ -72,7 +72,24 @@ class TimeZoneFieldBase(models.Field):
 # http://packages.python.org/six/#six.with_metaclass
 class TimeZoneField(six.with_metaclass(models.SubfieldBase,
                                        TimeZoneFieldBase)):
-    pass
+    def deconstruct(self):
+        # as field attributes, we want to preserve the max_length and if it
+        # exists, also the default the user has specified
+        keywords = {'max_length': TimeZoneField.MAX_LENGTH}
+        if self.default != models.fields.NOT_PROVIDED:
+            keywords['default'] = self.default
+
+        # information to recreate the field
+        return (
+            force_text(self.name, strings_only=True),  # name of the field on
+                                                       # the model
+            'timezone_field.fields.TimeZoneField',     # import path of the
+                                                       # field
+            (),                                        # list of positional
+                                                       # arguments
+            keywords                                   # dict of keyword
+                                                       # arguments
+        )
 
 
 # South support
