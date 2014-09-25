@@ -79,7 +79,7 @@ Installation
 
         INSTALLED_APPS = (
             ...
-            timezone_field,
+            'timezone_field',
             ...
         )
 
