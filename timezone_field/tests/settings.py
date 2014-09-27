@@ -10,16 +10,16 @@ ADMINS = (
 MANAGERS = ADMINS
 
 import os
-test_db = os.environ.get('DB', 'sqlite')
+test_db_engine = os.environ.get('TEST_DB_ENGINE', 'sqlite')
 
-if test_db == 'sqlite':
+if test_db_engine == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': ':memory:',
         },
     }
-if test_db == 'postgres':
+if test_db_engine == 'postgres':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',

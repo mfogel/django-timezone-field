@@ -1,6 +1,8 @@
 language: python
 install:
   - pip install tox coveralls
+before_script:
+  - psql -c 'create database timezone_field_test;' -U postgres
 script:
   - tox
   - tox -e coverage
