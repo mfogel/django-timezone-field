@@ -34,6 +34,7 @@ setup(
     license='BSD',
     packages=[
         'timezone_field',
+        'timezone_field.tests',
     ],
     install_requires=['django>=1.4.2', 'pytz'],
     classifiers=[

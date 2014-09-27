@@ -6,7 +6,8 @@ from django.db import models
 from django.test import TestCase
 from django.utils import six
 
-from . import TimeZoneField, TimeZoneFormField
+from timezone_field import TimeZoneField, TimeZoneFormField
+from timezone_field.tests.models import TestModel
 
 
 PST = 'America/Los_Angeles'  # pytz.tzinfo.DstTzInfo
@@ -18,12 +19,6 @@ GMT_tz = pytz.timezone(GMT)
 UTC_tz = pytz.timezone(UTC)
 
 INVALID_TZ = 'ogga booga'
-
-
-class TestModel(models.Model):
-    tz = TimeZoneField()
-    tz_opt = TimeZoneField(blank=True, null=True)
-    tz_opt_default = TimeZoneField(blank=True, default=PST)
 
 
 class TestForm(forms.Form):
