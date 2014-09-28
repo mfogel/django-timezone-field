@@ -1,10 +1,11 @@
 import pytz
 
+import django
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import TestCase
-from django.utils import six
+from django.utils import six, unittest
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.tests.models import TestModel
@@ -29,6 +30,7 @@ class TestForm(forms.Form):
 class TestModelForm(forms.ModelForm):
     class Meta:
         model = TestModel
+        fields = '__all__'
 
 
 class TimeZoneFormFieldTestCase(TestCase):
@@ -213,3 +215,20 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
     def test_invalid_choice(self):
         m1 = self.TestModelChoice(tz='Europe/Nicosia')
         self.assertRaises(ValidationError, m1.full_clean)
+
+
+@unittest.skipIf(django.VERSION < (1, 7), "Migrations not built-in before 1.7")
+class TimeZoneFieldDeconstructTestCase(TestCase):
+
+    def _test_deconstruct(self, org_field):
+        name, path, args, kwargs = org_field.deconstruct()
+        new_field = TimeZoneField(*args, **kwargs)
+        self.assertEqual(org_field.max_length, new_field.max_length)
+        self.assertEqual(org_field.choices, new_field.choices)
+
+    def test_deconstruct_basic(self):
+        self._test_deconstruct(TimeZoneField())
+
+    def test_deconstruct_with_options(self):
+        choices = [(tz, tz) for tz in pytz.common_timezones]
+        self._test_deconstruct(TimeZoneField(choices=choices, max_length=42))
