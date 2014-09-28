@@ -30,6 +30,7 @@ class TestForm(forms.Form):
 class TestModelForm(forms.ModelForm):
     class Meta:
         model = TestModel
+        fields = '__all__'
 
 
 class TimeZoneFormFieldTestCase(TestCase):
