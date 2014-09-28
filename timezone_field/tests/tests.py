@@ -4,6 +4,7 @@ import django
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
 from django.utils import six, unittest
 
@@ -220,15 +221,26 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
 @unittest.skipIf(django.VERSION < (1, 7), "Migrations not built-in before 1.7")
 class TimeZoneFieldDeconstructTestCase(TestCase):
 
-    def _test_deconstruct(self, org_field):
-        name, path, args, kwargs = org_field.deconstruct()
-        new_field = TimeZoneField(*args, **kwargs)
-        self.assertEqual(org_field.max_length, new_field.max_length)
-        self.assertEqual(org_field.choices, new_field.choices)
+    test_fields = (
+        TimeZoneField(),
+        TimeZoneField(
+            max_length=42,
+            choices=[(pytz.timezone(tz), tz) for tz in pytz.common_timezones],
+        ),
+    )
 
-    def test_deconstruct_basic(self):
-        self._test_deconstruct(TimeZoneField())
+    def test_deconstruct(self):
+        for org_field in self.test_fields:
+            name, path, args, kwargs = org_field.deconstruct()
+            new_field = TimeZoneField(*args, **kwargs)
+            self.assertEqual(org_field.max_length, new_field.max_length)
+            self.assertEqual(org_field.choices, new_field.choices)
 
-    def test_deconstruct_with_options(self):
-        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
-        self._test_deconstruct(TimeZoneField(choices=choices, max_length=42))
+    def test_full_serialization(self):
+        # ensure the values passed to kwarg arguments can be serialized
+        # the recommended 'deconstruct' testing by django docs doesn't cut it
+        # https://docs.djangoproject.com/en/dev/howto/custom-model-fields/#field-deconstruction
+        # replicates https://github.com/mfogel/django-timezone-field/issues/12
+        for field in self.test_fields:
+            # ensuring the following call doesn't throw an error
+            MigrationWriter.serialize(field)
