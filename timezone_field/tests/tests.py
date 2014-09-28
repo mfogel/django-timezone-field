@@ -204,7 +204,7 @@ class TimeZoneFieldTestCase(TestCase):
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
 
     class TestModelChoice(models.Model):
-        CHOICES = [(tz, tz) for tz in pytz.common_timezones]
+        CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
         tz = TimeZoneField(choices=CHOICES)
 
     def test_valid_choice(self):
@@ -230,5 +230,5 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         self._test_deconstruct(TimeZoneField())
 
     def test_deconstruct_with_options(self):
-        choices = [(tz, tz) for tz in pytz.common_timezones]
+        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
         self._test_deconstruct(TimeZoneField(choices=choices, max_length=42))
