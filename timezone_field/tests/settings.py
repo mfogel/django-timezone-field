@@ -70,7 +70,7 @@ if test_db_engine == 'postgres':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'timezone_field_test',
+            'NAME': 'timezone_field_tests',
             'USER': 'postgres',
         },
     }
