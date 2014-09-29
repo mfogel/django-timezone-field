@@ -14,7 +14,7 @@ class TimeZoneFieldBase(models.Field):
     Valid inputs:
         * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
         * the pytz.UTC singleton
-        * any string that validates against pytz.all_timezones. pytz will
+        * any string that validates against pytz.common_timezones. pytz will
           be used to build a timezone object from the string.
         * None and the empty string both represent 'no timezone'
 
@@ -34,7 +34,7 @@ class TimeZoneFieldBase(models.Field):
 
     description = "A pytz timezone object"
 
-    CHOICES = [(tz, tz) for tz in pytz.all_timezones]
+    CHOICES = [(tz, tz) for tz in pytz.common_timezones]
     MAX_LENGTH = 63
 
     def __init__(self, **kwargs):

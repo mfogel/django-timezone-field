@@ -21,6 +21,16 @@ UTC_tz = pytz.timezone(UTC)
 
 INVALID_TZ = 'ogga booga'
 
+USA_TZS = [
+    'US/Alaska',
+    'US/Arizona',
+    'US/Central',
+    'US/Eastern',
+    'US/Hawaii',
+    'US/Mountain',
+    'US/Pacific',
+]
+
 
 class TestForm(forms.Form):
     tz = TimeZoneFormField()
@@ -203,33 +213,58 @@ class TimeZoneFieldTestCase(TestCase):
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
 
+    invalid_superset_tz = 'not a tz'
+    invalid_subset_tz = 'Europe/Brussels'
+
     class TestModelChoice(models.Model):
-        CHOICES = [(tz, tz) for tz in pytz.common_timezones]
-        tz = TimeZoneField(choices=CHOICES)
+        tz_superset = TimeZoneField(
+            choices=[(tz, tz) for tz in pytz.all_timezones],
+            blank=True, null=True,
+        )
+        tz_subset = TimeZoneField(
+            choices=[(tz, tz) for tz in USA_TZS],
+            blank=True, null=True,
+        )
 
     class TestModelOldChoiceFormat(models.Model):
-        CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
-        tz = TimeZoneField(choices=CHOICES)
+        tz_superset = TimeZoneField(
+            choices=[(pytz.timezone(tz), tz) for tz in pytz.all_timezones],
+            blank=True, null=True,
+        )
+        tz_subset = TimeZoneField(
+            choices=[(pytz.timezone(tz), tz) for tz in USA_TZS],
+            blank=True, null=True,
+        )
 
     def test_valid_choice(self):
-        m = self.TestModelChoice.objects.create(tz=PST)
-        self.assertEqual(m.tz, PST_tz)
+        m = self.TestModelChoice.objects.create(tz_superset=PST, tz_subset=PST)
+        self.assertEqual(m.tz_superset, PST_tz)
+        self.assertEqual(m.tz_subset, PST_tz)
         m = self.TestModelChoice.objects.get()
-        self.assertEqual(m.tz, PST_tz)
+        self.assertEqual(m.tz_superset, PST_tz)
+        self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice(self):
-        m1 = self.TestModelChoice(tz='Europe/Nicosia')
-        self.assertRaises(ValidationError, m1.full_clean)
+        with self.assertRaises(ValidationError):
+            self.TestModelChoice(tz_superset=self.invalid_superset_tz)
+        m = self.TestModelChoice(tz_subset=self.invalid_subset_tz)
+        self.assertRaises(ValidationError, m.full_clean)
 
     def test_valid_choice_old_format(self):
-        m = self.TestModelOldChoiceFormat.objects.create(tz=PST)
-        self.assertEqual(m.tz, PST_tz)
+        m = self.TestModelOldChoiceFormat.objects.create(
+            tz_superset=PST, tz_subset=PST,
+        )
+        self.assertEqual(m.tz_superset, PST_tz)
+        self.assertEqual(m.tz_subset, PST_tz)
         m = self.TestModelOldChoiceFormat.objects.get()
-        self.assertEqual(m.tz, PST_tz)
+        self.assertEqual(m.tz_superset, PST_tz)
+        self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice_old_format(self):
-        m1 = self.TestModelOldChoiceFormat(tz='Europe/Nicosia')
-        self.assertRaises(ValidationError, m1.full_clean)
+        with self.assertRaises(ValidationError):
+            self.TestModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
+        m = self.TestModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
+        self.assertRaises(ValidationError, m.full_clean)
 
 
 @unittest.skipIf(django.VERSION < (1, 7), "Migrations not built-in before 1.7")
