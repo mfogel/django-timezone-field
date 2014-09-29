@@ -34,7 +34,7 @@ class TimeZoneFieldBase(models.Field):
 
     description = "A pytz timezone object"
 
-    CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.all_timezones]
+    CHOICES = [(tz, tz) for tz in pytz.all_timezones]
     MAX_LENGTH = 63
 
     def __init__(self, **kwargs):

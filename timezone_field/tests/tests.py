@@ -204,16 +204,31 @@ class TimeZoneFieldTestCase(TestCase):
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
 
     class TestModelChoice(models.Model):
+        CHOICES = [(tz, tz) for tz in pytz.common_timezones]
+        tz = TimeZoneField(choices=CHOICES)
+
+    class TestModelOldChoiceFormat(models.Model):
         CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
         tz = TimeZoneField(choices=CHOICES)
 
     def test_valid_choice(self):
         m = self.TestModelChoice.objects.create(tz=PST)
+        self.assertEqual(m.tz, PST_tz)
         m = self.TestModelChoice.objects.get()
         self.assertEqual(m.tz, PST_tz)
 
     def test_invalid_choice(self):
         m1 = self.TestModelChoice(tz='Europe/Nicosia')
+        self.assertRaises(ValidationError, m1.full_clean)
+
+    def test_valid_choice_old_format(self):
+        m = self.TestModelOldChoiceFormat.objects.create(tz=PST)
+        self.assertEqual(m.tz, PST_tz)
+        m = self.TestModelOldChoiceFormat.objects.get()
+        self.assertEqual(m.tz, PST_tz)
+
+    def test_invalid_choice_old_format(self):
+        m1 = self.TestModelOldChoiceFormat(tz='Europe/Nicosia')
         self.assertRaises(ValidationError, m1.full_clean)
 
 
