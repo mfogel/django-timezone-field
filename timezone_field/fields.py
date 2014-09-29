@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import six
 
+from timezone_field.utils import is_pytz_instance
+
 
 class TimeZoneFieldBase(models.Field):
     """
@@ -36,12 +38,27 @@ class TimeZoneFieldBase(models.Field):
     MAX_LENGTH = 63
 
     def __init__(self, **kwargs):
-        defaults = {
+        parent_kwargs = {
             'max_length': self.MAX_LENGTH,
             'choices': TimeZoneField.CHOICES,
         }
-        defaults.update(kwargs)
-        super(TimeZoneFieldBase, self).__init__(**defaults)
+        parent_kwargs.update(kwargs)
+        super(TimeZoneFieldBase, self).__init__(**parent_kwargs)
+
+        # We expect choices in form [<str>, <str>], but we
+        # also support [<pytz.timezone>, <str>], for backwards compatability
+        # Our parent saved those in self._choices.
+        if self._choices:
+            if is_pytz_instance(self._choices[0][0]):
+                self._choices = [(tz.zone, name) for tz, name in self._choices]
+
+    def validate(self, value, model_instance):
+        # since our choices are of the form [<str>, <str>], convert the
+        # incoming value to a string for validation
+        if not is_pytz_instance(value):
+            raise ValidationError("'%s' is not a pytz timezone object" % value)
+        tz_as_str = value.zone
+        super(TimeZoneFieldBase, self).validate(tz_as_str, model_instance)
 
     def get_internal_type(self):
         return 'CharField'
@@ -58,7 +75,7 @@ class TimeZoneFieldBase(models.Field):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == '':
             return (None, None)
-        if value is pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo):
+        if is_pytz_instance(value):
             return (value, value.zone)
         if isinstance(value, six.string_types):
             try:
