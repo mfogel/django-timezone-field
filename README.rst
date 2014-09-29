@@ -86,9 +86,23 @@ Installation
 Changelog
 ------------
 
-*  1.0 (2013/08/04)
+*   1.1
 
-   *  Initial release as `timezone_field`.
+    *   Django 1.7 compatibility
+    *   Changed format of `choices` kwarg to `[[<str>, <str>], ...]`,
+        was previously `[[<pytz timezone>, <str>], ...]`.
+        Old format is still deprecated but still accepted for now; support
+        will be removed in a future release.
+    *   Changed default list of accepted timezones from `pytz.all_timezones` to
+        `pytz.common_timezones`. If you have timezones in your DB that are in
+        `pytz.all_timezones` but not in `pytz.common_timezones`, this is a
+        backward-incompatible change. Old behavior can be restored by
+        specifying `choices=[(tz, tz) for tz in pytz.all_timezones]` in your
+        model definition.
+
+*   1.0 (2013/08/04)
+
+    *   Initial release as `timezone_field`.
 
 
 Running the Tests
