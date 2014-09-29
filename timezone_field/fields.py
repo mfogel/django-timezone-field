@@ -98,7 +98,13 @@ class TimeZoneFieldBase(models.Field):
 # http://packages.python.org/six/#six.with_metaclass
 class TimeZoneField(six.with_metaclass(models.SubfieldBase,
                                        TimeZoneFieldBase)):
-    pass
+    def deconstruct(self):
+        return (
+            self.name, 'timezone_field.fields.TimeZoneField',
+            (), {
+                'max_length': TimeZoneField.MAX_LENGTH
+            }
+        )
 
 
 # South support
