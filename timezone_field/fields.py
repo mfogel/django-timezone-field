@@ -34,6 +34,8 @@ class TimeZoneFieldBase(models.Field):
 
     description = "A pytz timezone object"
 
+    # NOTE: these defaults are excluded from migrations. If these are changed,
+    #       existing migration files will need to be accomodated.
     CHOICES = [(tz, tz) for tz in pytz.common_timezones]
     MAX_LENGTH = 63
 
@@ -59,6 +61,14 @@ class TimeZoneFieldBase(models.Field):
             raise ValidationError("'%s' is not a pytz timezone object" % value)
         tz_as_str = value.zone
         super(TimeZoneFieldBase, self).validate(tz_as_str, model_instance)
+
+    def deconstruct(self):
+        name, path, args, kwargs = super(TimeZoneFieldBase, self).deconstruct()
+        if kwargs['choices'] == self.CHOICES:
+            del kwargs['choices']
+        if kwargs['max_length'] == self.MAX_LENGTH:
+            del kwargs['max_length']
+        return name, path, args, kwargs
 
     def get_internal_type(self):
         return 'CharField'

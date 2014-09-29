@@ -296,3 +296,14 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         for field in self.test_fields:
             # ensuring the following call doesn't throw an error
             MigrationWriter.serialize(field)
+
+    def test_default_choices_not_frozen(self):
+        """
+        Ensure the deconstructed representation of the field does not contain
+        kwargs if they match the default.
+        Don't want to bloat everyone's migration files.
+        """
+        field = TimeZoneField()
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('choices', kwargs)
+        self.assertNotIn('max_length', kwargs)
