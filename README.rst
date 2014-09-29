@@ -83,6 +83,14 @@ Installation
             ...
         )
 
+Changelog
+------------
+
+*  1.0 (2013/08/04)
+
+   *  Initial release as `timezone_field`.
+
+
 Running the Tests
 -----------------
 
