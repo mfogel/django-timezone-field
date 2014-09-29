@@ -86,14 +86,15 @@ Installation
 Running the Tests
 -----------------
 
-Using `Doug Hellman's virtualenvwrapper`__:
+#.  Install `tox`__.
 
-.. code:: sh
+#.  From the repository root, run
 
-    mktmpenv
-    pip install django-timezone-field
-    export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
-    django-admin.py test timezone_field
+    .. code:: sh
+
+        tox
+
+    It's that simple.
 
 Found a Bug?
 ------------
@@ -110,6 +111,6 @@ __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.pip-installer.org/
 __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
-__ http://www.doughellmann.com/projects/virtualenvwrapper/
+__ https://tox.readthedocs.org/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
