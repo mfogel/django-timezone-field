@@ -28,7 +28,7 @@ Database Field
     from timezone_field import TimeZoneField
 
     class MyModel(models.Model):
-        timezone1 = TimeZoneField()
+        timezone1 = TimeZoneField(default='Europe/London') # defaults supported
         timezone2 = TimeZoneField()
         timezone3 = TimeZoneField()
 
@@ -37,7 +37,7 @@ Database Field
         timezone2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
         timezone3=pytz.UTC,                 # assignment of pytz.UTC singleton
     )
-    my_inst.full_clean()  # validates against pytz.all_timezones
+    my_inst.full_clean()  # validates against pytz.common_timezones
     my_inst.save()        # values stored in DB as strings
 
     tz = my_inst.timezone1  # values retrieved as pytz objects
@@ -58,7 +58,7 @@ Form Field
     my_form = MyForm({
         'timezone': 'America/Los_Angeles',
     })
-    my_form.full_clean()  # validates against pytz.all_timezones
+    my_form.full_clean()  # validates against pytz.common_timezones
 
     tz = my_form.cleaned_data['timezone']  # values retrieved as pytz objects
     repr(tz)                               # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
@@ -67,23 +67,56 @@ Form Field
 Installation
 ------------
 
-Now on `pypi`__!
+#.  From `pypi`__ using `pip`__:
 
-.. code:: sh
+    .. code:: sh
 
-    pip install django-timezone-field
+        pip install django-timezone-field
+
+#.  Add `timezone_field` to your `settings.INSTALLED_APPS`__:
+
+    .. code:: python
+
+        INSTALLED_APPS = (
+            ...
+            'timezone_field',
+            ...
+        )
+
+Changelog
+------------
+
+*   1.1 (2014-10-05)
+
+    *   Django 1.7 compatibility
+    *   Changed format of `choices` kwarg to `[[<str>, <str>], ...]`,
+        was previously `[[<pytz timezone>, <str>], ...]`.
+        Old format is still deprecated but still accepted for now; support
+        will be removed in a future release.
+    *   Changed default list of accepted timezones from `pytz.all_timezones` to
+        `pytz.common_timezones`. If you have timezones in your DB that are in
+        `pytz.all_timezones` but not in `pytz.common_timezones`, this is a
+        backward-incompatible change. Old behavior can be restored by
+        specifying `choices=[(tz, tz) for tz in pytz.all_timezones]` in your
+        model definition.
+
+*   1.0 (2013-08-04)
+
+    *   Initial release as `timezone_field`.
+
 
 Running the Tests
 -----------------
 
-Using `Doug Hellman's virtualenvwrapper`__:
+#.  Install `tox`__.
 
-.. code:: sh
+#.  From the repository root, run
 
-    mktmpenv
-    pip install django-timezone-field
-    export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
-    django-admin.py test timezone_field
+    .. code:: sh
+
+        tox
+
+    It's that simple.
 
 Found a Bug?
 ------------
@@ -93,11 +126,14 @@ To file a bug or submit a patch, please head over to `django-timezone-field on g
 Credits
 -------
 
-Originally adapted from `Brian Rosner's django-timezones`__.
+Originally adapted from `Brian Rosner's django-timezones`__. The full list of contributors is available on `github`__.
 
 
 __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
-__ http://www.doughellmann.com/projects/virtualenvwrapper/
+__ http://www.pip-installer.org/
+__ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+__ https://tox.readthedocs.org/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
+__ https://github.com/mfogel/django-timezone-field/graphs/contributors

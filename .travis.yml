@@ -1,36 +1,10 @@
 language: python
-python:
-  - 2.6
-  - 2.7
-  - 3.2
-  - 3.3
-env:
-  - DJANGO='django>=1.4.2,<1.5' DB='postgres'
-  - DJANGO='django>=1.4.2,<1.5' DB='sqlite'
-  - DJANGO='django>=1.5,<1.6' DB='postgres'
-  - DJANGO='django>=1.5,<1.6' DB='sqlite'
-  - DJANGO='git+git://github.com/django/django.git@1.6b1' DB='postgres'
-  - DJANGO='git+git://github.com/django/django.git@1.6b1' DB='sqlite'
-matrix:
-  exclude: # python 3 support only for django>=1.5
-    - python: 3.2
-      env: DJANGO='django>=1.4.2,<1.5' DB='postgres'
-    - python: 3.2
-      env: DJANGO='django>=1.4.2,<1.5' DB='sqlite'
-    - python: 3.3
-      env: DJANGO='django>=1.4.2,<1.5' DB='postgres'
-    - python: 3.3
-      env: DJANGO='django>=1.4.2,<1.5' DB='sqlite'
-before_install:
-  - export PIP_USE_MIRRORS=true
 install:
-  - pip install coveralls $DJANGO flake8 psycopg2
-  - pip install -e .
+  - pip install tox coveralls
 before_script:
-  - export DJANGO_SETTINGS_MODULE=timezone_field.test_settings
-  - psql -c 'create database timezone_field_test;' -U postgres
-  - flake8 .
+  - psql -c 'create database timezone_field_tests;' -U postgres
 script:
-  - coverage run --include='*timezone_field*' --omit='*test_settings.py,*tests.py' $(which django-admin.py) test timezone_field
+  - tox
+  - tox -e coverage
 after_success:
   - coveralls

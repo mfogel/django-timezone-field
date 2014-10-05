@@ -1,4 +1,5 @@
-from .fields import TimeZoneField     # noqa
-from .forms import TimeZoneFormField  # noqa
+__version__ = '1.1'
+__all__ = ['TimeZoneField', 'TimeZoneFormField']
 
-__version__ = '1.0'
+from timezone_field.fields import TimeZoneField
+from timezone_field.forms import TimeZoneFormField
