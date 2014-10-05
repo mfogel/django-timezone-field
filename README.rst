@@ -37,7 +37,7 @@ Database Field
         timezone2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
         timezone3=pytz.UTC,                 # assignment of pytz.UTC singleton
     )
-    my_inst.full_clean()  # validates against pytz.all_timezones
+    my_inst.full_clean()  # validates against pytz.common_timezones
     my_inst.save()        # values stored in DB as strings
 
     tz = my_inst.timezone1  # values retrieved as pytz objects
@@ -58,7 +58,7 @@ Form Field
     my_form = MyForm({
         'timezone': 'America/Los_Angeles',
     })
-    my_form.full_clean()  # validates against pytz.all_timezones
+    my_form.full_clean()  # validates against pytz.common_timezones
 
     tz = my_form.cleaned_data['timezone']  # values retrieved as pytz objects
     repr(tz)                               # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
@@ -86,7 +86,7 @@ Installation
 Changelog
 ------------
 
-*   1.1
+*   1.1 (2014-10-05)
 
     *   Django 1.7 compatibility
     *   Changed format of `choices` kwarg to `[[<str>, <str>], ...]`,
@@ -100,7 +100,7 @@ Changelog
         specifying `choices=[(tz, tz) for tz in pytz.all_timezones]` in your
         model definition.
 
-*   1.0 (2013/08/04)
+*   1.0 (2013-08-04)
 
     *   Initial release as `timezone_field`.
 
@@ -126,7 +126,7 @@ To file a bug or submit a patch, please head over to `django-timezone-field on g
 Credits
 -------
 
-Originally adapted from `Brian Rosner's django-timezones`__.
+Originally adapted from `Brian Rosner's django-timezones`__. The full list of contributors is available on `github`__.
 
 
 __ http://pypi.python.org/pypi/pytz/
@@ -136,3 +136,4 @@ __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 __ https://tox.readthedocs.org/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
+__ https://github.com/mfogel/django-timezone-field/graphs/contributors
