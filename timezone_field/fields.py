@@ -64,9 +64,9 @@ class TimeZoneFieldBase(models.Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(TimeZoneFieldBase, self).deconstruct()
-        if kwargs['choices'] == self.CHOICES:
+        if 'choices' in kwargs and kwargs['choices'] == self.CHOICES:
             del kwargs['choices']
-        if kwargs['max_length'] == self.MAX_LENGTH:
+        if 'max_length' in kwargs and kwargs['max_length'] == self.MAX_LENGTH:
             del kwargs['max_length']
         return name, path, args, kwargs
 
