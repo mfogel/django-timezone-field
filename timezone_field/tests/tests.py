@@ -20,6 +20,7 @@ GMT_tz = pytz.timezone(GMT)
 UTC_tz = pytz.timezone(UTC)
 
 INVALID_TZ = 'ogga booga'
+UNCOMMON_TZ = 'Singapore'
 
 USA_TZS = [
     'US/Alaska',
@@ -59,6 +60,10 @@ class TimeZoneFormFieldTestCase(TestCase):
 
     def test_invalid_invalid_str(self):
         form = TestForm({'tz': INVALID_TZ})
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_uncommon_tz(self):
+        form = TestForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
 
 
@@ -104,6 +109,11 @@ class TimeZoneFieldModelFormTestCase(TestCase):
 
     def test_invalid_choice(self):
         form = TestModelForm({'tz': INVALID_TZ})
+        self.assertFalse(form.is_valid())
+        self.assertTrue(any('choice' in e for e in form.errors['tz']))
+
+    def test_invalid_uncommmon_tz(self):
+        form = TestModelForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
         self.assertTrue(any('choice' in e for e in form.errors['tz']))
 

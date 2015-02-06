@@ -86,6 +86,12 @@ Installation
 Changelog
 ------------
 
+*   1.2 (2015-02-05)
+
+    *   For form field, changed default list of accepted timezones from
+        `pytz.all_timezones` to `pytz.common_timezones`, to match DB field
+        behavior.
+
 *   1.1 (2014-10-05)
 
     *   Django 1.7 compatibility
