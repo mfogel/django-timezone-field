@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 import pytz
 
 import django
@@ -8,7 +10,7 @@ from django.test import TestCase
 from django.utils import six, unittest
 
 from timezone_field import TimeZoneField, TimeZoneFormField
-from timezone_field.tests.models import TestModel
+from tests.models import TestModel
 
 
 PST = 'America/Los_Angeles'  # pytz.tzinfo.DstTzInfo
