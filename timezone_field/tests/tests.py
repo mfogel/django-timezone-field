@@ -229,21 +229,21 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
     class TestModelChoice(models.Model):
         tz_superset = TimeZoneField(
             choices=[(tz, tz) for tz in pytz.all_timezones],
-            blank=True, null=True,
+            blank=True,
         )
         tz_subset = TimeZoneField(
             choices=[(tz, tz) for tz in USA_TZS],
-            blank=True, null=True,
+            blank=True,
         )
 
     class TestModelOldChoiceFormat(models.Model):
         tz_superset = TimeZoneField(
             choices=[(pytz.timezone(tz), tz) for tz in pytz.all_timezones],
-            blank=True, null=True,
+            blank=True,
         )
         tz_subset = TimeZoneField(
             choices=[(pytz.timezone(tz), tz) for tz in USA_TZS],
-            blank=True, null=True,
+            blank=True,
         )
 
     def test_valid_choice(self):
@@ -307,7 +307,7 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             # ensuring the following call doesn't throw an error
             MigrationWriter.serialize(field)
 
-    def test_default_choices_not_frozen(self):
+    def test_default_kwargs_not_frozen(self):
         """
         Ensure the deconstructed representation of the field does not contain
         kwargs if they match the default.
@@ -317,3 +317,4 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
         self.assertNotIn('max_length', kwargs)
+        self.assertNotIn('null', kwargs)

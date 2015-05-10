@@ -23,9 +23,9 @@ class TimeZoneFieldBase(models.Field):
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
         * the pytz.UTC singleton
 
-    Note that blank values ('' and None) are stored as an empty string
-    in the db. Specifying null=True makes your db column not have a NOT
-    NULL constraint, but from the perspective of this field, has no effect.
+    Blank values are stored as null in the DB, not the empty string.
+    Thus, by default the database column does not have a NOT NULL constraint.
+    Note this is different than the default beahvior of django's CharField.
 
     If you choose to override the 'choices' kwarg argument, and you specify
     choices that can't be consumed by pytz.timezone(unicode(YOUR_NEW_CHOICE)),
@@ -43,6 +43,7 @@ class TimeZoneFieldBase(models.Field):
         parent_kwargs = {
             'max_length': self.MAX_LENGTH,
             'choices': TimeZoneField.CHOICES,
+            'null': True,
         }
         parent_kwargs.update(kwargs)
         super(TimeZoneFieldBase, self).__init__(**parent_kwargs)
@@ -68,6 +69,8 @@ class TimeZoneFieldBase(models.Field):
             del kwargs['choices']
         if kwargs['max_length'] == self.MAX_LENGTH:
             del kwargs['max_length']
+        if kwargs['null'] is True:
+            del kwargs['null']
         return name, path, args, kwargs
 
     def get_internal_type(self):
