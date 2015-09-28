@@ -1,11 +1,11 @@
 import pytz
 
-import django
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.utils import six, unittest
+from django.utils import six
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.tests.models import TestModel
@@ -277,7 +277,6 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
         self.assertRaises(ValidationError, m.full_clean)
 
 
-@unittest.skipIf(django.VERSION < (1, 7), "Migrations not built-in before 1.7")
 class TimeZoneFieldDeconstructTestCase(TestCase):
 
     test_fields = (
@@ -296,9 +295,6 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             self.assertEqual(org_field.choices, new_field.choices)
 
     def test_full_serialization(self):
-        # avoid importing this when test skipped on django 1.6
-        from django.db.migrations.writer import MigrationWriter
-
         # ensure the values passed to kwarg arguments can be serialized
         # the recommended 'deconstruct' testing by django docs doesn't cut it
         # https://docs.djangoproject.com/en/1.7/howto/custom-model-fields/#field-deconstruction

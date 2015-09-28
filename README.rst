@@ -86,6 +86,10 @@ Installation
 Changelog
 ------------
 
+*   1.3
+
+    *   Drop support for django 1.6
+
 *   1.2 (2015-02-05)
 
     *   For form field, changed default list of accepted timezones from
