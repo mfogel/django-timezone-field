@@ -89,6 +89,8 @@ Changelog
 *   1.3
 
     *   Drop support for django 1.6
+    *   Drop support for [<pytz.timezone>, <str>] format for `choices` kwarg
+        for db field.
 
 *   1.2 (2015-02-05)
 
