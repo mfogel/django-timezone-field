@@ -112,23 +112,3 @@ class TimeZoneFieldBase(models.Field):
 class TimeZoneField(six.with_metaclass(models.SubfieldBase,
                                        TimeZoneFieldBase)):
     pass
-
-
-# South support
-try:
-    from south.modelsinspector import add_introspection_rules
-except ImportError:
-    pass
-else:
-    add_introspection_rules(
-        rules=[(
-            (TimeZoneField, ),  # Class(es) these apply to
-            [],                 # Positional arguments (not used)
-            {                   # Keyword argument
-                'max_length': [
-                    'max_length', {'default': TimeZoneField.MAX_LENGTH},
-                ],
-            },
-        )],
-        patterns=['timezone_field\.fields\.']
-    )
