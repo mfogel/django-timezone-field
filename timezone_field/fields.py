@@ -48,6 +48,13 @@ class TimeZoneFieldBase(models.Field):
         parent_kwargs.update(kwargs)
         super(TimeZoneFieldBase, self).__init__(**parent_kwargs)
 
+        # We expect choices in form [<str>, <str>], but we
+        # also support [<pytz.timezone>, <str>], for backwards compatability
+        # Our parent saved those in self._choices.
+        if self._choices:
+            if is_pytz_instance(self._choices[0][0]):
+                self._choices = [(tz.zone, name) for tz, name in self._choices]
+
     def validate(self, value, model_instance):
         # since our choices are of the form [<str>, <str>], convert the
         # incoming value to a string for validation
