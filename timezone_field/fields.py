@@ -73,13 +73,28 @@ class TimeZoneFieldBase(models.Field):
             del kwargs['choices']
         if kwargs['max_length'] == self.MAX_LENGTH:
             del kwargs['max_length']
-        if kwargs['null'] is True:
-            del kwargs['null']
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
         if 'choices' in kwargs:
             kwargs['choices'] = [(tz.zone, n) for tz, n in kwargs['choices']]
+
+        # there was an unfortunate historical choice to make the default
+        # for this field null=True, rather than follow the default null=False
+        # The parent field's deconstruct() automatically strips null=False
+        # out of kwargs - so we have to add it back in here, and remove our
+        # default of null=True
+        #
+        # Note that if a django-timezone-field 2.0 is ever released, this
+        # default # value for the null kwarg will probably be switched over
+        # to False (and the empty string would be used at the DB level to
+        # represent the 'no timezone' case).
+        if 'null' in kwargs and kwargs['null']:
+            # our default of True, strip it out
+            del kwargs['null']
+        else:
+            # django default, add it back
+            kwargs['null'] = False
 
         return name, path, args, kwargs
 
