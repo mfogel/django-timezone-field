@@ -281,10 +281,15 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
 
     test_fields = (
         TimeZoneField(),
-        TimeZoneField(
-            max_length=42,
-            choices=[(pytz.timezone(tz), tz) for tz in pytz.common_timezones],
-        ),
+        TimeZoneField(max_length=42),
+        TimeZoneField(choices=[
+            (pytz.timezone('US/Pacific'), 'US/Pacific'),
+            (pytz.timezone('US/Eastern'), 'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
+            ('US/Pacific', 'US/Pacific'),
+            ('US/Eastern', 'US/Eastern'),
+        ]),
     )
 
     def test_deconstruct(self):
@@ -292,6 +297,7 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             name, path, args, kwargs = org_field.deconstruct()
             new_field = TimeZoneField(*args, **kwargs)
             self.assertEqual(org_field.max_length, new_field.max_length)
+            self.assertEqual(org_field.null, new_field.null)
             self.assertEqual(org_field.choices, new_field.choices)
 
     def test_full_serialization(self):
@@ -313,4 +319,27 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
         self.assertNotIn('max_length', kwargs)
+        self.assertNotIn('null', kwargs)
+
+    def test_specifying_defaults_not_frozen(self):
+        """
+        If someone's matched the default values with their kwarg args, we
+        shouldn't bothering freezing those.
+        """
+        field = TimeZoneField(max_length=63)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('max_length', kwargs)
+
+        field = TimeZoneField(null=True)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('null', kwargs)
+
+        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+        field = TimeZoneField(choices=choices)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('null', kwargs)
+
+        choices = [(tz, tz) for tz in pytz.common_timezones]
+        field = TimeZoneField(choices=choices)
+        name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('null', kwargs)
