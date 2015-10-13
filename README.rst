@@ -80,7 +80,7 @@ Installation
 Changelog
 ------------
 
-*   1.3
+*   1.3 (2015-10-12)
 
     *   Drop support for django 1.6, add support for django 1.8
     *   Various `bug fixes`__
