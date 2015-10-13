@@ -7,12 +7,6 @@ django-timezone-field
 .. image:: https://coveralls.io/repos/mfogel/django-timezone-field/badge.png?branch=develop
    :target: https://coveralls.io/r/mfogel/django-timezone-field
 
-.. image:: https://pypip.in/v/django-timezone-field/badge.png
-   :target: https://crate.io/packages/django-timezone-field/
-
-.. image:: https://pypip.in/d/django-timezone-field/badge.png
-   :target: https://crate.io/packages/django-timezone-field/
-
 A Django app providing database and form fields for `pytz`__ timezone objects.
 
 Examples
@@ -88,7 +82,8 @@ Changelog
 
 *   1.3
 
-    *   Drop support for django 1.6
+    *   Drop support for django 1.6, add support for django 1.8
+    *   Various `bug fixes`__
 
 *   1.2 (2015-02-05)
 
@@ -99,10 +94,8 @@ Changelog
 *   1.1 (2014-10-05)
 
     *   Django 1.7 compatibility
-    *   Changed format of `choices` kwarg to `[[<str>, <str>], ...]`,
-        was previously `[[<pytz timezone>, <str>], ...]`.
-        Old format is still deprecated but still accepted for now; support
-        will be removed in a future release.
+    *   Added support for formating `choices` kwarg as `[[<str>, <str>], ...]`,
+        in addition to previous format of `[[<pytz.timezone>, <str>], ...]`.
     *   Changed default list of accepted timezones from `pytz.all_timezones` to
         `pytz.common_timezones`. If you have timezones in your DB that are in
         `pytz.all_timezones` but not in `pytz.common_timezones`, this is a
@@ -126,7 +119,8 @@ Running the Tests
 
         tox
 
-    It's that simple.
+    Postgres will need to be running locally, and sqlite will need to be
+    installed in order for tox to do its job.
 
 Found a Bug?
 ------------
@@ -143,6 +137,7 @@ __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.pip-installer.org/
 __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+__ https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3
 __ https://tox.readthedocs.org/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/

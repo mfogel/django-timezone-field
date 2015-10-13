@@ -23,10 +23,12 @@ class TimeZoneFieldBase(models.Field):
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
         * the pytz.UTC singleton
 
-    Blank values are stored in the DB as the empty string.
+    Blank values are stored in the DB as the empty string. Timezones are stored
+    in their string representation.
 
     The `choices` kwarg can be specified as a list of either
-    [<pytz.timezone>, <str>] or [<str>, <str>].
+    [<pytz.timezone>, <str>] or [<str>, <str>]. Internally, it is stored as
+    [<pytz.timezone>, <str>].
     """
 
     description = "A pytz timezone object"
@@ -37,8 +39,9 @@ class TimeZoneFieldBase(models.Field):
     MAX_LENGTH = 63
 
     def __init__(self, choices=None, max_length=None, **kwargs):
-        if choices is not None:
-
+        if choices is None:
+            choices = self.CHOICES
+        else:
             # Choices can be specified in two forms: either
             # [<pytz.timezone>, <str>] or [<str>, <str>]
             #
@@ -53,10 +56,12 @@ class TimeZoneFieldBase(models.Field):
             if isinstance(choices[0][0], six.string_types):
                 choices = [(pytz.timezone(n1), n2) for n1, n2 in choices]
 
-        kwargs['choices'] = choices or self.CHOICES
-        kwargs['max_length'] = max_length or self.MAX_LENGTH
+        if max_length is None:
+            max_length = self.MAX_LENGTH
 
-        super(TimeZoneFieldBase, self).__init__(**kwargs)
+        super(TimeZoneFieldBase, self).__init__(choices=choices,
+                                                max_length=max_length,
+                                                **kwargs)
 
     def validate(self, value, model_instance):
         if not is_pytz_instance(value):
