@@ -23,13 +23,10 @@ class TimeZoneFieldBase(models.Field):
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
         * the pytz.UTC singleton
 
-    Blank values are stored as null in the DB, not the empty string.
-    Thus, by default the database column does not have a NOT NULL constraint.
-    Note this is different than the default beahvior of django's CharField.
+    Blank values are stored in the DB as the empty string.
 
-    If you choose to override the 'choices' kwarg argument, and you specify
-    choices that can't be consumed by pytz.timezone(unicode(YOUR_NEW_CHOICE)),
-    weirdness will ensue. It's ok to further limit CHOICES, but not expand it.
+    The `choices` kwarg can be specified as a list of either
+    [<pytz.timezone>, <str>] or [<str>, <str>].
     """
 
     description = "A pytz timezone object"
@@ -39,7 +36,7 @@ class TimeZoneFieldBase(models.Field):
     CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
     MAX_LENGTH = 63
 
-    def __init__(self, choices=None, max_length=None, null=None, **kwargs):
+    def __init__(self, choices=None, max_length=None, **kwargs):
         if choices is not None:
 
             # Choices can be specified in two forms: either
@@ -58,7 +55,6 @@ class TimeZoneFieldBase(models.Field):
 
         kwargs['choices'] = choices or self.CHOICES
         kwargs['max_length'] = max_length or self.MAX_LENGTH
-        kwargs['null'] = null if null is not None else True
 
         super(TimeZoneFieldBase, self).__init__(**kwargs)
 
@@ -79,23 +75,6 @@ class TimeZoneFieldBase(models.Field):
         if 'choices' in kwargs:
             kwargs['choices'] = [(tz.zone, n) for tz, n in kwargs['choices']]
 
-        # there was an unfortunate historical choice to make the default
-        # for this field null=True, rather than follow the default null=False
-        # The parent field's deconstruct() automatically strips null=False
-        # out of kwargs - so we have to add it back in here, and remove our
-        # default of null=True
-        #
-        # Note that if a django-timezone-field 2.0 is ever released, this
-        # default # value for the null kwarg will probably be switched over
-        # to False (and the empty string would be used at the DB level to
-        # represent the 'no timezone' case).
-        if 'null' in kwargs and kwargs['null']:
-            # our default of True, strip it out
-            del kwargs['null']
-        else:
-            # django default, add it back
-            kwargs['null'] = False
-
         return name, path, args, kwargs
 
     def get_internal_type(self):
@@ -112,7 +91,7 @@ class TimeZoneFieldBase(models.Field):
     def _get_python_and_db_repr(self, value):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == '':
-            return (None, None)
+            return (None, '')
         if is_pytz_instance(value):
             return (value, value.zone)
         if isinstance(value, six.string_types):
