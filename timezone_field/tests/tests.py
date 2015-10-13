@@ -1,11 +1,11 @@
 import pytz
 
-import django
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.utils import six, unittest
+from django.utils import six
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.tests.models import TestModel
@@ -229,21 +229,21 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
     class TestModelChoice(models.Model):
         tz_superset = TimeZoneField(
             choices=[(tz, tz) for tz in pytz.all_timezones],
-            blank=True, null=True,
+            blank=True,
         )
         tz_subset = TimeZoneField(
             choices=[(tz, tz) for tz in USA_TZS],
-            blank=True, null=True,
+            blank=True,
         )
 
     class TestModelOldChoiceFormat(models.Model):
         tz_superset = TimeZoneField(
             choices=[(pytz.timezone(tz), tz) for tz in pytz.all_timezones],
-            blank=True, null=True,
+            blank=True,
         )
         tz_subset = TimeZoneField(
             choices=[(pytz.timezone(tz), tz) for tz in USA_TZS],
-            blank=True, null=True,
+            blank=True,
         )
 
     def test_valid_choice(self):
@@ -277,15 +277,19 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
         self.assertRaises(ValidationError, m.full_clean)
 
 
-@unittest.skipIf(django.VERSION < (1, 7), "Migrations not built-in before 1.7")
 class TimeZoneFieldDeconstructTestCase(TestCase):
 
     test_fields = (
         TimeZoneField(),
-        TimeZoneField(
-            max_length=42,
-            choices=[(pytz.timezone(tz), tz) for tz in pytz.common_timezones],
-        ),
+        TimeZoneField(max_length=42),
+        TimeZoneField(choices=[
+            (pytz.timezone('US/Pacific'), 'US/Pacific'),
+            (pytz.timezone('US/Eastern'), 'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
+            ('US/Pacific', 'US/Pacific'),
+            ('US/Eastern', 'US/Eastern'),
+        ]),
     )
 
     def test_deconstruct(self):
@@ -296,9 +300,6 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             self.assertEqual(org_field.choices, new_field.choices)
 
     def test_full_serialization(self):
-        # avoid importing this when test skipped on django 1.6
-        from django.db.migrations.writer import MigrationWriter
-
         # ensure the values passed to kwarg arguments can be serialized
         # the recommended 'deconstruct' testing by django docs doesn't cut it
         # https://docs.djangoproject.com/en/1.7/howto/custom-model-fields/#field-deconstruction
@@ -307,7 +308,7 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             # ensuring the following call doesn't throw an error
             MigrationWriter.serialize(field)
 
-    def test_default_choices_not_frozen(self):
+    def test_default_kwargs_not_frozen(self):
         """
         Ensure the deconstructed representation of the field does not contain
         kwargs if they match the default.
@@ -317,3 +318,22 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
         self.assertNotIn('max_length', kwargs)
+
+    def test_specifying_defaults_not_frozen(self):
+        """
+        If someone's matched the default values with their kwarg args, we
+        shouldn't bothering freezing those.
+        """
+        field = TimeZoneField(max_length=63)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('max_length', kwargs)
+
+        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+        field = TimeZoneField(choices=choices)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('choices', kwargs)
+
+        choices = [(tz, tz) for tz in pytz.common_timezones]
+        field = TimeZoneField(choices=choices)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('choices', kwargs)
