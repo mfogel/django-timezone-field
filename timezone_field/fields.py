@@ -1,5 +1,6 @@
 import pytz
 
+import django
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import six
@@ -93,6 +94,9 @@ class TimeZoneFieldBase(models.Field):
         "Convert to string describing a valid pytz timezone object"
         return self._get_python_and_db_repr(value)[1]
 
+    def from_db_value(self, value, *args):
+        return self.to_python(value)
+
     def _get_python_and_db_repr(self, value):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == '':
@@ -107,7 +111,13 @@ class TimeZoneFieldBase(models.Field):
         raise ValidationError("Invalid timezone '%s'" % value)
 
 
+if django.VERSION < (1, 8):
+    _TimeZoneFieldBase = six.with_metaclass(models.SubfieldBase,
+                                            TimeZoneFieldBase)
+else:
+    _TimeZoneFieldBase = TimeZoneFieldBase
+
+
 # http://packages.python.org/six/#six.with_metaclass
-class TimeZoneField(six.with_metaclass(models.SubfieldBase,
-                                       TimeZoneFieldBase)):
+class TimeZoneField(_TimeZoneFieldBase):
     pass
