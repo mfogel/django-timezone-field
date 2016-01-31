@@ -83,9 +83,11 @@ Installation
 Changelog
 ------------
 
-*   ??? (2016-??-??)
+*   2.0rc1 (2016-01-31)
 
     *   Drop support for django 1.7, add support for django 1.9
+    *   Drop support for python 3.2, 3.3, add support for python 3.5
+    *   Remove tests from source distribution
 
 *   1.3 (2015-10-12)
 
