@@ -7,7 +7,7 @@ from django.utils import six
 from timezone_field.utils import is_pytz_instance
 
 
-class TimeZoneFieldBase(models.Field):
+class TimeZoneField(models.Field):
     """
     Provides database store for pytz timezone objects.
 
@@ -23,55 +23,71 @@ class TimeZoneFieldBase(models.Field):
         * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
         * the pytz.UTC singleton
 
-    Note that blank values ('' and None) are stored as an empty string
-    in the db. Specifying null=True makes your db column not have a NOT
-    NULL constraint, but from the perspective of this field, has no effect.
+    Blank values are stored in the DB as the empty string. Timezones are stored
+    in their string representation.
 
-    If you choose to override the 'choices' kwarg argument, and you specify
-    choices that can't be consumed by pytz.timezone(unicode(YOUR_NEW_CHOICE)),
-    weirdness will ensue. It's ok to further limit CHOICES, but not expand it.
+    The `choices` kwarg can be specified as a list of either
+    [<pytz.timezone>, <str>] or [<str>, <str>]. Internally, it is stored as
+    [<pytz.timezone>, <str>].
     """
 
     description = "A pytz timezone object"
 
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
-    CHOICES = [(tz, tz) for tz in pytz.common_timezones]
+    CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
     MAX_LENGTH = 63
 
-    def __init__(self, **kwargs):
-        parent_kwargs = {
-            'max_length': self.MAX_LENGTH,
-            'choices': TimeZoneField.CHOICES,
-        }
-        parent_kwargs.update(kwargs)
-        super(TimeZoneFieldBase, self).__init__(**parent_kwargs)
+    def __init__(self, choices=None, max_length=None, **kwargs):
+        if choices is None:
+            choices = self.CHOICES
+        else:
+            # Choices can be specified in two forms: either
+            # [<pytz.timezone>, <str>] or [<str>, <str>]
+            #
+            # The [<pytz.timezone>, <str>] format is the one we actually
+            # store the choices in memory because of
+            # https://github.com/mfogel/django-timezone-field/issues/24
+            #
+            # The [<str>, <str>] format is supported because since django
+            # can't deconstruct pytz.timezone objects, migration files must
+            # use an alternate format. Representing the timezones as strings
+            # is the obvious choice.
+            if isinstance(choices[0][0], six.string_types):
+                choices = [(pytz.timezone(n1), n2) for n1, n2 in choices]
 
-        # We expect choices in form [<str>, <str>], but we
-        # also support [<pytz.timezone>, <str>], for backwards compatability
-        # Our parent saved those in self._choices.
-        if self._choices:
-            if is_pytz_instance(self._choices[0][0]):
-                self._choices = [(tz.zone, name) for tz, name in self._choices]
+        if max_length is None:
+            max_length = self.MAX_LENGTH
+
+        super(TimeZoneField, self).__init__(choices=choices,
+                                            max_length=max_length,
+                                            **kwargs)
 
     def validate(self, value, model_instance):
-        # since our choices are of the form [<str>, <str>], convert the
-        # incoming value to a string for validation
         if not is_pytz_instance(value):
             raise ValidationError("'%s' is not a pytz timezone object" % value)
-        tz_as_str = value.zone
-        super(TimeZoneFieldBase, self).validate(tz_as_str, model_instance)
+        super(TimeZoneField, self).validate(value, model_instance)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TimeZoneFieldBase, self).deconstruct()
+        name, path, args, kwargs = super(TimeZoneField, self).deconstruct()
         if kwargs['choices'] == self.CHOICES:
             del kwargs['choices']
         if kwargs['max_length'] == self.MAX_LENGTH:
             del kwargs['max_length']
+
+        # django can't decontruct pytz objects, so transform choices
+        # to [<str>, <str>] format for writing out to the migration
+        if 'choices' in kwargs:
+            kwargs['choices'] = [(tz.zone, n) for tz, n in kwargs['choices']]
+
         return name, path, args, kwargs
 
     def get_internal_type(self):
         return 'CharField'
+
+    def from_db_value(self, value, expression, connection, context):
+        "Convert to pytz timezone object"
+        return self._get_python_and_db_repr(value)[0]
 
     def to_python(self, value):
         "Convert to pytz timezone object"
@@ -84,7 +100,7 @@ class TimeZoneFieldBase(models.Field):
     def _get_python_and_db_repr(self, value):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == '':
-            return (None, None)
+            return (None, '')
         if is_pytz_instance(value):
             return (value, value.zone)
         if isinstance(value, six.string_types):
@@ -93,29 +109,3 @@ class TimeZoneFieldBase(models.Field):
             except pytz.UnknownTimeZoneError:
                 pass
         raise ValidationError("Invalid timezone '%s'" % value)
-
-
-# http://packages.python.org/six/#six.with_metaclass
-class TimeZoneField(six.with_metaclass(models.SubfieldBase,
-                                       TimeZoneFieldBase)):
-    pass
-
-
-# South support
-try:
-    from south.modelsinspector import add_introspection_rules
-except ImportError:
-    pass
-else:
-    add_introspection_rules(
-        rules=[(
-            (TimeZoneField, ),  # Class(es) these apply to
-            [],                 # Positional arguments (not used)
-            {                   # Keyword argument
-                'max_length': [
-                    'max_length', {'default': TimeZoneField.MAX_LENGTH},
-                ],
-            },
-        )],
-        patterns=['timezone_field\.fields\.']
-    )

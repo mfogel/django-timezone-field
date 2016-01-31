@@ -2,12 +2,12 @@ from __future__ import absolute_import
 
 import pytz
 
-import django
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.utils import six, unittest
+from django.utils import six
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from tests.models import TestModel
@@ -22,6 +22,7 @@ GMT_tz = pytz.timezone(GMT)
 UTC_tz = pytz.timezone(UTC)
 
 INVALID_TZ = 'ogga booga'
+UNCOMMON_TZ = 'Singapore'
 
 USA_TZS = [
     'US/Alaska',
@@ -61,6 +62,10 @@ class TimeZoneFormFieldTestCase(TestCase):
 
     def test_invalid_invalid_str(self):
         form = TestForm({'tz': INVALID_TZ})
+        self.assertFalse(form.is_valid())
+
+    def test_invalid_uncommon_tz(self):
+        form = TestForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
 
 
@@ -106,6 +111,11 @@ class TimeZoneFieldModelFormTestCase(TestCase):
 
     def test_invalid_choice(self):
         form = TestModelForm({'tz': INVALID_TZ})
+        self.assertFalse(form.is_valid())
+        self.assertTrue(any('choice' in e for e in form.errors['tz']))
+
+    def test_invalid_uncommmon_tz(self):
+        form = TestModelForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
         self.assertTrue(any('choice' in e for e in form.errors['tz']))
 
@@ -205,12 +215,14 @@ class TimeZoneFieldTestCase(TestCase):
         self.assertRaises(ValidationError, m.full_clean)
 
     def test_invalid_choice(self):
-        with self.assertRaises(ValidationError):
-            TestModel(tz=INVALID_TZ)
-        with self.assertRaises(ValidationError):
-            TestModel(tz=4)
-        with self.assertRaises(ValidationError):
-            TestModel(tz=object())
+        m = TestModel(tz=INVALID_TZ)
+        self.assertRaises(ValidationError, m.full_clean)
+
+        m = TestModel(tz=4)
+        self.assertRaises(ValidationError, m.full_clean)
+
+        m = TestModel(tz=object())
+        self.assertRaises(ValidationError, m.full_clean)
 
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
@@ -221,63 +233,65 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
     class TestModelChoice(models.Model):
         tz_superset = TimeZoneField(
             choices=[(tz, tz) for tz in pytz.all_timezones],
-            blank=True, null=True,
+            blank=True,
         )
         tz_subset = TimeZoneField(
             choices=[(tz, tz) for tz in USA_TZS],
-            blank=True, null=True,
+            blank=True,
         )
 
     class TestModelOldChoiceFormat(models.Model):
         tz_superset = TimeZoneField(
             choices=[(pytz.timezone(tz), tz) for tz in pytz.all_timezones],
-            blank=True, null=True,
+            blank=True,
         )
         tz_subset = TimeZoneField(
             choices=[(pytz.timezone(tz), tz) for tz in USA_TZS],
-            blank=True, null=True,
+            blank=True,
         )
 
     def test_valid_choice(self):
-        m = self.TestModelChoice.objects.create(tz_superset=PST, tz_subset=PST)
-        self.assertEqual(m.tz_superset, PST_tz)
-        self.assertEqual(m.tz_subset, PST_tz)
+        self.TestModelChoice.objects.create(tz_superset=PST, tz_subset=PST)
         m = self.TestModelChoice.objects.get()
         self.assertEqual(m.tz_superset, PST_tz)
         self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice(self):
-        with self.assertRaises(ValidationError):
-            self.TestModelChoice(tz_superset=self.invalid_superset_tz)
+        m = self.TestModelChoice(tz_superset=self.invalid_superset_tz)
+        self.assertRaises(ValidationError, m.full_clean)
+
         m = self.TestModelChoice(tz_subset=self.invalid_subset_tz)
         self.assertRaises(ValidationError, m.full_clean)
 
     def test_valid_choice_old_format(self):
-        m = self.TestModelOldChoiceFormat.objects.create(
+        self.TestModelOldChoiceFormat.objects.create(
             tz_superset=PST, tz_subset=PST,
         )
-        self.assertEqual(m.tz_superset, PST_tz)
-        self.assertEqual(m.tz_subset, PST_tz)
         m = self.TestModelOldChoiceFormat.objects.get()
         self.assertEqual(m.tz_superset, PST_tz)
         self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice_old_format(self):
-        with self.assertRaises(ValidationError):
-            self.TestModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
+        m = self.TestModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
+        self.assertRaises(ValidationError, m.full_clean)
+
         m = self.TestModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
         self.assertRaises(ValidationError, m.full_clean)
 
 
-@unittest.skipIf(django.VERSION < (1, 7), "Migrations not built-in before 1.7")
 class TimeZoneFieldDeconstructTestCase(TestCase):
 
     test_fields = (
         TimeZoneField(),
-        TimeZoneField(
-            max_length=42,
-            choices=[(pytz.timezone(tz), tz) for tz in pytz.common_timezones],
-        ),
+        TimeZoneField(max_length=42),
+        TimeZoneField(choices=[
+            (pytz.timezone('US/Pacific'), 'US/Pacific'),
+            (pytz.timezone('US/Eastern'), 'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
+            ('US/Pacific', 'US/Pacific'),
+            ('US/Eastern', 'US/Eastern'),
+        ]),
     )
 
     def test_deconstruct(self):
@@ -288,9 +302,6 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             self.assertEqual(org_field.choices, new_field.choices)
 
     def test_full_serialization(self):
-        # avoid importing this when test skipped on django 1.6
-        from django.db.migrations.writer import MigrationWriter
-
         # ensure the values passed to kwarg arguments can be serialized
         # the recommended 'deconstruct' testing by django docs doesn't cut it
         # https://docs.djangoproject.com/en/1.7/howto/custom-model-fields/#field-deconstruction
@@ -299,7 +310,7 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             # ensuring the following call doesn't throw an error
             MigrationWriter.serialize(field)
 
-    def test_default_choices_not_frozen(self):
+    def test_default_kwargs_not_frozen(self):
         """
         Ensure the deconstructed representation of the field does not contain
         kwargs if they match the default.
@@ -309,3 +320,22 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
         self.assertNotIn('max_length', kwargs)
+
+    def test_specifying_defaults_not_frozen(self):
+        """
+        If someone's matched the default values with their kwarg args, we
+        shouldn't bothering freezing those.
+        """
+        field = TimeZoneField(max_length=63)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('max_length', kwargs)
+
+        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+        field = TimeZoneField(choices=choices)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('choices', kwargs)
+
+        choices = [(tz, tz) for tz in pytz.common_timezones]
+        field = TimeZoneField(choices=choices)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertNotIn('choices', kwargs)

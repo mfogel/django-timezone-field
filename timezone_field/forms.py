@@ -14,7 +14,7 @@ class TimeZoneFormField(forms.TypedChoiceField):
 
         defaults = {
             'coerce': coerce_to_pytz,
-            'choices': [(tz, tz) for tz in pytz.all_timezones],
+            'choices': [(tz, tz) for tz in pytz.common_timezones],
             'empty_value': None,
         }
         defaults.update(kwargs)
