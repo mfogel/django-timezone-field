@@ -213,12 +213,14 @@ class TimeZoneFieldTestCase(TestCase):
         self.assertRaises(ValidationError, m.full_clean)
 
     def test_invalid_choice(self):
-        with self.assertRaises(ValidationError):
-            TestModel(tz=INVALID_TZ)
-        with self.assertRaises(ValidationError):
-            TestModel(tz=4)
-        with self.assertRaises(ValidationError):
-            TestModel(tz=object())
+        m = TestModel(tz=INVALID_TZ)
+        self.assertRaises(ValidationError, m.full_clean)
+
+        m = TestModel(tz=4)
+        self.assertRaises(ValidationError, m.full_clean)
+
+        m = TestModel(tz=object())
+        self.assertRaises(ValidationError, m.full_clean)
 
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
@@ -247,32 +249,30 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
         )
 
     def test_valid_choice(self):
-        m = self.TestModelChoice.objects.create(tz_superset=PST, tz_subset=PST)
-        self.assertEqual(m.tz_superset, PST_tz)
-        self.assertEqual(m.tz_subset, PST_tz)
+        self.TestModelChoice.objects.create(tz_superset=PST, tz_subset=PST)
         m = self.TestModelChoice.objects.get()
         self.assertEqual(m.tz_superset, PST_tz)
         self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice(self):
-        with self.assertRaises(ValidationError):
-            self.TestModelChoice(tz_superset=self.invalid_superset_tz)
+        m = self.TestModelChoice(tz_superset=self.invalid_superset_tz)
+        self.assertRaises(ValidationError, m.full_clean)
+
         m = self.TestModelChoice(tz_subset=self.invalid_subset_tz)
         self.assertRaises(ValidationError, m.full_clean)
 
     def test_valid_choice_old_format(self):
-        m = self.TestModelOldChoiceFormat.objects.create(
+        self.TestModelOldChoiceFormat.objects.create(
             tz_superset=PST, tz_subset=PST,
         )
-        self.assertEqual(m.tz_superset, PST_tz)
-        self.assertEqual(m.tz_subset, PST_tz)
         m = self.TestModelOldChoiceFormat.objects.get()
         self.assertEqual(m.tz_superset, PST_tz)
         self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice_old_format(self):
-        with self.assertRaises(ValidationError):
-            self.TestModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
+        m = self.TestModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
+        self.assertRaises(ValidationError, m.full_clean)
+
         m = self.TestModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
         self.assertRaises(ValidationError, m.full_clean)
 
