@@ -1,11 +1,14 @@
 django-timezone-field
 =====================
 
-.. image:: https://api.travis-ci.org/mfogel/django-timezone-field.png?branch=develop
-   :target: https://travis-ci.org/mfogel/django-timezone-field
+.. image:: https://img.shields.io/travis/mfogel/django-timezone-field/develop.svg
+   :target: https://travis-ci.org/mfogel/django-timezone-field/
 
-.. image:: https://coveralls.io/repos/mfogel/django-timezone-field/badge.png?branch=develop
-   :target: https://coveralls.io/r/mfogel/django-timezone-field
+.. image:: https://img.shields.io/coveralls/mfogel/django-timezone-field/develop.svg
+   :target: https://coveralls.io/r/mfogel/django-timezone-field/
+
+.. image:: https://img.shields.io/pypi/dm/django-timezone-field.svg
+   :target: https://pypi.python.org/pypi/django-timezone-field/
 
 A Django app providing database and form fields for `pytz`__ timezone objects.
 
@@ -79,6 +82,12 @@ Installation
 
 Changelog
 ------------
+
+*   2.0rc1 (2016-01-31)
+
+    *   Drop support for django 1.7, add support for django 1.9
+    *   Drop support for python 3.2, 3.3, add support for python 3.5
+    *   Remove tests from source distribution
 
 *   1.3 (2015-10-12)
 

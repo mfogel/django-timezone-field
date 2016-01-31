@@ -1,5 +1,5 @@
 """
-Django settings for timezone_field.tests project.
+Django settings for tests project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.7/topics/settings/
@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'timezone_field',
-    'timezone_field.tests',
+    'tests',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -50,9 +50,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'timezone_field.tests.urls'
+ROOT_URLCONF = 'tests.urls'
 
-WSGI_APPLICATION = 'timezone_field.tests.wsgi.application'
+WSGI_APPLICATION = 'tests.wsgi.application'
 
 
 # Database

@@ -7,7 +7,7 @@ from django.utils import six
 from timezone_field.utils import is_pytz_instance
 
 
-class TimeZoneFieldBase(models.Field):
+class TimeZoneField(models.Field):
     """
     Provides database store for pytz timezone objects.
 
@@ -59,17 +59,17 @@ class TimeZoneFieldBase(models.Field):
         if max_length is None:
             max_length = self.MAX_LENGTH
 
-        super(TimeZoneFieldBase, self).__init__(choices=choices,
-                                                max_length=max_length,
-                                                **kwargs)
+        super(TimeZoneField, self).__init__(choices=choices,
+                                            max_length=max_length,
+                                            **kwargs)
 
     def validate(self, value, model_instance):
         if not is_pytz_instance(value):
             raise ValidationError("'%s' is not a pytz timezone object" % value)
-        super(TimeZoneFieldBase, self).validate(value, model_instance)
+        super(TimeZoneField, self).validate(value, model_instance)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TimeZoneFieldBase, self).deconstruct()
+        name, path, args, kwargs = super(TimeZoneField, self).deconstruct()
         if kwargs['choices'] == self.CHOICES:
             del kwargs['choices']
         if kwargs['max_length'] == self.MAX_LENGTH:
@@ -84,6 +84,16 @@ class TimeZoneFieldBase(models.Field):
 
     def get_internal_type(self):
         return 'CharField'
+
+    def get_default(self):
+        # allow defaults to be still specified as strings. Allows for easy
+        # serialization into migration files
+        value = super(TimeZoneField, self).get_default()
+        return self._get_python_and_db_repr(value)[0]
+
+    def from_db_value(self, value, expression, connection, context):
+        "Convert to pytz timezone object"
+        return self._get_python_and_db_repr(value)[0]
 
     def to_python(self, value):
         "Convert to pytz timezone object"
@@ -105,9 +115,3 @@ class TimeZoneFieldBase(models.Field):
             except pytz.UnknownTimeZoneError:
                 pass
         raise ValidationError("Invalid timezone '%s'" % value)
-
-
-# http://packages.python.org/six/#six.with_metaclass
-class TimeZoneField(six.with_metaclass(models.SubfieldBase,
-                                       TimeZoneFieldBase)):
-    pass
