@@ -180,6 +180,12 @@ class TimeZoneFieldTestCase(TestCase):
         self.assertEqual(m.tz_opt, None)
         self.assertEqual(m.tz_opt_default, PST_tz)
 
+    def test_valid_default_values_without_saving_to_db(self):
+        m = TestModel(tz=UTC_tz)
+        m.full_clean()
+        self.assertEqual(m.tz_opt, None)
+        self.assertEqual(m.tz_opt_default, PST_tz)
+
     def test_valid_blank_str(self):
         m = TestModel.objects.create(tz=PST, tz_opt='')
         m.full_clean()
