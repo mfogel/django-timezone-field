@@ -32,6 +32,14 @@ matrix:
       env: TOXENV=py35-django19-sqlite
     - python: "3.5"
       env: TOXENV=py35-django19-postgres
+    - python: "3.5"
+      env: TOXENV=py35-django110-sqlite
+    - python: "3.5"
+      env: TOXENV=py35-django110-postgres
+    - python: "3.5"
+      env: TOXENV=py35-django111-sqlite
+    - python: "3.5"
+      env: TOXENV=py35-django111-postgres
 install:
   - pip install tox
 before_script:
