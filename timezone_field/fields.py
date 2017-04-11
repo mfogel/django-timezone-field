@@ -35,7 +35,7 @@ class TimeZoneField(models.Field):
 
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
-    CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+    CHOICES = [(pytz.timezone(tz), tz.replace('_', ' ')) for tz in pytz.common_timezones]
     MAX_LENGTH = 63
 
     def __init__(self, choices=None, max_length=None, **kwargs):
