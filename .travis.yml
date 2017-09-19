@@ -18,4 +18,4 @@ before_script:
 script:
   - flake8 .
   - coverage run setup.py test
-  - coverage report --fail-under=100
+  - coverage report --fail-under=98
