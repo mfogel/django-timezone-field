@@ -10,7 +10,7 @@ from django.test import TestCase
 from django.utils import six
 
 from timezone_field import TimeZoneField, TimeZoneFormField
-from tests.models import TestModel
+from timezone_field.tests.models import TestModel
 
 
 PST = 'America/Los_Angeles'  # pytz.tzinfo.DstTzInfo
