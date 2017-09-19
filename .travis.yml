@@ -13,11 +13,9 @@ env:
     - DJANGO=">=1.11,<2.0"
 install:
   - pip install -q coverage flake8 Django$DJANGO django-nose>=1.4
-  - pip install -r requirements/docs.txt
 before_script:
   - psql -c 'CREATE DATABASE django_timezone_field;' -U postgres
 script:
   - flake8 .
   - coverage run setup.py test
   - coverage report --fail-under=100
-  - python setup.py build_sphinx
