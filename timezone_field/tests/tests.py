@@ -267,7 +267,8 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
             self.FakeModelChoice(tz_superset=self.invalid_superset_tz)
 
         with self.assertRaises(ValidationError):
-            self.FakeModelChoice(tz_subset=self.invalid_subset_tz)
+            m = self.FakeModelChoice(tz_subset=self.invalid_subset_tz)
+            m.full_clean()
 
     def test_valid_choice_old_format(self):
         self.FakeModelOldChoiceFormat.objects.create(
@@ -282,7 +283,8 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
             self.FakeModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
 
         with self.assertRaises(ValidationError):
-            self.FakeModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
+            m = self.FakeModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
+            m.full_clean()
 
 
 class TimeZoneFieldDeconstructTestCase(TestCase):
