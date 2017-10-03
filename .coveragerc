@@ -1,0 +1,15 @@
+[run]
+branch = True
+omit =
+    timezone_field/migrations/*
+    timezone_field/version.py
+source = timezone_field
+[report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise NotImplementedError
+fail_under = 98
+show_missing = 1

@@ -1,40 +1,21 @@
-sudo: false
 language: python
-matrix:
-  include:
-    - python: "2.7"
-      env: TOXENV=flake8
-    - python: "2.7"
-      env: TOXENV=coverage
-      install: pip install tox coveralls
-      after_success: coveralls
-    - python: "2.7"
-      env: TOXENV=py27-django18-sqlite
-    - python: "2.7"
-      env: TOXENV=py27-django18-postgres
-    - python: "2.7"
-      env: TOXENV=py27-django19-sqlite
-    - python: "2.7"
-      env: TOXENV=py27-django19-postgres
-    - python: "3.4"
-      env: TOXENV=py34-django18-sqlite
-    - python: "3.4"
-      env: TOXENV=py34-django18-postgres
-    - python: "3.4"
-      env: TOXENV=py34-django19-sqlite
-    - python: "3.4"
-      env: TOXENV=py34-django19-postgres
-    - python: "3.5"
-      env: TOXENV=py35-django18-sqlite
-    - python: "3.5"
-      env: TOXENV=py35-django18-postgres
-    - python: "3.5"
-      env: TOXENV=py35-django19-sqlite
-    - python: "3.5"
-      env: TOXENV=py35-django19-postgres
+python:
+  - '2.7'
+  - '3.4'
+  - '3.5'
+  - '3.6'
+env:
+  global:
+    - DB=postgres
+  matrix:
+    - DJANGO=">=1.9,<1.10"
+    - DJANGO=">=1.10,<1.11"
+    - DJANGO=">=1.11,<2.0"
 install:
-  - pip install tox
+  - pip install -q coverage flake8 Django$DJANGO django-nose>=1.4
 before_script:
-  - psql -c 'create database timezone_field_tests;' -U postgres
+  - psql -c 'CREATE DATABASE django_timezone_field;' -U postgres
 script:
-  - tox
+  - flake8 .
+  - coverage run setup.py test
+  - coverage report --fail-under=98
