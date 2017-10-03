@@ -221,14 +221,14 @@ class TimeZoneFieldTestCase(TestCase):
         self.assertRaises(ValidationError, m.full_clean)
 
     def test_invalid_choice(self):
-        m = FakeModel(tz=INVALID_TZ)
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            FakeModel(tz=INVALID_TZ)
 
-        m = FakeModel(tz=4)
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            FakeModel(tz=4)
 
-        m = FakeModel(tz=object())
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            FakeModel(tz=object())
 
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
@@ -263,11 +263,11 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
         self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice(self):
-        m = self.FakeModelChoice(tz_superset=self.invalid_superset_tz)
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            self.FakeModelChoice(tz_superset=self.invalid_superset_tz)
 
-        m = self.FakeModelChoice(tz_subset=self.invalid_subset_tz)
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            self.FakeModelChoice(tz_subset=self.invalid_subset_tz)
 
     def test_valid_choice_old_format(self):
         self.FakeModelOldChoiceFormat.objects.create(
@@ -278,11 +278,11 @@ class TimeZoneFieldLimitedChoicesTestCase(TestCase):
         self.assertEqual(m.tz_subset, PST_tz)
 
     def test_invalid_choice_old_format(self):
-        m = self.FakeModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            self.FakeModelOldChoiceFormat(tz_superset=self.invalid_superset_tz)
 
-        m = self.FakeModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
-        self.assertRaises(ValidationError, m.full_clean)
+        with self.assertRaises(ValidationError):
+            self.FakeModelOldChoiceFormat(tz_subset=self.invalid_subset_tz)
 
 
 class TimeZoneFieldDeconstructTestCase(TestCase):
