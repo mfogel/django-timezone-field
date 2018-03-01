@@ -110,11 +110,6 @@ class TimeZoneField(models.Field):
             return (None, '')
         if is_pytz_instance(value):
             return (value, value.zone)
-        if isinstance(value, six.string_types):
-            try:
-                return (pytz.timezone(value), value)
-            except pytz.UnknownTimeZoneError:
-                pass
         try:
             return (pytz.timezone(force_text(value)), force_text(value))
         except pytz.UnknownTimeZoneError:

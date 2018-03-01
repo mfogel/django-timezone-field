@@ -88,6 +88,7 @@ Changelog
     *   Add support for django 1.10, 1.11
     *   Add support for python 3.6
     *   Add wheel support
+    *   Support bytes in DB fields (#38 & #39)
 
 *   2.0 (2016-01-31)
 
