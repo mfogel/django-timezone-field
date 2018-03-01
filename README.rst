@@ -83,6 +83,12 @@ Installation
 Changelog
 ------------
 
+*   2.1 (in development)
+
+    *   Add support for django 1.10, 1.11
+    *   Add support for python 3.6
+    *   Add wheel support
+
 *   2.0 (2016-01-31)
 
     *   Drop support for django 1.7, add support for django 1.9
