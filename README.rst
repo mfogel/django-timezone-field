@@ -88,7 +88,7 @@ Changelog
     *   Add support for django 1.10, 1.11
     *   Add support for python 3.6
     *   Add wheel support
-    *   Support bytes in DB fields (#38 & #39)
+    *   Support bytes in DB fields (`#38`__ & `#39`__)
 
 *   2.0 (2016-01-31)
 
@@ -153,6 +153,8 @@ __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.pip-installer.org/
 __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+__ https://github.com/mfogel/django-timezone-field/issues/38
+__ https://github.com/mfogel/django-timezone-field/issues/39
 __ https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3
 __ https://tox.readthedocs.org/
 __ https://github.com/mfogel/django-timezone-field/
