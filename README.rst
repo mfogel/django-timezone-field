@@ -83,7 +83,7 @@ Installation
 Changelog
 ------------
 
-*   2.1 (in development)
+*   2.1 (2018-03-01)
 
     *   Add support for django 1.10, 1.11
     *   Add support for python 3.6
