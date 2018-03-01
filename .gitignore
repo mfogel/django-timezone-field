@@ -2,3 +2,4 @@
 .tox
 *.pyc
 *.egg-info
+htmlcov
