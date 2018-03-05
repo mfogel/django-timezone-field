@@ -57,6 +57,8 @@ class TimeZoneField(models.Field):
             if isinstance(choices[0][0], six.string_types):
                 choices = [(pytz.timezone(n1), n2) for n1, n2 in choices]
 
+        choices = [(n1, n2.replace('_', ' ')) for n1, n2 in choices]
+        
         if max_length is None:
             max_length = self.MAX_LENGTH
 
