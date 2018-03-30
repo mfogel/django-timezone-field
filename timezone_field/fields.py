@@ -39,30 +39,32 @@ class TimeZoneField(models.Field):
     CHOICES = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
     MAX_LENGTH = 63
 
-    def __init__(self, choices=None, max_length=None, **kwargs):
-        if choices is None:
-            choices = self.CHOICES
-        else:
-            # Choices can be specified in two forms: either
-            # [<pytz.timezone>, <str>] or [<str>, <str>]
-            #
-            # The [<pytz.timezone>, <str>] format is the one we actually
-            # store the choices in memory because of
-            # https://github.com/mfogel/django-timezone-field/issues/24
-            #
-            # The [<str>, <str>] format is supported because since django
-            # can't deconstruct pytz.timezone objects, migration files must
-            # use an alternate format. Representing the timezones as strings
-            # is the obvious choice.
-            if isinstance(choices[0][0], six.string_types):
-                choices = [(pytz.timezone(n1), n2) for n1, n2 in choices]
+    def __init__(self, *args, **kwargs):
+        # allow some use of positional args up until the args we customize
+        # https://github.com/mfogel/django-timezone-field/issues/42
+        # https://github.com/django/django/blob/1.11.11/django/db/models/fields/__init__.py#L145
+        if len(args) > 3:
+            raise ValueError('Cannot specify max_length by positional arg')
 
-        if max_length is None:
-            max_length = self.MAX_LENGTH
+        kwargs.setdefault('choices', self.CHOICES)
+        kwargs.setdefault('max_length', self.MAX_LENGTH)
 
-        super(TimeZoneField, self).__init__(choices=choices,
-                                            max_length=max_length,
-                                            **kwargs)
+        # Choices can be specified in two forms: either
+        # [<pytz.timezone>, <str>] or [<str>, <str>]
+        #
+        # The [<pytz.timezone>, <str>] format is the one we actually
+        # store the choices in memory because of
+        # https://github.com/mfogel/django-timezone-field/issues/24
+        #
+        # The [<str>, <str>] format is supported because since django
+        # can't deconstruct pytz.timezone objects, migration files must
+        # use an alternate format. Representing the timezones as strings
+        # is the obvious choice.
+        choices = kwargs['choices']
+        if isinstance(choices[0][0], six.string_types):
+            kwargs['choices'] = [(pytz.timezone(n1), n2) for n1, n2 in choices]
+
+        super(TimeZoneField, self).__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
         if not is_pytz_instance(value):

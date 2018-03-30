@@ -230,6 +230,14 @@ class TimeZoneFieldTestCase(TestCase):
         m = TestModel(tz=object())
         self.assertRaises(ValidationError, m.full_clean)
 
+    def test_some_positional_args_ok(self):
+        TimeZoneField('a verbose name', 'a name', True)
+
+    def test_too_many_positional_args_not_ok(self):
+        def createField():
+            TimeZoneField('a verbose name', 'a name', True, 42)
+        self.assertRaises(ValueError, createField)
+
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
 
