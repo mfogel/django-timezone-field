@@ -296,8 +296,16 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             (pytz.timezone('US/Eastern'), 'US/Eastern'),
         ]),
         TimeZoneField(choices=[
+            (pytz.timezone(b'US/Pacific'), b'US/Pacific'),
+            (pytz.timezone(b'US/Eastern'), b'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
             ('US/Pacific', 'US/Pacific'),
             ('US/Eastern', 'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
+            (b'US/Pacific', b'US/Pacific'),
+            (b'US/Eastern', b'US/Eastern'),
         ]),
     )
 

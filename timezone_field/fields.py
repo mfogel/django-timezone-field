@@ -54,7 +54,7 @@ class TimeZoneField(models.Field):
             # can't deconstruct pytz.timezone objects, migration files must
             # use an alternate format. Representing the timezones as strings
             # is the obvious choice.
-            if isinstance(choices[0][0], six.string_types):
+            if isinstance(choices[0][0], (six.string_types, six.binary_type)):
                 choices = [(pytz.timezone(n1), n2) for n1, n2 in choices]
 
         if max_length is None:
