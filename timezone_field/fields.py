@@ -61,7 +61,7 @@ class TimeZoneField(models.Field):
         # use an alternate format. Representing the timezones as strings
         # is the obvious choice.
         choices = kwargs['choices']
-        if isinstance(choices[0][0], six.string_types):
+        if isinstance(choices[0][0], (six.string_types, six.binary_type)):
             kwargs['choices'] = [(pytz.timezone(n1), n2) for n1, n2 in choices]
 
         super(TimeZoneField, self).__init__(*args, **kwargs)
