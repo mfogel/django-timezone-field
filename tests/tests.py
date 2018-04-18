@@ -339,7 +339,13 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         db.
         """
         field = TimeZoneField()
+
+        # django 1.11 signuature
         value = field.from_db_value(b'UTC', None, None, None)
+        self.assertEqual(pytz.UTC, value)
+
+        # django 2.0+ signuature
+        value = field.from_db_value(b'UTC', None, None)
         self.assertEqual(pytz.UTC, value)
 
     def test_default_kwargs_not_frozen(self):
