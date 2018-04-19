@@ -68,6 +68,11 @@ class TimeZoneFormFieldTestCase(TestCase):
         form = TestForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
 
+    def test_default_human_readable_choices_dont_have_underscores(self):
+        form = TestForm()
+        pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST]
+        self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
+
 
 class TimeZoneFieldModelFormTestCase(TestCase):
 
@@ -118,6 +123,11 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         form = TestModelForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
         self.assertTrue(any('choice' in e for e in form.errors['tz']))
+
+    def test_default_human_readable_choices_dont_have_underscores(self):
+        form = TestModelForm()
+        pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST_tz]
+        self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
 
 
 class TimeZoneFieldTestCase(TestCase):
@@ -237,6 +247,10 @@ class TimeZoneFieldTestCase(TestCase):
         def createField():
             TimeZoneField('a verbose name', 'a name', True, 42)
         self.assertRaises(ValueError, createField)
+
+    def test_default_human_readable_choices_dont_have_underscores(self):
+        m = TestModel(tz=PST_tz)
+        self.assertEqual(m.get_tz_display(), 'America/Los Angeles')
 
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
@@ -368,12 +382,15 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('max_length', kwargs)
 
-        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+        choices = [
+            (pytz.timezone(tz), tz.replace('_', ' '))
+            for tz in pytz.common_timezones
+        ]
         field = TimeZoneField(choices=choices)
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
 
-        choices = [(tz, tz) for tz in pytz.common_timezones]
+        choices = [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones]
         field = TimeZoneField(choices=choices)
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)

@@ -86,6 +86,8 @@ Changelog
 *   3.0 (in developement, not yet released)
 
     *   Support django 1.11, 2.0
+    *   Change default human-readable timezone names to exclude underscores
+        (`#32`__ & `#37`__)
 
 
 *   2.1 (2018-03-01)
@@ -158,6 +160,8 @@ __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.pip-installer.org/
 __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+__ https://github.com/mfogel/django-timezone-field/issues/32
+__ https://github.com/mfogel/django-timezone-field/issues/37
 __ https://github.com/mfogel/django-timezone-field/issues/38
 __ https://github.com/mfogel/django-timezone-field/issues/39
 __ https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3
