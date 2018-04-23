@@ -68,6 +68,11 @@ class TimeZoneFormFieldTestCase(TestCase):
         form = TestForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
 
+    def test_default_human_readable_choices_dont_have_underscores(self):
+        form = TestForm()
+        pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST]
+        self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
+
 
 class TimeZoneFieldModelFormTestCase(TestCase):
 
@@ -118,6 +123,11 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         form = TestModelForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
         self.assertTrue(any('choice' in e for e in form.errors['tz']))
+
+    def test_default_human_readable_choices_dont_have_underscores(self):
+        form = TestModelForm()
+        pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST_tz]
+        self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
 
 
 class TimeZoneFieldTestCase(TestCase):
@@ -230,6 +240,18 @@ class TimeZoneFieldTestCase(TestCase):
         m = TestModel(tz=object())
         self.assertRaises(ValidationError, m.full_clean)
 
+    def test_some_positional_args_ok(self):
+        TimeZoneField('a verbose name', 'a name', True)
+
+    def test_too_many_positional_args_not_ok(self):
+        def createField():
+            TimeZoneField('a verbose name', 'a name', True, 42)
+        self.assertRaises(ValueError, createField)
+
+    def test_default_human_readable_choices_dont_have_underscores(self):
+        m = TestModel(tz=PST_tz)
+        self.assertEqual(m.get_tz_display(), 'America/Los Angeles')
+
 
 class TimeZoneFieldLimitedChoicesTestCase(TestCase):
 
@@ -296,8 +318,16 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
             (pytz.timezone('US/Eastern'), 'US/Eastern'),
         ]),
         TimeZoneField(choices=[
+            (pytz.timezone(b'US/Pacific'), b'US/Pacific'),
+            (pytz.timezone(b'US/Eastern'), b'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
             ('US/Pacific', 'US/Pacific'),
             ('US/Eastern', 'US/Eastern'),
+        ]),
+        TimeZoneField(choices=[
+            (b'US/Pacific', b'US/Pacific'),
+            (b'US/Eastern', b'US/Eastern'),
         ]),
     )
 
@@ -323,7 +353,13 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         db.
         """
         field = TimeZoneField()
+
+        # django 1.11 signuature
         value = field.from_db_value(b'UTC', None, None, None)
+        self.assertEqual(pytz.UTC, value)
+
+        # django 2.0+ signuature
+        value = field.from_db_value(b'UTC', None, None)
         self.assertEqual(pytz.UTC, value)
 
     def test_default_kwargs_not_frozen(self):
@@ -346,12 +382,15 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('max_length', kwargs)
 
-        choices = [(pytz.timezone(tz), tz) for tz in pytz.common_timezones]
+        choices = [
+            (pytz.timezone(tz), tz.replace('_', ' '))
+            for tz in pytz.common_timezones
+        ]
         field = TimeZoneField(choices=choices)
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
 
-        choices = [(tz, tz) for tz in pytz.common_timezones]
+        choices = [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones]
         field = TimeZoneField(choices=choices)
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
