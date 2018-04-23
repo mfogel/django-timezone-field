@@ -83,7 +83,7 @@ Installation
 Changelog
 ------------
 
-*   3.0 (in developement, not yet released)
+*   3.0rc1 (2018-04-23)
 
     *   Support django 1.11, 2.0
     *   Change default human-readable timezone names to exclude underscores
