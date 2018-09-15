@@ -85,7 +85,8 @@ Changelog
 
 *   3.0rc1 (2018-04-23)
 
-    *   Support django 1.11, 2.0
+    *   Support django 1.11, 2.0, 2.1
+    *   Add support for python 3.7
     *   Change default human-readable timezone names to exclude underscores
         (`#32`__ & `#37`__)
 
