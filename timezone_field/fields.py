@@ -152,7 +152,7 @@ class TimeZoneField(models.Field):
             pair_two = "GMT{sign}{gmt_diff} {timezone}".format(
                 sign="-" if delta < 0 else "+",
                 gmt_diff=gmt_diff,
-                timezone=tz
+                timezone=tz_str.replace('_', ' ')
             )
             _choices.append((delta, pair_one, pair_two))
 
