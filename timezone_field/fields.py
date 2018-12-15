@@ -139,7 +139,6 @@ class TimeZoneField(models.Field):
         A list of tuples in this format:
         (<pytz.timezone>, <str>)
         """
-        # timezones = pytz.common_timezones_set
         gmt_timezone = pytz.timezone('Greenwich')
         time_ref = datetime(2000, 1, 1)
         time_zero = gmt_timezone.localize(time_ref)
