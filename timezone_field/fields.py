@@ -2,7 +2,6 @@ import pytz
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import six
 from django.utils.encoding import force_text
 
 from timezone_field.utils import is_pytz_instance, add_gmt_offset_to_choices
@@ -65,7 +64,7 @@ class TimeZoneField(models.Field):
         # use an alternate format. Representing the timezones as strings
         # is the obvious choice.
         choices = kwargs['choices']
-        if isinstance(choices[0][0], (six.string_types, six.binary_type)):
+        if isinstance(choices[0][0], (str, bytes)):
             kwargs['choices'] = [(pytz.timezone(n1), n2) for n1, n2 in choices]
 
         if kwargs['display_GMT_offset']:
