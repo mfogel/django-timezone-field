@@ -81,9 +81,9 @@ class TimeZoneField(models.Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(TimeZoneField, self).deconstruct()
-        if kwargs['choices'] == self.CHOICES:
+        if kwargs.get('choices') == self.CHOICES:
             del kwargs['choices']
-        if kwargs['max_length'] == self.MAX_LENGTH:
+        if kwargs.get('max_length') == self.MAX_LENGTH:
             del kwargs['max_length']
 
         # django can't decontruct pytz objects, so transform choices
