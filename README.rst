@@ -50,7 +50,8 @@ Form Field
     from timezone_field import TimeZoneFormField
 
     class MyForm(forms.Form):
-        timezone = TimeZoneFormField()
+        timezone = TimeZoneFormField() # displays like "America/Los_Angeles"
+        timezone2 = TimeZoneFormField(display_GMT_offset=True) # displays like "GMT-08:00 America/Los_Angeles"
 
     my_form = MyForm({
         'timezone': 'America/Los_Angeles',

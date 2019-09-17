@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import six
 from django.utils.encoding import force_text
 
-from timezone_field.utils import is_pytz_instance
+from timezone_field.utils import is_pytz_instance, add_gmt_offset_to_choices
 
 
 class TimeZoneField(models.Field):
@@ -51,6 +51,7 @@ class TimeZoneField(models.Field):
 
         kwargs.setdefault('choices', self.CHOICES)
         kwargs.setdefault('max_length', self.MAX_LENGTH)
+        kwargs.setdefault('display_GMT_offset', False)
 
         # Choices can be specified in two forms: either
         # [<pytz.timezone>, <str>] or [<str>, <str>]
@@ -66,6 +67,10 @@ class TimeZoneField(models.Field):
         choices = kwargs['choices']
         if isinstance(choices[0][0], (six.string_types, six.binary_type)):
             kwargs['choices'] = [(pytz.timezone(n1), n2) for n1, n2 in choices]
+
+        if kwargs['display_GMT_offset']:
+            kwargs['choices'] = add_gmt_offset_to_choices(kwargs['choices'])
+        kwargs.pop('display_GMT_offset', None)
 
         super(TimeZoneField, self).__init__(*args, **kwargs)
 
