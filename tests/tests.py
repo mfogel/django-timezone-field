@@ -396,6 +396,7 @@ class TimeZoneFieldDeconstructTestCase(TestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertNotIn('choices', kwargs)
 
+
 class GmtOffsetInChoicesTestCase(TestCase):
 
     # test timezones out of order, but they should appear in order in result.

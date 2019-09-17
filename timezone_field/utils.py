@@ -1,8 +1,10 @@
 import pytz
 from datetime import datetime, timedelta, time
 
+
 def is_pytz_instance(value):
     return value is pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo)
+
 
 def add_gmt_offset_to_choices(timezone_tuple_set):
     """
