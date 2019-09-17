@@ -21,7 +21,6 @@ def add_gmt_offset_to_choices(timezone_tuple_set):
     time_zero = gmt_timezone.localize(time_ref)
     _choices = []
     for tz, tz_str in timezone_tuple_set:
-        # z = pytz.timezone(tz)
         delta = (time_zero - tz.localize(time_ref)).total_seconds()
         h = (datetime.min + timedelta(seconds=delta.__abs__())).hour
         gmt_diff = time(h).strftime('%H:%M')
