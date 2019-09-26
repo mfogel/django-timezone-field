@@ -65,6 +65,10 @@ class TimeZoneFormFieldTestCase(TestCase):
         form = TestForm({'tz': INVALID_TZ})
         self.assertFalse(form.is_valid())
 
+    def test_invalid_choice(self):
+        form = TestForm({'tz_invalid_choice': INVALID_TZ})
+        self.assertFalse(form.is_valid())
+
     def test_invalid_uncommon_tz(self):
         form = TestForm({'tz': UNCOMMON_TZ})
         self.assertFalse(form.is_valid())
@@ -73,6 +77,27 @@ class TimeZoneFormFieldTestCase(TestCase):
         form = TestForm()
         pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST]
         self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
+
+
+class TestFormInvalidChoice(forms.Form):
+    tz = TimeZoneFormField(
+        choices=(
+            [(tz, tz) for tz in pytz.all_timezones] +
+            [(INVALID_TZ, pytz.UTC)]
+        )
+    )
+
+
+class TimeZoneFormFieldInvalidChoideTestCase(TestCase):
+
+    def test_valid(self):
+        form = TestFormInvalidChoice({'tz': PST})
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data['tz'], PST_tz)
+
+    def test_invalid_choide(self):
+        form = TestFormInvalidChoice({'tz': INVALID_TZ})
+        self.assertFalse(form.is_valid())
 
 
 class TimeZoneFieldModelFormTestCase(TestCase):
@@ -94,12 +119,14 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         self.assertEqual(m.tz, GMT_tz)
         self.assertEqual(m.tz_opt, None)
         self.assertEqual(m.tz_opt_default, PST_tz)
+        self.assertEqual(m.tz_gmt_offset, None)
 
     def test_valid_specify_all(self):
         form = TestModelForm({
             'tz': UTC,
             'tz_opt': PST,
             'tz_opt_default': GMT,
+            'tz_gmt_offset': UTC,
         })
         self.assertTrue(form.is_valid())
         form.save()
@@ -109,6 +136,7 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         self.assertEqual(m.tz, UTC_tz)
         self.assertEqual(m.tz_opt, PST_tz)
         self.assertEqual(m.tz_opt_default, GMT_tz)
+        self.assertEqual(m.tz_gmt_offset, UTC_tz)
 
     def test_invalid_not_blank(self):
         form = TestModelForm({})
@@ -129,6 +157,11 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         form = TestModelForm()
         pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST_tz]
         self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
+
+    def test_display_GMT_offsets(self):
+        form = TestModelForm({'tz_gmt_offset': PST_tz})
+        c = [c for c in form.fields['tz_gmt_offset'].choices if c[0] == PST_tz]
+        self.assertEqual(c[0][1], 'GMT-08:00 America/Los Angeles')
 
 
 class TimeZoneFieldTestCase(TestCase):
