@@ -1,10 +1,10 @@
 django-timezone-field
 =====================
 
-.. image:: https://img.shields.io/travis/mfogel/django-timezone-field/develop.svg
+.. image:: https://img.shields.io/travis/mfogel/django-timezone-field.svg
    :target: https://travis-ci.org/mfogel/django-timezone-field/
 
-.. image:: https://img.shields.io/coveralls/mfogel/django-timezone-field/develop.svg
+.. image:: https://img.shields.io/coveralls/mfogel/django-timezone-field.svg
    :target: https://coveralls.io/r/mfogel/django-timezone-field/
 
 .. image:: https://img.shields.io/pypi/dm/django-timezone-field.svg
