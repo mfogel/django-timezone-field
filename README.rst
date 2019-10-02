@@ -84,13 +84,17 @@ Installation
 Changelog
 ------------
 
+*   3.1 (2019-10-02)
+
+    *   Officially support django 2.2 (already worked)
+    *   Add option to display TZ offsets in form field `#46`__
+
 *   3.0 (2018-09-15)
 
     *   Support django 1.11, 2.0, 2.1
     *   Add support for python 3.7
     *   Change default human-readable timezone names to exclude underscores
         (`#32`__ & `#37`__)
-
 
 *   2.1 (2018-03-01)
 
@@ -119,7 +123,7 @@ Changelog
 *   1.1 (2014-10-05)
 
     *   Django 1.7 compatibility
-    *   Added support for formating `choices` kwarg as `[[<str>, <str>], ...]`,
+    *   Added support for formatting `choices` kwarg as `[[<str>, <str>], ...]`,
         in addition to previous format of `[[<pytz.timezone>, <str>], ...]`.
     *   Changed default list of accepted timezones from `pytz.all_timezones` to
         `pytz.common_timezones`. If you have timezones in your DB that are in
@@ -162,6 +166,7 @@ __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.pip-installer.org/
 __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+__ https://github.com/mfogel/django-timezone-field/issues/46
 __ https://github.com/mfogel/django-timezone-field/issues/32
 __ https://github.com/mfogel/django-timezone-field/issues/37
 __ https://github.com/mfogel/django-timezone-field/issues/38
