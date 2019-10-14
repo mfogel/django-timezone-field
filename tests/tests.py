@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
 import pytz
+import six
 
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.utils import six
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.utils import add_gmt_offset_to_choices
