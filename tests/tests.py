@@ -106,7 +106,7 @@ class TimeZoneFieldModelFormTestCase(TestCase):
         # http://stackoverflow.com/questions/7399490/
         data = dict(
             (field_name, field.initial)
-            for field_name, field in iter(TestModelForm().fields.items())
+            for field_name, field in TestModelForm().fields.items()
         )
         data.update({'tz': GMT})
         form = TestModelForm(data=data)
