@@ -84,6 +84,11 @@ Installation
 Changelog
 ------------
 
+*   4.0 (2019-12-03)
+
+    *   Add support for django 3.0, python 3.8
+    *   Drop support for django 1.11, 2.0, 2.1, python 2.7, 3.4
+
 *   3.1 (2019-10-02)
 
     *   Officially support django 2.2 (already worked)
