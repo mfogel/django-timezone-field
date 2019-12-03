@@ -2,7 +2,7 @@ import pytz
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from timezone_field.utils import is_pytz_instance, add_gmt_offset_to_choices
 
@@ -120,7 +120,7 @@ class TimeZoneField(models.Field):
         if is_pytz_instance(value):
             return (value, value.zone)
         try:
-            return (pytz.timezone(force_text(value)), force_text(value))
+            return (pytz.timezone(force_str(value)), force_str(value))
         except pytz.UnknownTimeZoneError:
             pass
         raise ValidationError("Invalid timezone '%s'" % value)
