@@ -48,6 +48,7 @@ class TimeZoneField(models.Field):
         if len(args) > 3:
             raise ValueError('Cannot specify max_length by positional arg')
 
+        kwargs.setdefault('blank_label', None)
         kwargs.setdefault('choices', self.CHOICES)
         kwargs.setdefault('max_length', self.MAX_LENGTH)
         kwargs.setdefault('display_GMT_offset', False)
@@ -71,6 +72,9 @@ class TimeZoneField(models.Field):
             kwargs['choices'] = add_gmt_offset_to_choices(kwargs['choices'])
         kwargs.pop('display_GMT_offset', None)
 
+        if kwargs['blank_label'] is not None:
+            kwargs['choices'].insert(0, ('', kwargs['blank_label']))
+        kwargs.pop('blank_label', None)
         super(TimeZoneField, self).__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
