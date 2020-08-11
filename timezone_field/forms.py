@@ -23,9 +23,9 @@ class TimeZoneFormField(forms.TypedChoiceField):
                 offset = a.utcoffset(dt)
                 offset_days = offset.days
                 offset_hours = offset_days * 24 + offset.seconds / 3600.0
-                name = "{:s} (UTC {:d}:{:02d})".format(tz.replace('_', ' '),
-                                                       int(offset_hours),
-                                                       int((offset_hours % 1) * 60))
+                name = "{:s} (UTC {:+d}:{:02d})".format(tz.replace('_', ' '),
+                                                        int(offset_hours),
+                                                        int((offset_hours % 1) * 60))
                 choices.append((tz, name))
         else:
             choices = [(tz, tz.replace('_', ' ')) for tz in pytz.common_timezones]
