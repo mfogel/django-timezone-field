@@ -11,7 +11,8 @@ from rest_framework import serializers
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.utils import add_gmt_offset_to_choices
-from timezone_field.rest_framework.fields import TimeZoneField as DrfTimeZoneField
+from timezone_field.rest_framework.fields import \
+    TimeZoneField as DrfTimeZoneField
 from tests.models import TestModel
 
 
