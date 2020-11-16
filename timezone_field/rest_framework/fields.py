@@ -1,7 +1,15 @@
 import pytz
-from rest_framework.fields import Field
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 from django.utils.encoding import force_str
+
+try:
+    from rest_framework.fields import Field
+except ImportError as err:
+    raise ImproperlyConfigured(
+        'Error loading rest_framework module.\n'
+        'Did you install django_rest_framework?'
+    )
 
 
 class TimeZoneField(Field):

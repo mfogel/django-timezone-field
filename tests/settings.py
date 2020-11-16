@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'timezone_field',
     'tests',
+    'rest_framework'
 )
 
 MIDDLEWARE_CLASSES = (

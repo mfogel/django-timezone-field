@@ -7,9 +7,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
+from rest_framework import serializers
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.utils import add_gmt_offset_to_choices
+from timezone_field.rest_framework.fields import TimeZoneField as DrfTimeZoneField
 from tests.models import TestModel
 
 
@@ -453,3 +455,18 @@ class GmtOffsetInChoicesTestCase(TestCase):
         ]
         for i in range(len(expected)):
             self.assertEqual(expected[i], result[i][1])
+
+
+class DrfTimeZoneSerializer(serializers.Serializer):
+    tz = DrfTimeZoneField()
+
+
+class DrfTimeZoneFieldTestCase(TestCase):
+    def test_invalid_str(self):
+        serializer = DrfTimeZoneSerializer(data={'tz': INVALID_TZ})
+        self.assertFalse(serializer.is_valid())
+
+    def test_valid(self):
+        serializer = DrfTimeZoneSerializer(data={'tz': PST})
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['tz'], PST_tz)
