@@ -470,3 +470,8 @@ class DrfTimeZoneFieldTestCase(TestCase):
         serializer = DrfTimeZoneSerializer(data={'tz': PST})
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.validated_data['tz'], PST_tz)
+
+    def test_valid_representation(self):
+        serializer = DrfTimeZoneSerializer(data={'tz': PST})
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.data['tz'], PST)
