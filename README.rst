@@ -62,6 +62,28 @@ Form Field
     repr(tz)                               # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
 
 
+REST Framework Serializer Field
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: python
+
+    import pytz
+    from rest_framework import serializers
+    from timezone_field import TimeZoneSerializerField
+
+    class MySerializer(serializers.Serializer):
+        tz1 = TimeZoneSerializerField()
+        tz2 = TimeZoneSerializerField()
+
+    my_serializer = MySerializer(data={
+        'tz1': 'America/Argentina/Buenos_Aires',
+        'tz2': pytz.timezone('America/Argentina/Buenos_Aires'),
+    })
+    my_serializer.is_valid()  # true
+    my_serializer.validated_data['tz1']  # "<DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>"
+    my_serializer.validated_data['tz2']  # "<DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>"
+
+
 Installation
 ------------
 
@@ -83,6 +105,10 @@ Installation
 
 Changelog
 ------------
+
+*   master
+
+    *   Add Django REST Framework serializer field
 
 *   4.0 (2019-12-03)
 

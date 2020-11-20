@@ -7,8 +7,11 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
+from rest_framework import serializers
 
-from timezone_field import TimeZoneField, TimeZoneFormField
+from timezone_field import (
+    TimeZoneField, TimeZoneFormField, TimeZoneSerializerField,
+)
 from timezone_field.utils import add_gmt_offset_to_choices
 from tests.models import TestModel
 
@@ -81,8 +84,8 @@ class TimeZoneFormFieldTestCase(TestCase):
 class TestFormInvalidChoice(forms.Form):
     tz = TimeZoneFormField(
         choices=(
-            [(tz, tz) for tz in pytz.all_timezones] +
-            [(INVALID_TZ, pytz.UTC)]
+            [(tz, tz) for tz in pytz.all_timezones]
+            + [(INVALID_TZ, pytz.UTC)]
         )
     )
 
@@ -453,3 +456,29 @@ class GmtOffsetInChoicesTestCase(TestCase):
         ]
         for i in range(len(expected)):
             self.assertEqual(expected[i], result[i][1])
+
+
+class TimeZoneSerializer(serializers.Serializer):
+    tz = TimeZoneSerializerField()
+
+
+class TimeZoneSerializerFieldTestCase(TestCase):
+    def test_invalid_str(self):
+        serializer = TimeZoneSerializer(data={'tz': INVALID_TZ})
+        self.assertFalse(serializer.is_valid())
+
+    def test_valid(self):
+        serializer = TimeZoneSerializer(data={'tz': PST})
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data['tz'], PST_tz)
+
+    def test_valid_representation(self):
+        serializer = TimeZoneSerializer(data={'tz': PST})
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.data['tz'], PST)
+
+    def test_valid_with_timezone_object(self):
+        serializer = TimeZoneSerializer(data={'tz': PST_tz})
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.data['tz'], PST)
+        self.assertEqual(serializer.validated_data['tz'], PST_tz)

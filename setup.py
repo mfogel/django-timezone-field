@@ -36,6 +36,9 @@ setup(
         'timezone_field',
     ],
     install_requires=['django>=2.2', 'pytz'],
+    extras_require={
+        'rest_framework': ['djangorestframework>=3.0.0']
+    },
     python_requires='>=3.5',
     classifiers=[
         'Development Status :: 4 - Beta',
