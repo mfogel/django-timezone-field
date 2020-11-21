@@ -25,20 +25,18 @@ Database Field
     from timezone_field import TimeZoneField
 
     class MyModel(models.Model):
-        timezone1 = TimeZoneField(default='Europe/London') # defaults supported
-        timezone2 = TimeZoneField()
-        timezone3 = TimeZoneField()
+        tz1 = TimeZoneField(default='Europe/London')            # defaults supported
+        tz2 = TimeZoneField()                                   # in ModelForm displays like "America/Los Angeles"
+        tz3 = TimeZoneField(choices_display='WITH_GMT_OFFSET')  # in ModelForm displays like "GMT-08:00 America/Los Angeles"
 
-    my_inst = MyModel(
-        timezone1='America/Los_Angeles',    # assignment of a string
-        timezone2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
-        timezone3=pytz.UTC,                 # assignment of pytz.UTC singleton
+    my_model = MyModel(
+        tz1='America/Los_Angeles',    # assignment of a string
+        tz2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
+        tz3=pytz.UTC,                 # assignment of pytz.UTC singleton
     )
-    my_inst.full_clean()  # validates against pytz.common_timezones
-    my_inst.save()        # values stored in DB as strings
-
-    tz = my_inst.timezone1  # values retrieved as pytz objects
-    repr(tz)                # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+    my_model.full_clean() # validates against pytz.common_timezones by default
+    my_model.save()       # values stored in DB as strings
+    my_model.tz1          # values retrieved as pytz objects: <DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>
 
 
 Form Field
@@ -50,16 +48,12 @@ Form Field
     from timezone_field import TimeZoneFormField
 
     class MyForm(forms.Form):
-        timezone = TimeZoneFormField() # displays like "America/Los_Angeles"
-        timezone2 = TimeZoneFormField(display_GMT_offset=True) # displays like "GMT-08:00 America/Los_Angeles"
+        tz = TimeZoneFormField()                                    # displays like "America/Los Angeles"
+        tz2 = TimeZoneFormField(choices_display='WITH_GMT_OFFSET')  # displays like "GMT-08:00 America/Los Angeles"
 
-    my_form = MyForm({
-        'timezone': 'America/Los_Angeles',
-    })
-    my_form.full_clean()  # validates against pytz.common_timezones
-
-    tz = my_form.cleaned_data['timezone']  # values retrieved as pytz objects
-    repr(tz)                               # "<DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>"
+    my_form = MyForm({'tz': 'America/Los_Angeles'})
+    my_form.full_clean()        # validates against pytz.common_timezones by default
+    my_form.cleaned_data['tz']  # values retrieved as pytz objects: <DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>
 
 
 REST Framework Serializer Field
@@ -79,9 +73,9 @@ REST Framework Serializer Field
         'tz1': 'America/Argentina/Buenos_Aires',
         'tz2': pytz.timezone('America/Argentina/Buenos_Aires'),
     })
-    my_serializer.is_valid()  # true
-    my_serializer.validated_data['tz1']  # "<DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>"
-    my_serializer.validated_data['tz2']  # "<DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>"
+    my_serializer.is_valid()            # true
+    my_serializer.validated_data['tz1'] # <DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>
+    my_serializer.validated_data['tz2'] # <DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>
 
 
 Installation
@@ -109,6 +103,8 @@ Changelog
 *   master
 
     *   Add Django REST Framework serializer field
+    *   Add new `choices_display` kwarg with supported values `WITH_GMT_OFFSET` and `STANDARD`
+    *   Deprecate `display_GMT_offset` kwarg
 
 *   4.0 (2019-12-03)
 

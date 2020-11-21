@@ -6,14 +6,13 @@ def is_pytz_instance(value):
     return value is pytz.UTC or isinstance(value, pytz.tzinfo.BaseTzInfo)
 
 
+# DEPRECATED. Use choices.with_gmt_offset instead
 def add_gmt_offset_to_choices(timezone_tuple_set):
     """
     Currently timezone choices items show up like this:
     'America/New_York'
-
     But this function formats the choices to display in this format:
     GMT-05:00 America/New_York
-
     :return:
     A list of tuples in this format:
     (<pytz.timezone>, <str>)

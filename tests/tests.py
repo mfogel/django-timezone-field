@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from datetime import datetime
 
 import pytz
 
@@ -12,8 +13,9 @@ from rest_framework import serializers
 from timezone_field import (
     TimeZoneField, TimeZoneFormField, TimeZoneSerializerField,
 )
+from timezone_field.choices import standard, with_gmt_offset
 from timezone_field.utils import add_gmt_offset_to_choices
-from tests.models import TestModel
+from tests.models import TestModel, TestChoicesDisplayModel
 
 
 PST = 'America/Los_Angeles'  # pytz.tzinfo.DstTzInfo
@@ -77,8 +79,8 @@ class TimeZoneFormFieldTestCase(TestCase):
 
     def test_default_human_readable_choices_dont_have_underscores(self):
         form = TestForm()
-        pst_choice = [c for c in form.fields['tz'].choices if c[0] == PST]
-        self.assertEqual(pst_choice[0][1], 'America/Los Angeles')
+        for choice in form.fields['tz'].choices:
+            self.assertFalse('_' in choice[1])
 
 
 class TestFormInvalidChoice(forms.Form):
@@ -458,6 +460,94 @@ class GmtOffsetInChoicesTestCase(TestCase):
             self.assertEqual(expected[i], result[i][1])
 
 
+class ChoicesStandardTestCase(TestCase):
+
+    tz_names = [
+        'America/Los_Angeles',
+        'Europe/London',
+        'America/Argentina/Buenos_Aires',
+    ]
+    tz_objects = [pytz.timezone(tz) for tz in tz_names]
+    tz_displays = [
+        'America/Los Angeles',
+        'Europe/London',
+        'America/Argentina/Buenos Aires',
+    ]
+
+    def test_using_timezone_objects(self):
+        result = standard(self.tz_objects)
+        self.assertEqual(result, list(zip(self.tz_objects, self.tz_displays)))
+
+    def test_using_timezone_names(self):
+        result = standard(self.tz_names)
+        self.assertEqual(result, list(zip(self.tz_names, self.tz_displays)))
+
+
+class ChoicesWithGMTOffsetTestCase(TestCase):
+
+    # test timezones out of order, but they should appear in order in result.
+    # avoiding an timezones that go through a Daylight Savings change here
+    tz_names = [
+        'Asia/Kathmandu',                   # 45 min off the hour
+        'Asia/Kolkata',                     # 30 min off the hour
+        'America/Argentina/Buenos_Aires',   # on the hour
+        'Asia/Qatar',                       # on the hour
+    ]
+    tz_objects = [pytz.timezone(name) for name in tz_names]
+
+    def test_using_timezone_objects(self):
+        result = with_gmt_offset(self.tz_objects)
+        self.assertEqual(result, [
+            (
+                pytz.timezone('America/Argentina/Buenos_Aires'),
+                'GMT-03:00 America/Argentina/Buenos Aires',
+            ),
+            (pytz.timezone('Asia/Qatar'), 'GMT+03:00 Asia/Qatar'),
+            (pytz.timezone('Asia/Kolkata'), 'GMT+05:30 Asia/Kolkata'),
+            (pytz.timezone('Asia/Kathmandu'), 'GMT+05:45 Asia/Kathmandu'),
+        ])
+
+    def test_using_timezone_names(self):
+        result = with_gmt_offset(self.tz_names)
+        self.assertEqual(result, [
+            ('America/Argentina/Buenos_Aires', 'GMT-03:00 America/Argentina/Buenos Aires'),
+            ('Asia/Qatar', 'GMT+03:00 Asia/Qatar'),
+            ('Asia/Kolkata', 'GMT+05:30 Asia/Kolkata'),
+            ('Asia/Kathmandu', 'GMT+05:45 Asia/Kathmandu'),
+        ])
+
+
+class ChoicesWithGMTOffsetDaylightSavingsTimeTestCase(TestCase):
+
+    # test timezones out of order, but they should appear in order in result.
+    tz_names = [
+        'Europe/London',
+        'Canada/Newfoundland',  # 30 min off the hour
+        'America/Los_Angeles',  # on the hour
+        'America/Santiago',     # southern hemisphere
+    ]
+
+    def test_in_northern_summer(self):
+        now = datetime(2020, 7, 15)
+        result = with_gmt_offset(self.tz_names, now=now)
+        self.assertEqual(result, [
+            ('America/Los_Angeles', 'GMT-07:00 America/Los Angeles'),
+            ('America/Santiago', 'GMT-04:00 America/Santiago'),
+            ('Canada/Newfoundland', 'GMT-02:30 Canada/Newfoundland'),
+            ('Europe/London', 'GMT+01:00 Europe/London'),
+        ])
+
+    def test_in_northern_winter(self):
+        now = datetime(2020, 1, 15)
+        result = with_gmt_offset(self.tz_names, now=now)
+        self.assertEqual(result, [
+            ('America/Los_Angeles', 'GMT-08:00 America/Los Angeles'),
+            ('Canada/Newfoundland', 'GMT-03:30 Canada/Newfoundland'),
+            ('America/Santiago', 'GMT-03:00 America/Santiago'),
+            ('Europe/London', 'GMT+00:00 Europe/London'),
+        ])
+
+
 class TimeZoneSerializer(serializers.Serializer):
     tz = TimeZoneSerializerField()
 
@@ -482,3 +572,155 @@ class TimeZoneSerializerFieldTestCase(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertEqual(serializer.data['tz'], PST)
         self.assertEqual(serializer.validated_data['tz'], PST_tz)
+
+
+class TestChoicesDisplayForm(forms.Form):
+    limited_tzs = [
+        'Asia/Tokyo',
+        'Asia/Dubai',
+        'America/Argentina/Buenos_Aires',
+        'Africa/Nairobi',
+    ]
+    limited_choices = [(tz, tz) for tz in limited_tzs]
+
+    tz_none = TimeZoneFormField()
+    tz_standard = TimeZoneFormField(choices_display='STANDARD')
+    tz_with_gmt_offset = TimeZoneFormField(choices_display='WITH_GMT_OFFSET')
+    tz_limited_none = TimeZoneFormField(choices=limited_choices)
+    tz_limited_standard = TimeZoneFormField(choices=limited_choices, choices_display='STANDARD')
+    tz_limited_with_gmt_offset = TimeZoneFormField(
+        choices=limited_choices,
+        choices_display='WITH_GMT_OFFSET',
+    )
+
+
+class TestChoicesDisplayTestCase(TestCase):
+
+    common_tzs = tuple(tz for tz in pytz.common_timezones)
+
+    def test_none(self):
+        form = TestChoicesDisplayForm()
+        values, displays = zip(*form.fields['tz_none'].choices)
+        self.assertEqual(values, self.common_tzs)
+        self.assertEqual(displays[values.index('America/Los_Angeles')], 'America/Los Angeles')
+        self.assertEqual(displays[values.index('Asia/Kolkata')], 'Asia/Kolkata')
+
+    def test_standard(self):
+        form = TestChoicesDisplayForm()
+        self.assertEqual(form.fields['tz_standard'].choices, form.fields['tz_none'].choices)
+
+    def test_with_gmt_offset(self):
+        form = TestChoicesDisplayForm()
+        values, displays = zip(*form.fields['tz_with_gmt_offset'].choices)
+        self.assertNotEqual(values, self.common_tzs)
+        self.assertEqual(sorted(values), sorted(self.common_tzs))
+        self.assertEqual(
+            displays[values.index('America/Argentina/Buenos_Aires')],
+            'GMT-03:00 America/Argentina/Buenos Aires',
+        )
+        self.assertEqual(displays[values.index('Europe/Moscow')], 'GMT+03:00 Europe/Moscow')
+
+    def test_limited_none(self):
+        form = TestChoicesDisplayForm()
+        self.assertEqual(form.fields['tz_limited_none'].choices, [
+            ('Asia/Tokyo', 'Asia/Tokyo'),
+            ('Asia/Dubai', 'Asia/Dubai'),
+            ('America/Argentina/Buenos_Aires', 'America/Argentina/Buenos_Aires'),
+            ('Africa/Nairobi', 'Africa/Nairobi'),
+        ])
+
+    def test_limited_standard(self):
+        form = TestChoicesDisplayForm()
+        self.assertEqual(form.fields['tz_limited_standard'].choices, [
+            ('Asia/Tokyo', 'Asia/Tokyo'),
+            ('Asia/Dubai', 'Asia/Dubai'),
+            ('America/Argentina/Buenos_Aires', 'America/Argentina/Buenos Aires'),
+            ('Africa/Nairobi', 'Africa/Nairobi'),
+        ])
+
+    def test_limited_with_gmt_offset(self):
+        form = TestChoicesDisplayForm()
+        self.assertEqual(form.fields['tz_limited_with_gmt_offset'].choices, [
+            ('America/Argentina/Buenos_Aires', 'GMT-03:00 America/Argentina/Buenos Aires'),
+            ('Africa/Nairobi', 'GMT+03:00 Africa/Nairobi'),
+            ('Asia/Dubai', 'GMT+04:00 Asia/Dubai'),
+            ('Asia/Tokyo', 'GMT+09:00 Asia/Tokyo'),
+        ])
+
+
+class TestChoicesDisplayModelForm(forms.ModelForm):
+    class Meta:
+        model = TestChoicesDisplayModel
+        fields = '__all__'
+
+
+class TestChoicesDisplayModelFormTestCase(TestCase):
+
+    common_tzs = tuple(pytz.timezone(tz) for tz in pytz.common_timezones)
+
+    def test_none(self):
+        form = TestChoicesDisplayModelForm()
+        values, displays = zip(*form.fields['tz_none'].choices)
+        self.assertEqual(values, ('',) + self.common_tzs)
+        self.assertEqual(
+            displays[values.index(pytz.timezone('America/Los_Angeles'))],
+            'America/Los Angeles',
+        )
+        self.assertEqual(
+            displays[values.index(pytz.timezone('Asia/Kolkata'))],
+            'Asia/Kolkata',
+        )
+
+    def test_standard(self):
+        form = TestChoicesDisplayModelForm()
+        self.assertEqual(form.fields['tz_standard'].choices, form.fields['tz_none'].choices)
+
+    def test_with_gmt_offset(self):
+        form = TestChoicesDisplayModelForm()
+        values, displays = zip(*form.fields['tz_with_gmt_offset'].choices)
+        self.assertNotEqual(values, self.common_tzs)
+        self.assertEqual(
+            sorted(str(v) for v in values),
+            sorted([''] + [str(tz) for tz in self.common_tzs]),
+        )
+        self.assertEqual(
+            displays[values.index(pytz.timezone('America/Argentina/Buenos_Aires'))],
+            'GMT-03:00 America/Argentina/Buenos Aires',
+        )
+        self.assertEqual(
+            displays[values.index(pytz.timezone('Europe/Moscow'))],
+            'GMT+03:00 Europe/Moscow',
+        )
+
+    def test_limited_none(self):
+        form = TestChoicesDisplayModelForm()
+        self.assertEqual(form.fields['tz_limited_none'].choices, [
+            ('', '---------'),
+            (pytz.timezone('Asia/Tokyo'), 'Asia/Tokyo'),
+            (pytz.timezone('Asia/Dubai'), 'Asia/Dubai'),
+            (pytz.timezone('America/Argentina/Buenos_Aires'), 'America/Argentina/Buenos_Aires'),
+            (pytz.timezone('Africa/Nairobi'), 'Africa/Nairobi'),
+        ])
+
+    def test_limited_standard(self):
+        form = TestChoicesDisplayModelForm()
+        self.assertEqual(form.fields['tz_limited_standard'].choices, [
+            ('', '---------'),
+            (pytz.timezone('Asia/Tokyo'), 'Asia/Tokyo'),
+            (pytz.timezone('Asia/Dubai'), 'Asia/Dubai'),
+            (pytz.timezone('America/Argentina/Buenos_Aires'), 'America/Argentina/Buenos Aires'),
+            (pytz.timezone('Africa/Nairobi'), 'Africa/Nairobi'),
+        ])
+
+    def test_limited_with_gmt_offset(self):
+        form = TestChoicesDisplayModelForm()
+        self.assertEqual(form.fields['tz_limited_with_gmt_offset'].choices, [
+            ('', '---------'),
+            (
+                pytz.timezone('America/Argentina/Buenos_Aires'),
+                'GMT-03:00 America/Argentina/Buenos Aires',
+            ),
+            (pytz.timezone('Africa/Nairobi'), 'GMT+03:00 Africa/Nairobi'),
+            (pytz.timezone('Asia/Dubai'), 'GMT+04:00 Asia/Dubai'),
+            (pytz.timezone('Asia/Tokyo'), 'GMT+09:00 Asia/Tokyo'),
+        ])
