@@ -10,10 +10,9 @@ from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
 from rest_framework import serializers
 
-from timezone_field import (
-    TimeZoneField, TimeZoneFormField, TimeZoneSerializerField,
-)
+from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.choices import standard, with_gmt_offset
+from timezone_field.rest_framework import TimeZoneSerializerField
 from timezone_field.utils import add_gmt_offset_to_choices
 from tests.models import TestModel, TestChoicesDisplayModel
 

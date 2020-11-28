@@ -63,7 +63,7 @@ REST Framework Serializer Field
 
     import pytz
     from rest_framework import serializers
-    from timezone_field import TimeZoneSerializerField
+    from timezone_field.rest_framework import TimeZoneSerializerField
 
     class MySerializer(serializers.Serializer):
         tz1 = TimeZoneSerializerField()
@@ -99,6 +99,10 @@ Installation
 
 Changelog
 ------------
+
+*   `master`
+
+    *   Don't import `rest_framework` from package root (#67)
 
 *   4.1 (2020-11-28)
 
