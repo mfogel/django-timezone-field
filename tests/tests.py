@@ -598,6 +598,9 @@ class TestChoicesDisplayTestCase(TestCase):
 
     common_tzs = tuple(tz for tz in pytz.common_timezones)
 
+    def test_invalid_choices_display(self):
+        self.assertRaises(ValueError, lambda: TimeZoneFormField(choices_display='invalid'))
+
     def test_none(self):
         form = TestChoicesDisplayForm()
         values, displays = zip(*form.fields['tz_none'].choices)
@@ -657,6 +660,9 @@ class TestChoicesDisplayModelForm(forms.ModelForm):
 class TestChoicesDisplayModelFormTestCase(TestCase):
 
     common_tzs = tuple(pytz.timezone(tz) for tz in pytz.common_timezones)
+
+    def test_invalid_choices_display(self):
+        self.assertRaises(ValueError, lambda: TimeZoneField(choices_display='invalid'))
 
     def test_none(self):
         form = TestChoicesDisplayModelForm()
