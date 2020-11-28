@@ -100,7 +100,7 @@ Installation
 Changelog
 ------------
 
-*   master
+*   4.1 (2020-11-28)
 
     *   Add Django REST Framework serializer field
     *   Add new `choices_display` kwarg with supported values `WITH_GMT_OFFSET` and `STANDARD`
