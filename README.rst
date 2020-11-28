@@ -100,9 +100,9 @@ Installation
 Changelog
 ------------
 
-*   `master`
+*   4.1.1 (2020-11-28)
 
-    *   Don't import `rest_framework` from package root (#67)
+    *   Don't import `rest_framework` from package root (`#67`__)
 
 *   4.1 (2020-11-28)
 
@@ -197,6 +197,7 @@ __ http://pypi.python.org/pypi/pytz/
 __ http://pypi.python.org/pypi/django-timezone-field/
 __ http://www.pip-installer.org/
 __ https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+__ https://github.com/mfogel/django-timezone-field/issues/67
 __ https://github.com/mfogel/django-timezone-field/issues/46
 __ https://github.com/mfogel/django-timezone-field/issues/32
 __ https://github.com/mfogel/django-timezone-field/issues/37
