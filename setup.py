@@ -37,7 +37,8 @@ setup(
     ],
     install_requires=[
         'Django>=2.2',
-        'pytz'
+        'pytz',
+        'six',
     ],
     tests_require=[
         'psycopg2',

@@ -2,7 +2,7 @@ import pytz
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import six
+import six
 
 from timezone_field.utils import is_pytz_instance
 

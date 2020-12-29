@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.utils import six
+import six
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 from timezone_field.tests.models import FakeModel
