@@ -1,8 +1,8 @@
 import pytz
-
+import six
 from django.core.exceptions import ValidationError
 from django.db import models
-import six
+from django.utils.encoding import force_text
 
 from timezone_field.utils import is_pytz_instance
 
@@ -135,6 +135,10 @@ class TimeZoneField(models.Field):
                 return (pytz.timezone(value), value)
             except pytz.UnknownTimeZoneError:
                 pass
+        try:
+            return (pytz.timezone(force_text(value)), force_text(value))
+        except pytz.UnknownTimeZoneError:
+            pass
         raise ValidationError("Invalid timezone '%s'" % value)
 
     def contribute_to_class(self, cls, name, virtual_only=False):
