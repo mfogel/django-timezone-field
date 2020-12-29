@@ -1,8 +1,15 @@
+dist: xenial
 language: python
+sudo: false
+
 python:
   - '3.6'
   - '3.7'
   - '3.8'
+
+addons:
+  postgresql: '9.6'
+
 env:
   global:
     - DB=postgres
