@@ -1,8 +1,7 @@
 import pytz
-
+import six
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils import six
 from django.utils.encoding import force_text
 
 from timezone_field.utils import is_pytz_instance
@@ -113,7 +112,7 @@ class TimeZoneField(models.Field):
         value = super(TimeZoneField, self).get_default()
         return self._get_python_and_db_repr(value)[0]
 
-    def from_db_value(self, value, expression, connection, context):
+    def from_db_value(self, value, expression, connection, *args):
         "Convert to pytz timezone object"
         return self._get_python_and_db_repr(value)[0]
 
