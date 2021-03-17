@@ -25,11 +25,12 @@ def with_gmt_offset(timezones, now=None):
           underscores. For example: "GMT-05:00 America/New York"
         * sorted by their timezone offset
     """
-    now = now or datetime.utcnow()
+    now = now or datetime.now(pytz.utc)
     _choices = []
     for tz in timezones:
         tz_str = str(tz)
-        delta = pytz.timezone(tz_str).utcoffset(now)
+        now_tz = now.astimezone(pytz.timezone(tz_str))
+        delta = now_tz.replace(tzinfo=pytz.utc) - now
         display = "GMT{sign}{gmt_diff} {timezone}".format(
             sign='+' if delta == abs(delta) else '-',
             gmt_diff=str(abs(delta)).zfill(8)[:-3],

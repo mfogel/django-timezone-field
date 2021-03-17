@@ -527,7 +527,7 @@ class ChoicesWithGMTOffsetDaylightSavingsTimeTestCase(TestCase):
     ]
 
     def test_in_northern_summer(self):
-        now = datetime(2020, 7, 15)
+        now = datetime(2020, 7, 15, tzinfo=pytz.utc)
         result = with_gmt_offset(self.tz_names, now=now)
         self.assertEqual(result, [
             ('America/Los_Angeles', 'GMT-07:00 America/Los Angeles'),
@@ -537,7 +537,7 @@ class ChoicesWithGMTOffsetDaylightSavingsTimeTestCase(TestCase):
         ])
 
     def test_in_northern_winter(self):
-        now = datetime(2020, 1, 15)
+        now = datetime(2020, 1, 15, tzinfo=pytz.utc)
         result = with_gmt_offset(self.tz_names, now=now)
         self.assertEqual(result, [
             ('America/Los_Angeles', 'GMT-08:00 America/Los Angeles'),
@@ -545,6 +545,32 @@ class ChoicesWithGMTOffsetDaylightSavingsTimeTestCase(TestCase):
             ('America/Santiago', 'GMT-03:00 America/Santiago'),
             ('Europe/London', 'GMT+00:00 Europe/London'),
         ])
+
+    def test_transition_forward(self):
+        tz_names = ['Europe/London']
+        before = datetime(2021, 3, 28, 0, 59, 59, 999999, tzinfo=pytz.utc)
+        after = datetime(2021, 3, 28, 1, 0, 0, 0, tzinfo=pytz.utc)
+        self.assertEqual(
+            with_gmt_offset(tz_names, now=before),
+            [('Europe/London', 'GMT+00:00 Europe/London')]
+        )
+        self.assertEqual(
+            with_gmt_offset(tz_names, now=after),
+            [('Europe/London', 'GMT+01:00 Europe/London')]
+        )
+
+    def test_transition_backward(self):
+        tz_names = ['Europe/London']
+        before = datetime(2021, 10, 31, 0, 59, 59, 999999, tzinfo=pytz.utc)
+        after = datetime(2021, 10, 31, 1, 0, 0, 0, tzinfo=pytz.utc)
+        self.assertEqual(
+            with_gmt_offset(tz_names, now=before),
+            [('Europe/London', 'GMT+01:00 Europe/London')]
+        )
+        self.assertEqual(
+            with_gmt_offset(tz_names, now=after),
+            [('Europe/London', 'GMT+00:00 Europe/London')]
+        )
 
 
 class TimeZoneSerializer(serializers.Serializer):
