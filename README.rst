@@ -102,7 +102,6 @@ Changelog
 *   MASTER
 
     *   Add support for django 3.2
-    *   Drop support for django 3.0, python 3.5
 
 *   4.1.2 (2021-03-17)
 
