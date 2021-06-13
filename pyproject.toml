@@ -19,4 +19,5 @@ pytz = "^2021.1"
 coverage = {extras = ["toml"], version = "^5.5"}
 Django = "^2.2"
 djangorestframework = "^3.12.4"
+flake8 = "^3.9.2"
 psycopg2-binary = "^2.8.6"
