@@ -96,11 +96,11 @@ DJANGO_SETTINGS_MODULE=tests.settings PYTHONPATH=. poetry run django-admin test
 
 #### 4.1.2 (2021-03-17)
 
-* Avoid `NonExistentTimeError` during DST transition (#70_)
+* Avoid `NonExistentTimeError` during DST transition ([#70](https://github.com/mfogel/django-timezone-field/issues/70))
 
 #### 4.1.1 (2020-11-28)
 
-* Don't import `rest_framework` from package root (#67)
+* Don't import `rest_framework` from package root ([#67](https://github.com/mfogel/django-timezone-field/issues/67))
 
 #### 4.1 (2020-11-28)
 
@@ -116,20 +116,20 @@ DJANGO_SETTINGS_MODULE=tests.settings PYTHONPATH=. poetry run django-admin test
 #### 3.1 (2019-10-02)
 
 * Officially support django 2.2 (already worked)
-* Add option to display TZ offsets in form field #46
+* Add option to display TZ offsets in form field ([#46](https://github.com/mfogel/django-timezone-field/issues/46))
 
 #### 3.0 (2018-09-15)
 
 * Support django 1.11, 2.0, 2.1
 * Add support for python 3.7
-* Change default human-readable timezone names to exclude underscores (#32 & #37)
+* Change default human-readable timezone names to exclude underscores ([#32](https://github.com/mfogel/django-timezone-field/issues/32) & [#37](https://github.com/mfogel/django-timezone-field/issues/37))
 
 #### 2.1 (2018-03-01)
 
 * Add support for django 1.10, 1.11
 * Add support for python 3.6
 * Add wheel support
-* Support bytes in DB fields (#38 & #39)
+* Support bytes in DB fields ([#38](https://github.com/mfogel/django-timezone-field/issues/38) & [#39](https://github.com/mfogel/django-timezone-field/issues/39))
 
 #### 2.0 (2016-01-31)
 
@@ -140,7 +140,7 @@ DJANGO_SETTINGS_MODULE=tests.settings PYTHONPATH=. poetry run django-admin test
 #### 1.3 (2015-10-12)
 
 * Drop support for django 1.6, add support for django 1.8
-* Various (bug fixes)[https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3]
+* Various [bug fixes](https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3)
 
 #### 1.2 (2015-02-05)
 
