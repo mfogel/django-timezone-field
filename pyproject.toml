@@ -1,0 +1,22 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.coverage.run]
+relative_files = true
+
+[tool.poetry]
+name = "django-timezone-field"
+version = "4.1.2"
+description = "A Django app providing database and form fields for pytz timezone objects."
+authors = ["Mike Fogel <mike@fogel.ca>"]
+
+[tool.poetry.dependencies]
+python = "^3.5"
+pytz = "^2021.1"
+
+[tool.poetry.dev-dependencies]
+coverage = {extras = ["toml"], version = "^5.5"}
+Django = "^2.2"
+djangorestframework = "^3.12.4"
+psycopg2-binary = "^2.8.6"

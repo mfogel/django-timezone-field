@@ -56,15 +56,15 @@ WSGI_APPLICATION = 'tests.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
-test_db_engine = os.environ.get('TEST_DB_ENGINE', 'sqlite')
+db_engine = os.environ.get('DB_ENGINE', 'sqlite')
 
-if test_db_engine == 'sqlite':
+if db_engine == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
         },
     }
-if test_db_engine == 'postgres':
+if db_engine == 'postgres':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
