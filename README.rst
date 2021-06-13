@@ -178,16 +178,13 @@ Changelog
 Running the Tests
 -----------------
 
-#.  Install `tox`__.
+#.  Install `poetry`__.
 
 #.  From the repository root, run
 
     .. code:: sh
 
-        tox
-
-    Postgres will need to be running locally, and sqlite will need to be
-    installed in order for tox to do its job.
+        DJANGO_SETTINGS_MODULE=tests.settings PYTHONPATH=. poetry run django-admin test
 
 Found a Bug?
 ------------
@@ -212,7 +209,7 @@ __ https://github.com/mfogel/django-timezone-field/issues/37
 __ https://github.com/mfogel/django-timezone-field/issues/38
 __ https://github.com/mfogel/django-timezone-field/issues/39
 __ https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3
-__ https://tox.readthedocs.org/
+__ https://python-poetry.org/
 __ https://github.com/mfogel/django-timezone-field/
 __ https://github.com/brosner/django-timezones/
 __ https://github.com/mfogel/django-timezone-field/graphs/contributors

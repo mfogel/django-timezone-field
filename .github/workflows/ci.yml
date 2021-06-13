@@ -76,7 +76,7 @@ jobs:
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
         PYTHONPATH: .
-      run: poetry run coverage run --include='*/timezone_field/*' .venv/bin/django-admin.py test tests
+      run: poetry run coverage run --include='*/timezone_field/*' .venv/bin/django-admin test
 
     - name: Generate coverage report
       run: poetry run coverage xml
