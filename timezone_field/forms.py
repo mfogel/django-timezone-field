@@ -38,4 +38,4 @@ class TimeZoneFormField(forms.TypedChoiceField):
             )
 
         kwargs['choices'] = choices
-        super(TimeZoneFormField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)

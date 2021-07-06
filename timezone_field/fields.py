@@ -84,15 +84,15 @@ class TimeZoneField(models.Field):
             choices = add_gmt_offset_to_choices(choices)
 
         kwargs['choices'] = choices
-        super(TimeZoneField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
         if not is_pytz_instance(value):
             raise ValidationError("'%s' is not a pytz timezone object" % value)
-        super(TimeZoneField, self).validate(value, model_instance)
+        super().validate(value, model_instance)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(TimeZoneField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         if kwargs.get('max_length') == self.default_max_length:
             del kwargs['max_length']
 
@@ -122,7 +122,7 @@ class TimeZoneField(models.Field):
     def get_default(self):
         # allow defaults to be still specified as strings. Allows for easy
         # serialization into migration files
-        value = super(TimeZoneField, self).get_default()
+        value = super().get_default()
         return self._get_python_and_db_repr(value)[0]
 
     def from_db_value(self, value, *args):
