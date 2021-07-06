@@ -89,7 +89,7 @@ From the repository root, with [`poetry`](https://python-poetry.org/)
 
 ```sh
 poetry install
-DJANGO_SETTINGS_MODULE=tests.settings PYTHONPATH=. poetry run django-admin test
+poetry run pytest
 ```
 
 ## Changelog

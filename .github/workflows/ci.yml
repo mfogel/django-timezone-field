@@ -102,14 +102,12 @@ jobs:
 
     - name: Test with coverage
       env:
-        DJANGO_SETTINGS_MODULE: tests.settings
         POSTGRES_HOST: localhost
         POSTGRES_PORT: 5432
         POSTGRES_DB: postgres
         POSTGRES_USER: postgres
         POSTGRES_PASSWORD: postgres
-        PYTHONPATH: .
-      run: poetry run coverage run --include='*/timezone_field/*' .venv/bin/django-admin test
+      run: poetry run pytest --cov=timezone_field
 
     - name: Generate coverage report
       run: poetry run coverage xml
