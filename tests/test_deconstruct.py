@@ -1,3 +1,4 @@
+import pytest
 import pytz
 
 from django.db.migrations.writer import MigrationWriter
@@ -95,3 +96,59 @@ def test_specifying_defaults_not_frozen():
     field = TimeZoneField(choices=choices)
     name, path, args, kwargs = field.deconstruct()
     assert 'choices' not in kwargs
+
+
+@pytest.mark.parametrize('choices', [[
+    (pytz.timezone('US/Pacific'), 'US/Pacific'),
+    (pytz.timezone('US/Eastern'), 'US/Eastern'),
+], [
+    ('US/Pacific', 'US/Pacific'),
+    ('US/Eastern', 'US/Eastern'),
+]])
+def test_deconstruct_when_using_just_choices(choices):
+    field = TimeZoneField(choices=choices)
+    name, path, args, kwargs = field.deconstruct()
+    assert kwargs == {'choices': [
+        ('US/Pacific', 'US/Pacific'),
+        ('US/Eastern', 'US/Eastern'),
+    ]}
+
+
+@pytest.mark.parametrize('choices_display, expected_kwargs', [
+    [None, {}],
+    ['STANDARD', {'choices_display': 'STANDARD'}],
+    ['WITH_GMT_OFFSET', {'choices_display': 'WITH_GMT_OFFSET'}],
+])
+def test_deconstruct_when_using_just_choices_display(choices_display, expected_kwargs):
+    field = TimeZoneField(choices_display=choices_display)
+    name, path, args, kwargs = field.deconstruct()
+    assert kwargs == expected_kwargs
+
+
+@pytest.mark.parametrize('choices, choices_display, expected_kwargs', [
+    [
+        [['US/Pacific', 'West Coast Time']],
+        None,
+        {'choices': [('US/Pacific', 'West Coast Time')]},
+    ],
+    [
+        [['US/Pacific', 'West Coast Time']],
+        'STANDARD',
+        {'choices': [('US/Pacific', '')], 'choices_display': 'STANDARD'},
+    ],
+    [
+        [['US/Pacific', 'West Coast Time']],
+        'WITH_GMT_OFFSET',
+        {'choices': [('US/Pacific', '')], 'choices_display': 'WITH_GMT_OFFSET'},
+    ],
+    [
+        [[tz, 'ignored'] for tz in pytz.common_timezones],
+        'WITH_GMT_OFFSET',
+        {'choices_display': 'WITH_GMT_OFFSET'},
+    ],
+])
+def test_deconstruct_when_using_choices_and_choices_display(
+        choices, choices_display, expected_kwargs):
+    field = TimeZoneField(choices=choices, choices_display=choices_display)
+    name, path, args, kwargs = field.deconstruct()
+    assert kwargs == expected_kwargs

@@ -37,7 +37,6 @@ class TimeZoneField(models.Field):
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
     default_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
-    default_choices = standard(default_tzs)
     default_max_length = 63
 
     def __init__(self, *args, **kwargs):
@@ -67,17 +66,17 @@ class TimeZoneField(models.Field):
             values = self.default_tzs
             displays = None
 
-        choices_display = kwargs.pop('choices_display', None)
-        if choices_display == 'WITH_GMT_OFFSET':
+        self.choices_display = kwargs.pop('choices_display', None)
+        if self.choices_display == 'WITH_GMT_OFFSET':
             choices = with_gmt_offset(values)
-        elif choices_display == 'STANDARD':
+        elif self.choices_display == 'STANDARD':
             choices = standard(values)
-        elif choices_display is None:
+        elif self.choices_display is None:
             choices = zip(values, displays) if displays else standard(values)
         else:
             raise ValueError(
                 "Unrecognized value for kwarg 'choices_display' of '"
-                + choices_display + "'"
+                + self.choices_display + "'"
             )
 
         # 'display_GMT_offset' is deprecated, use 'choices_display' instead
@@ -94,10 +93,22 @@ class TimeZoneField(models.Field):
 
     def deconstruct(self):
         name, path, args, kwargs = super(TimeZoneField, self).deconstruct()
-        if kwargs.get('choices') == self.default_choices:
-            del kwargs['choices']
         if kwargs.get('max_length') == self.default_max_length:
             del kwargs['max_length']
+
+        if self.choices_display is not None:
+            kwargs['choices_display'] = self.choices_display
+
+        choices = kwargs['choices']
+        if self.choices_display is None:
+            if choices == standard(self.default_tzs):
+                kwargs.pop('choices')
+        else:
+            values, _ = zip(*choices)
+            if sorted(values, key=str) == sorted(self.default_tzs, key=str):
+                kwargs.pop('choices')
+            else:
+                kwargs['choices'] = [(value, '') for value in values]
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
