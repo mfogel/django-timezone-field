@@ -29,7 +29,7 @@ setup(
         'A Django app providing database and form fields for '
         'pytz timezone objects.'
     ),
-    long_description=read('README.rst'),
+    long_description=read('README.md'),
     url='http://github.com/mfogel/django-timezone-field/',
     license='BSD',
     packages=[
