@@ -3,10 +3,8 @@
 [![CI](https://github.com/mfogel/django-timezone-field/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/mfogel/django-timezone-field/actions)
 [![codecov](https://codecov.io/gh/mfogel/django-timezone-field/branch/main/graph/badge.svg?token=Rwekzmim3l)](https://codecov.io/gh/mfogel/django-timezone-field)
 [![pypi downloads](https://img.shields.io/pypi/dm/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
-<!---
 [![pypi python support](https://img.shields.io/pypi/pyversions/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
 [![pypi django support](https://img.shields.io/pypi/djversions/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
--->
 
 A Django app providing database, form and serializer fields for [pytz](http://pypi.python.org/pypi/pytz/) timezone objects.
 
