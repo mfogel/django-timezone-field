@@ -30,6 +30,7 @@ setup(
         'pytz timezone objects.'
     ),
     long_description=read('README.md'),
+    long_description_content_type='text/markdown',
     url='http://github.com/mfogel/django-timezone-field/',
     license='BSD',
     packages=[
