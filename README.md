@@ -92,7 +92,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 4.2 (2021-07-07)
 
 * Officially support for django 3.2, python 3.9
 * Fix bug with field deconstruction ([#74](https://github.com/mfogel/django-timezone-field/issues/74))
