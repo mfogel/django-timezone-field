@@ -92,7 +92,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 4.2.1 (2021-07-07)
 
 * Reinstate `TimeZoneField.default_choices` ([#76](https://github.com/mfogel/django-timezone-field/issues/76))
 
