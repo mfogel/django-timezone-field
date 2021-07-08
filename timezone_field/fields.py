@@ -37,6 +37,7 @@ class TimeZoneField(models.Field):
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
     default_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
+    default_choices = standard(default_tzs)
     default_max_length = 63
 
     def __init__(self, *args, **kwargs):
@@ -101,7 +102,7 @@ class TimeZoneField(models.Field):
 
         choices = kwargs['choices']
         if self.choices_display is None:
-            if choices == standard(self.default_tzs):
+            if choices == self.default_choices:
                 kwargs.pop('choices')
         else:
             values, _ = zip(*choices)
