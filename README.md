@@ -92,13 +92,17 @@ poetry run pytest
 
 ## Changelog
 
+#### main branch, unreleased
+
+* Officially support python 3.10
+
 #### 4.2.1 (2021-07-07)
 
 * Reinstate `TimeZoneField.default_choices` ([#76](https://github.com/mfogel/django-timezone-field/issues/76))
 
 #### 4.2 (2021-07-07)
 
-* Officially support for django 3.2, python 3.9
+* Officially support django 3.2, python 3.9
 * Fix bug with field deconstruction ([#74](https://github.com/mfogel/django-timezone-field/issues/74))
 * Housekeeping: use poetry, github actions, pytest
 
