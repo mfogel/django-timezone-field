@@ -69,17 +69,11 @@ my_serializer.validated_data['tz2'] # <DstTzInfo 'America/Argentina/Buenos_Aires
 
 ## Installation
 
-1.  Install from [`pypi`](https://pypi.org/project/django-timezone-field/)
+Install from [`pypi`](https://pypi.org/project/django-timezone-field/)
 
-    ```sh
-    pip install django-timezone-field
-    ```
-
-1.  Add `timezone_field` to your django project's [`settings.INSTALLED_APPS`](https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps)
-
-    ```py
-    INSTALLED_APPS = [..., 'timezone_field', ...]
-    ```
+```sh
+pip install django-timezone-field
+```
 
 ## Running the tests
 
