@@ -86,7 +86,7 @@ poetry run pytest
 
 ## Changelog
 
-#### 4.2.2 (2022-01-13)
+#### 4.2.3 (2022-01-13)
 
 * Fix sdist installs ([#78](https://github.com/mfogel/django-timezone-field/issues/78))
 * Officially support python 3.10
