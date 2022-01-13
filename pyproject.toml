@@ -10,6 +10,9 @@ name = "django-timezone-field"
 version = "4.1.2"
 description = "A Django app providing database and form fields for pytz timezone objects."
 authors = ["Mike Fogel <mike@fogel.ca>"]
+packages = [
+    { include = "timezone_field" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.5"
