@@ -2,6 +2,7 @@ from datetime import datetime
 
 import pytest
 import pytz
+
 from timezone_field.choices import standard, with_gmt_offset
 
 
@@ -92,24 +93,16 @@ def test_with_gmt_offset_transition_forward():
     tz_names = ["Europe/London"]
     before = datetime(2021, 3, 28, 0, 59, 59, 999999, tzinfo=pytz.utc)
     after = datetime(2021, 3, 28, 1, 0, 0, 0, tzinfo=pytz.utc)
-    assert with_gmt_offset(tz_names, now=before) == [
-        ("Europe/London", "GMT+00:00 Europe/London")
-    ]
-    assert with_gmt_offset(tz_names, now=after) == [
-        ("Europe/London", "GMT+01:00 Europe/London")
-    ]
+    assert with_gmt_offset(tz_names, now=before) == [("Europe/London", "GMT+00:00 Europe/London")]
+    assert with_gmt_offset(tz_names, now=after) == [("Europe/London", "GMT+01:00 Europe/London")]
 
 
 def test_with_gmt_offset_transition_backward():
     tz_names = ["Europe/London"]
     before = datetime(2021, 10, 31, 0, 59, 59, 999999, tzinfo=pytz.utc)
     after = datetime(2021, 10, 31, 1, 0, 0, 0, tzinfo=pytz.utc)
-    assert with_gmt_offset(tz_names, now=before) == [
-        ("Europe/London", "GMT+01:00 Europe/London")
-    ]
-    assert with_gmt_offset(tz_names, now=after) == [
-        ("Europe/London", "GMT+00:00 Europe/London")
-    ]
+    assert with_gmt_offset(tz_names, now=before) == [("Europe/London", "GMT+01:00 Europe/London")]
+    assert with_gmt_offset(tz_names, now=after) == [("Europe/London", "GMT+00:00 Europe/London")]
 
 
 def test_standard_using_timezone_names(tzs3_names, tzs3_standard_displays):

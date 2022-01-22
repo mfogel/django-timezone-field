@@ -33,8 +33,14 @@ jobs:
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
 
+    - name: Lint with black
+      run: poetry run black --check --diff .
+
     - name: Lint with flake8
       run: poetry run flake8 --exclude .venv
+
+    - name: Lint with isort
+      run: poetry run isort --check --diff .
 
   test:
     runs-on: ubuntu-latest

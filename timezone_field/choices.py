@@ -1,5 +1,6 @@
-import pytz
 from datetime import datetime
+
+import pytz
 
 
 def standard(timezones):
@@ -12,7 +13,7 @@ def standard(timezones):
     choices = []
     for tz in timezones:
         tz_str = str(tz)
-        choices.append((tz, tz_str.replace('_', ' ')))
+        choices.append((tz, tz_str.replace("_", " ")))
     return choices
 
 
@@ -32,9 +33,9 @@ def with_gmt_offset(timezones, now=None):
         now_tz = now.astimezone(pytz.timezone(tz_str))
         delta = now_tz.replace(tzinfo=pytz.utc) - now
         display = "GMT{sign}{gmt_diff} {timezone}".format(
-            sign='+' if delta == abs(delta) else '-',
+            sign="+" if delta == abs(delta) else "-",
             gmt_diff=str(abs(delta)).zfill(8)[:-3],
-            timezone=tz_str.replace('_', ' ')
+            timezone=tz_str.replace("_", " "),
         )
         _choices.append((delta, tz, display))
     _choices.sort(key=lambda x: x[0])

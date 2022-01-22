@@ -1,5 +1,6 @@
+from datetime import datetime, time, timedelta
+
 import pytz
-from datetime import datetime, timedelta, time
 
 
 def is_pytz_instance(value):
@@ -17,19 +18,19 @@ def add_gmt_offset_to_choices(timezone_tuple_set):
     A list of tuples in this format:
     (<pytz.timezone>, <str>)
     """
-    gmt_timezone = pytz.timezone('Greenwich')
+    gmt_timezone = pytz.timezone("Greenwich")
     time_ref = datetime(2000, 1, 1)
     time_zero = gmt_timezone.localize(time_ref)
     _choices = []
     for tz, tz_str in timezone_tuple_set:
         delta = (time_zero - tz.localize(time_ref)).total_seconds()
         h = (datetime.min + timedelta(seconds=delta.__abs__())).hour
-        gmt_diff = time(h).strftime('%H:%M')
+        gmt_diff = time(h).strftime("%H:%M")
         pair_one = tz
         pair_two = "GMT{sign}{gmt_diff} {timezone}".format(
             sign="-" if delta < 0 else "+",
             gmt_diff=gmt_diff,
-            timezone=tz_str.replace('_', ' ')
+            timezone=tz_str.replace("_", " "),
         )
         _choices.append((delta, pair_one, pair_two))
 

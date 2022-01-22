@@ -6,12 +6,12 @@ from timezone_field.utils import add_gmt_offset_to_choices
 def test_add_gmt_offset_to_choices():
     # test timezones out of order, but they should appear in order in result.
     timezones = [
-        (pytz.timezone('US/Eastern'), 'US/Eastern'),
-        (pytz.timezone('US/Pacific'), 'US/Pacific'),
-        (pytz.timezone('Asia/Qatar'), 'Asia/Qatar'),
-        (pytz.timezone('Pacific/Fiji'), 'Pacific/Fiji'),
-        (pytz.timezone('Europe/London'), 'Europe/London'),
-        (pytz.timezone('Pacific/Apia'), 'Pacific/Apia'),
+        (pytz.timezone("US/Eastern"), "US/Eastern"),
+        (pytz.timezone("US/Pacific"), "US/Pacific"),
+        (pytz.timezone("Asia/Qatar"), "Asia/Qatar"),
+        (pytz.timezone("Pacific/Fiji"), "Pacific/Fiji"),
+        (pytz.timezone("Europe/London"), "Europe/London"),
+        (pytz.timezone("Pacific/Apia"), "Pacific/Apia"),
     ]
     result = add_gmt_offset_to_choices(timezones)
     expected = [

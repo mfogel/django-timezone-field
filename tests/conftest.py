@@ -1,19 +1,18 @@
 import pytest
 import pytz
-
 from django import forms
 from django.db import models
 
 from timezone_field import TimeZoneField
 
 USA_TZS = [
-    'US/Alaska',
-    'US/Arizona',
-    'US/Central',
-    'US/Eastern',
-    'US/Hawaii',
-    'US/Mountain',
-    'US/Pacific',
+    "US/Alaska",
+    "US/Arizona",
+    "US/Central",
+    "US/Eastern",
+    "US/Hawaii",
+    "US/Mountain",
+    "US/Pacific",
 ]
 
 
@@ -49,7 +48,7 @@ class _ModelOldChoiceFormat(models.Model):
 class _ModelForm(forms.ModelForm):
     class Meta:
         model = _Model
-        fields = '__all__'
+        fields = "__all__"
 
 
 @pytest.fixture
@@ -74,7 +73,7 @@ def ModelForm():
 
 @pytest.fixture
 def pst():
-    yield 'America/Los_Angeles'
+    yield "America/Los_Angeles"
 
 
 @pytest.fixture
@@ -84,7 +83,7 @@ def pst_tz(pst):
 
 @pytest.fixture
 def gmt():
-    yield 'GMT'
+    yield "GMT"
 
 
 @pytest.fixture
@@ -94,7 +93,7 @@ def gmt_tz(gmt):
 
 @pytest.fixture
 def utc():
-    yield 'UTC'
+    yield "UTC"
 
 
 @pytest.fixture
@@ -104,9 +103,9 @@ def utc_tz(utc):
 
 @pytest.fixture
 def uncommon_tz():
-    yield 'Singapore'
+    yield "Singapore"
 
 
 @pytest.fixture
 def invalid_tz():
-    yield 'foobar'
+    yield "foobar"
