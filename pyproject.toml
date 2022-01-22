@@ -7,7 +7,7 @@ relative_files = true
 
 [tool.poetry]
 name = "django-timezone-field"
-version = "4.2.3"
+version = "5.0"
 description = "A Django app providing database and form fields for pytz timezone objects."
 authors = ["Mike Fogel <mike@fogel.ca>"]
 packages = [
@@ -16,19 +16,19 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-pytz = "^2021.1"
+pytz = "*"
 
 [tool.poetry.dev-dependencies]
-coverage = {extras = ["toml"], version = "^5.5"}
-Django = "^2.2"
-djangorestframework = "^3.12.4"
-flake8 = "^3.9.2"
-psycopg2-binary = "~2.8.6"
+coverage = {extras = ["toml"], version = "^6.2"}
+Django = "^3.2"
+djangorestframework = "^3.13.1"
+flake8 = "^4.0.1"
+psycopg2-binary = "^2.9.3"
 pytest = "^6.2.5"
-pytest-django = "^4.4.0"
+pytest-django = "^4.5.2"
 pytest-pythonpath = "^0.7.3"
 pytest-lazy-fixture = "^0.6.3"
-pytest-cov = "^2.12.1"
+pytest-cov = "^3.0.0"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
