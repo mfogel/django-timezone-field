@@ -42,18 +42,13 @@ jobs:
 
     strategy:
       matrix:
-        # skipping python 3.5 (doesn't seem to play well with install-poetry action)
         # https://docs.djangoproject.com/en/4.0/faq/install/#what-python-version-can-i-use-with-django
-        python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
-        django-version: ["2.2", "3.0", "3.1", "3.2"]
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+        django-version: ["2.2", "3.2"]
         db-engine: [sqlite, postgres]
         exclude:
           - python-version: "3.10"
             django-version: "2.2"
-          - python-version: "3.10"
-            django-version: "3.0"
-          - python-version: "3.10"
-            django-version: "3.1"
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -101,14 +96,6 @@ jobs:
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --no-interaction --no-root
-
-    # pytest v6.2 is required for python 3.10 but doesn't support python 3.5
-    # so as long as we support python 3.5 it can't go in our pyproject.toml
-    - name: Upgrade pytest
-      if: matrix.python-version == '3.10'
-      run: |
-        source .venv/bin/activate
-        pip install 'pytest==6.2.5'
 
     - name: Install django ${{ matrix.django-version }}
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'

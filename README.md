@@ -86,6 +86,11 @@ poetry run pytest
 
 ## Changelog
 
+#### 5.0 (unreleased!! in development)
+
+* Drop support for django 3.0, 3.1
+* Drop support for python 3.5, 3.6
+
 #### 4.2.3 (2022-01-13)
 
 * Fix sdist installs ([#78](https://github.com/mfogel/django-timezone-field/issues/78))
