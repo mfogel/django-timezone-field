@@ -1,6 +1,7 @@
 import pytest
 import pytz
 from django import forms
+from pytest_lazyfixture import lazy_fixture
 
 from timezone_field import TimeZoneFormField
 
@@ -39,9 +40,9 @@ def test_form_valid2(Form, gmt, gmt_tz, utc, utc_tz):
 @pytest.mark.parametrize(
     "tz, tz_invalid_choice",
     [
-        [pytest.lazy_fixture("invalid_tz"), None],
-        [None, pytest.lazy_fixture("invalid_tz")],
-        [pytest.lazy_fixture("uncommon_tz"), None],
+        [lazy_fixture("invalid_tz"), None],
+        [None, lazy_fixture("invalid_tz")],
+        [lazy_fixture("uncommon_tz"), None],
     ],
 )
 def test_form_invalid(Form, tz, tz_invalid_choice):

@@ -7,7 +7,7 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    name: Lint with flake8
+    name: Lint
 
     steps:
     - name: Git checkout
@@ -41,6 +41,9 @@ jobs:
 
     - name: Lint with isort
       run: poetry run isort --check --diff .
+
+    - name: Lint with pylint
+      run: poetry run pylint tests timezone_field setup.py
 
   test:
     runs-on: ubuntu-latest

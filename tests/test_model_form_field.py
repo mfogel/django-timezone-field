@@ -1,8 +1,9 @@
 import pytest
+from pytest_lazyfixture import lazy_fixture
 
 
 @pytest.mark.django_db
-def test_valid_with_defaults(Model, ModelForm, pst, pst_tz, gmt, gmt_tz):
+def test_valid_with_defaults(Model, ModelForm, pst_tz, gmt, gmt_tz):
     # seems there should be a better way to get a form's default values...?
     # http://stackoverflow.com/questions/7399490/
     data = dict((field_name, field.initial) for field_name, field in ModelForm().fields.items())
@@ -44,8 +45,8 @@ def test_valid_specify_all(Model, ModelForm, utc, pst, gmt, utc_tz, gmt_tz, pst_
     "tz, error_keyword",
     [
         [None, "required"],
-        [pytest.lazy_fixture("invalid_tz"), "choice"],
-        [pytest.lazy_fixture("uncommon_tz"), "choice"],
+        [lazy_fixture("invalid_tz"), "choice"],
+        [lazy_fixture("uncommon_tz"), "choice"],
     ],
 )
 def test_invalid_not_blank(ModelForm, tz, error_keyword):

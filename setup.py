@@ -8,7 +8,7 @@ from setuptools import setup
 
 
 def read(*parts):
-    return open(path.join(path.dirname(__file__), *parts)).read()
+    return open(path.join(path.dirname(__file__), *parts), encoding="utf8").read()
 
 
 def find_version(*file_paths):

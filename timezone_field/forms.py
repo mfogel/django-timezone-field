@@ -8,8 +8,8 @@ from timezone_field.choices import standard, with_gmt_offset
 def coerce_to_pytz(val):
     try:
         return pytz.timezone(val)
-    except pytz.UnknownTimeZoneError:
-        raise ValidationError("Unknown time zone: '%s'" % val)
+    except pytz.UnknownTimeZoneError as err:
+        raise ValidationError("Unknown time zone: '%s'" % val) from err
 
 
 class TimeZoneFormField(forms.TypedChoiceField):

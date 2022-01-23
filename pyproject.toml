@@ -38,6 +38,11 @@ pytest-lazy-fixture = "^0.6.3"
 pytest-cov = "^3.0.0"
 black = "^21.12b0"
 isort = "^5.10.1"
+pylint = "^2.12.2"
+
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = "C, R, redefined-outer-name"
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"

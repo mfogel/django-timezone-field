@@ -1,5 +1,6 @@
 import pytest
 from django.core.exceptions import ValidationError
+from pytest_lazyfixture import lazy_fixture
 
 from timezone_field import TimeZoneField
 
@@ -8,12 +9,12 @@ from timezone_field import TimeZoneField
 @pytest.mark.parametrize(
     "input_tz, output_tz",
     [
-        [pytest.lazy_fixture("pst"), pytest.lazy_fixture("pst_tz")],
-        [pytest.lazy_fixture("pst_tz"), pytest.lazy_fixture("pst_tz")],
-        [pytest.lazy_fixture("gmt"), pytest.lazy_fixture("gmt_tz")],
-        [pytest.lazy_fixture("gmt_tz"), pytest.lazy_fixture("gmt_tz")],
-        [pytest.lazy_fixture("utc"), pytest.lazy_fixture("utc_tz")],
-        [pytest.lazy_fixture("utc_tz"), pytest.lazy_fixture("utc_tz")],
+        [lazy_fixture("pst"), lazy_fixture("pst_tz")],
+        [lazy_fixture("pst_tz"), lazy_fixture("pst_tz")],
+        [lazy_fixture("gmt"), lazy_fixture("gmt_tz")],
+        [lazy_fixture("gmt_tz"), lazy_fixture("gmt_tz")],
+        [lazy_fixture("utc"), lazy_fixture("utc_tz")],
+        [lazy_fixture("utc_tz"), lazy_fixture("utc_tz")],
     ],
 )
 def test_valid_dst_tz(Model, input_tz, output_tz):
@@ -51,7 +52,7 @@ def test_valid_blank(Model, pst, tz_opt):
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("filter_tz", [pytest.lazy_fixture("pst"), pytest.lazy_fixture("pst_tz")])
+@pytest.mark.parametrize("filter_tz", [lazy_fixture("pst"), lazy_fixture("pst_tz")])
 def test_string_value_lookup(Model, pst, filter_tz):
     Model.objects.create(tz=pst)
     qs = Model.objects.filter(tz=filter_tz)

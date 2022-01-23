@@ -7,6 +7,7 @@ from timezone_field.rest_framework import TimeZoneSerializerField
 @pytest.fixture
 def TimeZoneSerializer():
     class _TimeZoneSerializer(serializers.Serializer):
+        # pylint: disable=abstract-method
         tz = TimeZoneSerializerField()
 
     yield _TimeZoneSerializer

@@ -122,7 +122,7 @@ class TimeZoneField(models.Field):
         value = super().get_default()
         return self._get_python_and_db_repr(value)[0]
 
-    def from_db_value(self, value, *args):
+    def from_db_value(self, value, *_args):
         "Convert to pytz timezone object"
         return self._get_python_and_db_repr(value)[0]
 
