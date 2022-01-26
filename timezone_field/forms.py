@@ -1,8 +1,13 @@
+import zoneinfo
+
+import django
 import pytz
 from django import forms
 from django.core.exceptions import ValidationError
 
 from timezone_field.choices import standard, with_gmt_offset
+
+use_tzinfo = django.VERSION >= (4, 0)
 
 
 def coerce_to_pytz(val):
@@ -12,10 +17,18 @@ def coerce_to_pytz(val):
         raise ValidationError("Unknown time zone: '%s'" % val) from err
 
 
+def coerce_to_zoneinfo(val):
+    try:
+        return zoneinfo.ZoneInfo(val)
+    except zoneinfo.ZoneInfoNotFoundError:
+        raise ValidationError("Unknown time zone: '%s'" % val)
+
+
 class TimeZoneFormField(forms.TypedChoiceField):
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault("coerce", coerce_to_pytz)
-        kwargs.setdefault("empty_value", None)
+        self.use_pytz = kwargs.pop('use_pytz', not use_tzinfo)
+        kwargs.setdefault('coerce', coerce_to_pytz if self.use_pytz else coerce_to_zoneinfo)
+        kwargs.setdefault('empty_value', None)
 
         if "choices" in kwargs:
             values, displays = zip(*kwargs["choices"])

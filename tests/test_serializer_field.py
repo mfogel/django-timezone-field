@@ -5,10 +5,10 @@ from timezone_field.rest_framework import TimeZoneSerializerField
 
 
 @pytest.fixture
-def TimeZoneSerializer():
+def TimeZoneSerializer(use_pytz):
     class _TimeZoneSerializer(serializers.Serializer):
         # pylint: disable=abstract-method
-        tz = TimeZoneSerializerField()
+        tz = TimeZoneSerializerField(use_pytz=use_pytz)
 
     yield _TimeZoneSerializer
 

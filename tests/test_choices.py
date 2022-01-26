@@ -47,8 +47,8 @@ def tzs3_standard_displays():
     ]
 
 
-def test_with_gmt_offset_using_timezone_names(tzs1):
-    assert with_gmt_offset(tzs1) == [
+def test_with_gmt_offset_using_timezone_names(tzs1, use_pytz):
+    assert with_gmt_offset(tzs1, use_pytz=use_pytz) == [
         ("America/Argentina/Buenos_Aires", "GMT-03:00 America/Argentina/Buenos Aires"),
         ("Asia/Qatar", "GMT+03:00 Asia/Qatar"),
         ("Asia/Kolkata", "GMT+05:30 Asia/Kolkata"),
@@ -56,22 +56,22 @@ def test_with_gmt_offset_using_timezone_names(tzs1):
     ]
 
 
-def test_with_gmt_offset_using_timezone_objects(tzs1):
-    tz_objects = [pytz.timezone(name) for name in tzs1]
-    assert with_gmt_offset(tz_objects) == [
+def test_with_gmt_offset_using_timezone_objects(tzs1, use_pytz, tz_func):
+    tz_objects = [tz_func(name) for name in tzs1]
+    assert with_gmt_offset(tz_objects, use_pytz=use_pytz) == [
         (
-            pytz.timezone("America/Argentina/Buenos_Aires"),
+            tz_func("America/Argentina/Buenos_Aires"),
             "GMT-03:00 America/Argentina/Buenos Aires",
         ),
-        (pytz.timezone("Asia/Qatar"), "GMT+03:00 Asia/Qatar"),
-        (pytz.timezone("Asia/Kolkata"), "GMT+05:30 Asia/Kolkata"),
-        (pytz.timezone("Asia/Kathmandu"), "GMT+05:45 Asia/Kathmandu"),
+        (tz_func("Asia/Qatar"), "GMT+03:00 Asia/Qatar"),
+        (tz_func("Asia/Kolkata"), "GMT+05:30 Asia/Kolkata"),
+        (tz_func("Asia/Kathmandu"), "GMT+05:45 Asia/Kathmandu"),
     ]
 
 
-def test_with_gmt_offset_in_northern_summer(tzs2):
+def test_with_gmt_offset_in_northern_summer(tzs2, use_pytz):
     now = datetime(2020, 7, 15, tzinfo=pytz.utc)
-    assert with_gmt_offset(tzs2, now=now) == [
+    assert with_gmt_offset(tzs2, now=now, use_pytz=use_pytz) == [
         ("America/Los_Angeles", "GMT-07:00 America/Los Angeles"),
         ("America/Santiago", "GMT-04:00 America/Santiago"),
         ("Canada/Newfoundland", "GMT-02:30 Canada/Newfoundland"),
@@ -79,9 +79,9 @@ def test_with_gmt_offset_in_northern_summer(tzs2):
     ]
 
 
-def test_with_gmt_offset_in_northern_winter(tzs2):
+def test_with_gmt_offset_in_northern_winter(tzs2, use_pytz):
     now = datetime(2020, 1, 15, tzinfo=pytz.utc)
-    assert with_gmt_offset(tzs2, now=now) == [
+    assert with_gmt_offset(tzs2, now=now, use_pytz=use_pytz) == [
         ("America/Los_Angeles", "GMT-08:00 America/Los Angeles"),
         ("Canada/Newfoundland", "GMT-03:30 Canada/Newfoundland"),
         ("America/Santiago", "GMT-03:00 America/Santiago"),
@@ -89,20 +89,28 @@ def test_with_gmt_offset_in_northern_winter(tzs2):
     ]
 
 
-def test_with_gmt_offset_transition_forward():
+def test_with_gmt_offset_transition_forward(use_pytz):
     tz_names = ["Europe/London"]
     before = datetime(2021, 3, 28, 0, 59, 59, 999999, tzinfo=pytz.utc)
     after = datetime(2021, 3, 28, 1, 0, 0, 0, tzinfo=pytz.utc)
-    assert with_gmt_offset(tz_names, now=before) == [("Europe/London", "GMT+00:00 Europe/London")]
-    assert with_gmt_offset(tz_names, now=after) == [("Europe/London", "GMT+01:00 Europe/London")]
+    assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [
+        ("Europe/London", "GMT+00:00 Europe/London")
+    ]
+    assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [
+        ("Europe/London", "GMT+01:00 Europe/London")
+    ]
 
 
-def test_with_gmt_offset_transition_backward():
+def test_with_gmt_offset_transition_backward(use_pytz):
     tz_names = ["Europe/London"]
     before = datetime(2021, 10, 31, 0, 59, 59, 999999, tzinfo=pytz.utc)
     after = datetime(2021, 10, 31, 1, 0, 0, 0, tzinfo=pytz.utc)
-    assert with_gmt_offset(tz_names, now=before) == [("Europe/London", "GMT+01:00 Europe/London")]
-    assert with_gmt_offset(tz_names, now=after) == [("Europe/London", "GMT+00:00 Europe/London")]
+    assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [
+        ("Europe/London", "GMT+01:00 Europe/London")
+    ]
+    assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [
+        ("Europe/London", "GMT+00:00 Europe/London")
+    ]
 
 
 def test_standard_using_timezone_names(tzs3_names, tzs3_standard_displays):

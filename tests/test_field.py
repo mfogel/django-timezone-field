@@ -19,6 +19,7 @@ from timezone_field import TimeZoneField
 )
 def test_valid_dst_tz(Model, input_tz, output_tz):
     m = Model.objects.create(tz=input_tz, tz_opt=input_tz, tz_opt_default=input_tz)
+    print(getattr(Model.tz, 'use_pytz', None), input_tz.__class__, output_tz.__class__)
     m.full_clean()
     m = Model.objects.get(pk=m.pk)
     assert m.tz == output_tz
