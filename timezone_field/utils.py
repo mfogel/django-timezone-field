@@ -1,8 +1,8 @@
-
-import zoneinfo
+import datetime
 
 import pytz
-import datetime
+
+from timezone_field import compat
 
 
 def is_pytz_instance(value):
@@ -10,7 +10,7 @@ def is_pytz_instance(value):
 
 
 def is_tzinfo_instance(value):
-    return value is datetime.timezone.utc or isinstance(value, zoneinfo.ZoneInfo)
+    return value is datetime.timezone.utc or compat.is_zoneinfo_instance(value)
 
 
 # DEPRECATED. Use choices.with_gmt_offset instead
@@ -31,7 +31,7 @@ def add_gmt_offset_to_choices(timezone_tuple_set):
     for tz, tz_str in timezone_tuple_set:
         delta = (time_zero - tz.localize(time_ref)).total_seconds()
         h = (datetime.datetime.min + datetime.timedelta(seconds=delta.__abs__())).hour
-        gmt_diff = datetime.time(h).strftime('%H:%M')
+        gmt_diff = datetime.time(h).strftime("%H:%M")
         pair_one = tz
         pair_two = "GMT{sign}{gmt_diff} {timezone}".format(
             sign="-" if delta < 0 else "+",

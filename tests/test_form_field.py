@@ -11,6 +11,7 @@ def Form(use_pytz):
     class _Form(forms.Form):
         tz = TimeZoneFormField(use_pytz=use_pytz)
         tz_opt = TimeZoneFormField(required=False, use_pytz=use_pytz)
+
     yield _Form
 
 
@@ -18,12 +19,9 @@ def Form(use_pytz):
 def FormInvalidChoice(use_pytz, invalid_tz):
     class _FormInvalidChoice(forms.Form):
         tz = TimeZoneFormField(
-            choices=(
-                [(tz, tz) for tz in pytz.all_timezones]
-                + [(invalid_tz, pytz.utc)]
-            ),
-            use_pytz=use_pytz
+            choices=([(tz, tz) for tz in pytz.all_timezones] + [(invalid_tz, pytz.utc)]), use_pytz=use_pytz
         )
+
     yield _FormInvalidChoice
 
 

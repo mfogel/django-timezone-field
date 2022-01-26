@@ -1,6 +1,8 @@
 import datetime
+
 import pytz
-import zoneinfo
+
+from timezone_field import compat
 
 
 def standard(timezones):
@@ -30,8 +32,8 @@ def with_gmt_offset(timezones, now=None, use_pytz=True):
         utc = pytz.utc
         timezone_func = pytz.timezone
     else:
-        utc = zoneinfo.ZoneInfo("UTC")
-        timezone_func = zoneinfo.ZoneInfo
+        utc = compat.to_zoneinfo("UTC")
+        timezone_func = compat.to_zoneinfo
     now = now or datetime.datetime.now(utc)
     _choices = []
     for tz in timezones:

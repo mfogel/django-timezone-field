@@ -93,30 +93,22 @@ def test_with_gmt_offset_transition_forward(use_pytz):
     tz_names = ["Europe/London"]
     before = datetime(2021, 3, 28, 0, 59, 59, 999999, tzinfo=pytz.utc)
     after = datetime(2021, 3, 28, 1, 0, 0, 0, tzinfo=pytz.utc)
-    assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [
-        ("Europe/London", "GMT+00:00 Europe/London")
-    ]
-    assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [
-        ("Europe/London", "GMT+01:00 Europe/London")
-    ]
+    assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [("Europe/London", "GMT+00:00 Europe/London")]
+    assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [("Europe/London", "GMT+01:00 Europe/London")]
 
 
 def test_with_gmt_offset_transition_backward(use_pytz):
     tz_names = ["Europe/London"]
     before = datetime(2021, 10, 31, 0, 59, 59, 999999, tzinfo=pytz.utc)
     after = datetime(2021, 10, 31, 1, 0, 0, 0, tzinfo=pytz.utc)
-    assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [
-        ("Europe/London", "GMT+01:00 Europe/London")
-    ]
-    assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [
-        ("Europe/London", "GMT+00:00 Europe/London")
-    ]
+    assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [("Europe/London", "GMT+01:00 Europe/London")]
+    assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [("Europe/London", "GMT+00:00 Europe/London")]
 
 
 def test_standard_using_timezone_names(tzs3_names, tzs3_standard_displays):
     assert standard(tzs3_names) == list(zip(tzs3_names, tzs3_standard_displays))
 
 
-def test_standard_using_timezone_objects(tzs3_names, tzs3_standard_displays):
-    tzs3_objects = [pytz.timezone(tz) for tz in tzs3_names]
+def test_standard_using_timezone_objects(tzs3_names, tzs3_standard_displays, tz_func):
+    tzs3_objects = [tz_func(tz) for tz in tzs3_names]
     assert standard(tzs3_objects) == list(zip(tzs3_objects, tzs3_standard_displays))

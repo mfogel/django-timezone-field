@@ -66,6 +66,6 @@ def test_display_gmt_offsets(ModelForm, use_pytz, pst_tz):
         # The zoneinfo implementation does not support the
         # deprecated display_GMT_offset parameter.
         return
-    form = ModelForm({'tz_gmt_offset': pst_tz})
-    c = [c for c in form.fields['tz_gmt_offset'].choices if c[0] == pst_tz]
-    assert c[0][1] == 'GMT-08:00 America/Los Angeles'
+    form = ModelForm({"tz_gmt_offset": pst_tz})
+    c = [c for c in form.fields["tz_gmt_offset"].choices if c[0] == pst_tz]
+    assert c[0][1] == "GMT-08:00 America/Los Angeles"
