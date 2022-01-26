@@ -10,6 +10,11 @@ from timezone_field.utils import add_gmt_offset_to_choices, is_pytz_instance, is
 
 use_tzinfo = django.VERSION >= (4, 0)
 
+default_pytz_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
+default_pytz_choices = standard(default_pytz_tzs)
+default_zoneinfo_tzs = compat.get_default_zoneinfo_tzs()
+default_zoneinfo_choices = standard(default_zoneinfo_tzs)
+
 
 class TimeZoneField(models.Field):
     """
@@ -39,8 +44,6 @@ class TimeZoneField(models.Field):
 
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
-    default_pytz_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
-    default_zoneinfo_tzs = compat.get_default_zoneinfo_tzs()
     default_max_length = 63
 
     def __init__(self, *args, **kwargs):
@@ -55,8 +58,8 @@ class TimeZoneField(models.Field):
         if not self.use_pytz and kwargs.get("display_GMT_offset"):
             raise ValueError("Cannot use ZoneInfo based timezones and display_GMT_offset")
 
-        self.default_tzs = self.default_pytz_tzs if self.use_pytz else self.default_zoneinfo_tzs
-        self.default_choices = standard(self.default_tzs)
+        self.default_tzs = default_pytz_tzs if self.use_pytz else default_zoneinfo_tzs
+        self.default_choices = default_pytz_choices if self.use_pytz else default_zoneinfo_choices
 
         if "choices" in kwargs:
             values, displays = zip(*kwargs["choices"])
@@ -109,22 +112,28 @@ class TimeZoneField(models.Field):
         if self.choices_display is not None:
             kwargs["choices_display"] = self.choices_display
 
-        choices = kwargs["choices"]
-        if self.choices_display is None:
-            if choices == self.default_choices:
-                kwargs.pop("choices")
-        else:
-            values, _ = zip(*choices)
-            if sorted(values, key=str) == sorted(self.default_tzs, key=str):
-                kwargs.pop("choices")
+        choices = kwargs.get("choices")
+        if choices:
+            if self.choices_display is None:
+                defaults = [default_pytz_choices]
+                if default_zoneinfo_tzs:
+                    defaults += [default_zoneinfo_choices]
+                if choices == self.default_choices:
+                    kwargs.pop("choices")
             else:
-                kwargs["choices"] = [(value, "") for value in values]
+                values, _ = zip(*choices)
+                defaults = [default_pytz_tzs]
+                if default_zoneinfo_tzs:
+                    defaults += [default_zoneinfo_tzs]
+                if sorted(values, key=str) in defaults:
+                    kwargs.pop("choices")
+                else:
+                    kwargs["choices"] = [(value, "") for value in values]
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
         if "choices" in kwargs:
-            attr = "zone" if self.use_pytz else "key"
-            kwargs["choices"] = [(getattr(tz, attr), n) for tz, n in kwargs["choices"]]
+            kwargs["choices"] = [(str(tz), n) for tz, n in kwargs["choices"]]
         return name, path, args, kwargs
 
     def get_internal_type(self):
