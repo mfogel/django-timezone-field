@@ -61,7 +61,7 @@ class TimeZoneField(models.Field):
         self.default_tzs = default_pytz_tzs if self.use_pytz else default_zoneinfo_tzs
         self.default_choices = default_pytz_choices if self.use_pytz else default_zoneinfo_choices
 
-        if "choices" in kwargs:
+        if kwargs.get("choices"):
             values, displays = zip(*kwargs["choices"])
             # Choices can be specified in two forms: either
             # [<pytz.timezone>, <str>] or [<str>, <str>]
@@ -132,7 +132,7 @@ class TimeZoneField(models.Field):
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
-        if "choices" in kwargs:
+        if kwargs.get("choices"):
             kwargs["choices"] = [(str(tz), n) for tz, n in kwargs["choices"]]
         return name, path, args, kwargs
 
