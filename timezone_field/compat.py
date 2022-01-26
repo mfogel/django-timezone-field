@@ -4,10 +4,13 @@ from django.utils.encoding import force_str
 try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
-    ZoneInfo = None
+    try:
+        from backports.zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+    except ImportError:
+        ZoneInfo = None
 
-    class ZoneInfoNotFoundError(Exception):
-        pass
+        class ZoneInfoNotFoundError(Exception):
+            pass
 
 
 def get_default_zoneinfo_tzs():

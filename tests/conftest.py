@@ -5,12 +5,18 @@ from django.db import models
 
 from timezone_field import TimeZoneField, compat
 
+use_pytz_params = [True]
 try:
     import zoneinfo  # noqa: F401
 
     use_pytz_params = [True, False]
 except ImportError:
-    use_pytz_params = [True]
+    try:
+        from backports import zoneinfo  # noqa: F401
+
+        use_pytz_params = [True, False]
+    except ImportError:
+        pass
 
 USA_TZS = [
     "US/Alaska",
