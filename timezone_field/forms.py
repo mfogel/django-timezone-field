@@ -19,8 +19,8 @@ def coerce_to_pytz(val):
 def coerce_to_zoneinfo(val):
     try:
         return compat.to_zoneinfo(val)
-    except compat.ZoneInfoNotFoundError:
-        raise ValidationError("Unknown time zone: '%s'" % val)
+    except compat.ZoneInfoNotFoundError as err:
+        raise ValidationError("Unknown time zone: '%s'" % val) from err
 
 
 class TimeZoneFormField(forms.TypedChoiceField):

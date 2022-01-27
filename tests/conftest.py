@@ -7,12 +7,12 @@ from timezone_field import TimeZoneField, compat
 
 use_pytz_params = [True]
 try:
-    import zoneinfo  # noqa: F401
+    import zoneinfo  # pylint: disable=unused-import
 
     use_pytz_params = [True, False]
 except ImportError:
     try:
-        from backports import zoneinfo  # noqa: F401
+        from backports import zoneinfo  # pylint: disable=unused-import
 
         use_pytz_params = [True, False]
     except ImportError:

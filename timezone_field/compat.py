@@ -2,7 +2,7 @@ import pytz
 from django.utils.encoding import force_str
 
 try:
-    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError  # pylint: disable=unused-import
 except ImportError:
     try:
         from backports.zoneinfo import ZoneInfo, ZoneInfoNotFoundError

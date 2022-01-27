@@ -54,7 +54,7 @@ def test_deconstruct(fields, use_pytz):
             ),
         )
     for org_field in fields:
-        name, path, args, kwargs = org_field.deconstruct()
+        _name, _path, args, kwargs = org_field.deconstruct()
         new_field = TimeZoneField(*args, use_pytz=use_pytz, **kwargs)
         assert org_field.max_length == new_field.max_length
         assert org_field.choices == new_field.choices
@@ -88,7 +88,7 @@ def test_default_kwargs_not_frozen(use_pytz):
     Don't want to bloat everyone's migration files.
     """
     field = TimeZoneField(use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert "choices" not in kwargs
     assert "max_length" not in kwargs
 
@@ -99,17 +99,17 @@ def test_specifying_defaults_not_frozen(use_pytz, tz_func):
     shouldn't bothering freezing those.
     """
     field = TimeZoneField(max_length=63, use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert "max_length" not in kwargs
 
     choices = [(tz_func(tz), tz.replace("_", " ")) for tz in pytz.common_timezones]
     field = TimeZoneField(choices=choices, use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert "choices" not in kwargs
 
     choices = [(tz, tz.replace("_", " ")) for tz in pytz.common_timezones]
     field = TimeZoneField(choices=choices, use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert "choices" not in kwargs
 
 
@@ -125,7 +125,7 @@ def test_deconstruct_when_using_just_choices(use_tz_object, timezones, use_pytz,
         tz_func = str
     choices = [(tz_func(tz), tz) for tz in timezones]
     field = TimeZoneField(choices=choices, use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert kwargs == {
         "choices": [
             ("US/Pacific", "US/Pacific"),
@@ -144,7 +144,7 @@ def test_deconstruct_when_using_just_choices(use_tz_object, timezones, use_pytz,
 )
 def test_deconstruct_when_using_just_choices_display(use_pytz, choices_display, expected_kwargs):
     field = TimeZoneField(choices_display=choices_display, use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert kwargs == expected_kwargs
 
 
@@ -175,5 +175,5 @@ def test_deconstruct_when_using_just_choices_display(use_pytz, choices_display, 
 )
 def test_deconstruct_when_using_choices_and_choices_display(use_pytz, choices, choices_display, expected_kwargs):
     field = TimeZoneField(choices=choices, choices_display=choices_display, use_pytz=use_pytz)
-    name, path, args, kwargs = field.deconstruct()
+    _name, _path, _args, kwargs = field.deconstruct()
     assert kwargs == expected_kwargs
