@@ -61,7 +61,11 @@ def test_default_human_readable_choices_dont_have_underscores(ModelForm, pst_tz)
     assert pst_choice[0][1] == "America/Los Angeles"
 
 
-def test_display_gmt_offsets(ModelForm, pst_tz):
+def test_display_gmt_offsets(ModelForm, use_pytz, pst_tz):
+    if not use_pytz:
+        # The zoneinfo implementation does not support the
+        # deprecated display_GMT_offset parameter.
+        return
     form = ModelForm({"tz_gmt_offset": pst_tz})
     c = [c for c in form.fields["tz_gmt_offset"].choices if c[0] == pst_tz]
     assert c[0][1] == "GMT-08:00 America/Los Angeles"

@@ -84,6 +84,38 @@ poetry install
 poetry run pytest
 ```
 
+## Django 4 Compatibility
+
+Django 4 switched the timezone support to [`zoneinfo`](https://docs.python.org/3/library/zoneinfo.html). By default,
+when using `TimezoneField` with Django 4+, it will use `zoneinfo` rather than `pytz`.
+If you desire to use `pytz`, this can be specified with the `use_pytz=True` parameter.
+
+
+```python
+
+# Models
+from django.db import models
+from timezone_field import TimeZoneField
+
+class MyModel(models.Model):
+    tz = TimeZoneField(default='Europe/London', use_pytz=True)
+
+# Forms
+from django import forms
+from timezone_field import TimeZoneFormField
+
+class MyForm(forms.Form):
+    tz = TimeZoneFormField(use_pytz=True)
+
+# Serializers
+from rest_framework import serializers
+from timezone_field.rest_framework import TimeZoneSerializerField
+
+class MySerializer(serializers.Serializer):
+    tz = TimeZoneSerializerField(use_pytz=True)
+```
+
+
 ## Changelog
 
 #### 5.0 (unreleased!! in development)

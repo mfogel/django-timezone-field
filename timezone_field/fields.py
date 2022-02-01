@@ -1,10 +1,19 @@
+import django
 import pytz
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
 
+from timezone_field import compat
 from timezone_field.choices import standard, with_gmt_offset
-from timezone_field.utils import add_gmt_offset_to_choices, is_pytz_instance
+from timezone_field.utils import add_gmt_offset_to_choices, is_pytz_instance, is_tzinfo_instance
+
+use_tzinfo = django.VERSION >= (4, 0)
+
+default_pytz_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
+default_pytz_choices = standard(default_pytz_tzs)
+default_zoneinfo_tzs = compat.get_default_zoneinfo_tzs()
+default_zoneinfo_choices = standard(default_zoneinfo_tzs)
 
 
 class TimeZoneField(models.Field):
@@ -31,12 +40,10 @@ class TimeZoneField(models.Field):
     [<pytz.timezone>, <str>].
     """
 
-    description = "A pytz timezone object"
+    description = "A timezone object"
 
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
-    default_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
-    default_choices = standard(default_tzs)
     default_max_length = 63
 
     def __init__(self, *args, **kwargs):
@@ -46,8 +53,15 @@ class TimeZoneField(models.Field):
         if len(args) > 3:
             raise ValueError("Cannot specify max_length by positional arg")
         kwargs.setdefault("max_length", self.default_max_length)
+        self.use_pytz = kwargs.pop("use_pytz", not use_tzinfo)
 
-        if "choices" in kwargs:
+        if not self.use_pytz and kwargs.get("display_GMT_offset"):
+            raise ValueError("Cannot use ZoneInfo based timezones and display_GMT_offset")
+
+        self.default_tzs = default_pytz_tzs if self.use_pytz else default_zoneinfo_tzs
+        self.default_choices = default_pytz_choices if self.use_pytz else default_zoneinfo_choices
+
+        if kwargs.get("choices"):
             values, displays = zip(*kwargs["choices"])
             # Choices can be specified in two forms: either
             # [<pytz.timezone>, <str>] or [<str>, <str>]
@@ -60,8 +74,10 @@ class TimeZoneField(models.Field):
             # can't deconstruct pytz.timezone objects, migration files must
             # use an alternate format. Representing the timezones as strings
             # is the obvious choice.
-            if not is_pytz_instance(values[0]):
+            if self.use_pytz and not is_pytz_instance(values[0]):
                 values = [pytz.timezone(v) for v in values]
+            elif not self.use_pytz and not is_tzinfo_instance(values[0]):
+                values = [compat.to_zoneinfo(force_str(v)) for v in values]
         else:
             values = self.default_tzs
             displays = None
@@ -84,7 +100,7 @@ class TimeZoneField(models.Field):
         super().__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
-        if not is_pytz_instance(value):
+        if (self.use_pytz and not is_pytz_instance(value)) or (not self.use_pytz and not is_tzinfo_instance(value)):
             raise ValidationError("'%s' is not a pytz timezone object" % value)
         super().validate(value, model_instance)
 
@@ -96,21 +112,28 @@ class TimeZoneField(models.Field):
         if self.choices_display is not None:
             kwargs["choices_display"] = self.choices_display
 
-        choices = kwargs["choices"]
-        if self.choices_display is None:
-            if choices == self.default_choices:
-                kwargs.pop("choices")
-        else:
-            values, _ = zip(*choices)
-            if sorted(values, key=str) == sorted(self.default_tzs, key=str):
-                kwargs.pop("choices")
+        choices = kwargs.get("choices")
+        if choices:
+            if self.choices_display is None:
+                defaults = [default_pytz_choices]
+                if default_zoneinfo_tzs:
+                    defaults += [default_zoneinfo_choices]
+                if choices == self.default_choices:
+                    kwargs.pop("choices")
             else:
-                kwargs["choices"] = [(value, "") for value in values]
+                values, _ = zip(*choices)
+                defaults = [default_pytz_tzs]
+                if default_zoneinfo_tzs:
+                    defaults += [default_zoneinfo_tzs]
+                if sorted(values, key=str) in defaults:
+                    kwargs.pop("choices")
+                else:
+                    kwargs["choices"] = [(value, "") for value in values]
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
-        if "choices" in kwargs:
-            kwargs["choices"] = [(tz.zone, n) for tz, n in kwargs["choices"]]
+        if kwargs.get("choices"):
+            kwargs["choices"] = [(str(tz), n) for tz, n in kwargs["choices"]]
         return name, path, args, kwargs
 
     def get_internal_type(self):
@@ -138,10 +161,18 @@ class TimeZoneField(models.Field):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == "":
             return (None, "")
-        if is_pytz_instance(value):
-            return (value, value.zone)
-        try:
-            return (pytz.timezone(force_str(value)), force_str(value))
-        except pytz.UnknownTimeZoneError:
-            pass
+        if self.use_pytz:
+            if is_pytz_instance(value):
+                return (value, value.zone)
+            try:
+                return (pytz.timezone(force_str(value)), force_str(value))
+            except pytz.UnknownTimeZoneError:
+                pass
+        else:
+            if compat.is_zoneinfo_instance(value):
+                return (value, value.key)
+            try:
+                return (compat.to_zoneinfo(value), force_str(value))
+            except compat.ZoneInfoNotFoundError:
+                pass
         raise ValidationError("Invalid timezone '%s'" % value)
