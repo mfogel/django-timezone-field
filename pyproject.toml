@@ -42,6 +42,8 @@ pytest-cov = "^3.0.0"
 black = "^21.12b0"
 isort = "^5.10.1"
 pylint = "^2.12.2"
+"backports.zoneinfo" = { version = "^0.2.1", python = "~3.7 || ~3.8 || ~3.9" }
+
 
 [tool.pylint.'MESSAGES CONTROL']
 max-line-length = 120

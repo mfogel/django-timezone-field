@@ -5,19 +5,6 @@ from django.db import models
 
 from timezone_field import TimeZoneField, compat
 
-use_pytz_params = [True]
-try:
-    import zoneinfo  # pylint: disable=unused-import
-
-    use_pytz_params = [True, False]
-except ImportError:
-    try:
-        from backports import zoneinfo  # pylint: disable=unused-import
-
-        use_pytz_params = [True, False]
-    except ImportError:
-        pass
-
 USA_TZS = [
     "US/Alaska",
     "US/Arizona",
@@ -107,7 +94,7 @@ class _ZIModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-@pytest.fixture(params=use_pytz_params)
+@pytest.fixture(params=[True, False])
 def use_pytz(request):
     yield request.param
 
