@@ -6,7 +6,7 @@ from django.utils.encoding import force_str
 
 from timezone_field import compat
 from timezone_field.choices import standard, with_gmt_offset
-from timezone_field.utils import add_gmt_offset_to_choices, is_pytz_instance, is_tzinfo_instance
+from timezone_field.utils import is_pytz_instance, is_tzinfo_instance
 
 use_tzinfo = django.VERSION >= (4, 0)
 
@@ -55,9 +55,6 @@ class TimeZoneField(models.Field):
         kwargs.setdefault("max_length", self.default_max_length)
         self.use_pytz = kwargs.pop("use_pytz", not use_tzinfo)
 
-        if not self.use_pytz and kwargs.get("display_GMT_offset"):
-            raise ValueError("Cannot use ZoneInfo based timezones and display_GMT_offset")
-
         self.default_tzs = default_pytz_tzs if self.use_pytz else default_zoneinfo_tzs
         self.default_choices = default_pytz_choices if self.use_pytz else default_zoneinfo_choices
 
@@ -91,10 +88,6 @@ class TimeZoneField(models.Field):
             choices = zip(values, displays) if displays else standard(values)
         else:
             raise ValueError("Unrecognized value for kwarg 'choices_display' of '" + self.choices_display + "'")
-
-        # 'display_GMT_offset' is deprecated, use 'choices_display' instead
-        if kwargs.pop("display_GMT_offset", False):
-            choices = add_gmt_offset_to_choices(choices)
 
         kwargs["choices"] = choices
         super().__init__(*args, **kwargs)

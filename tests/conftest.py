@@ -20,14 +20,12 @@ class _TZModel(models.Model):
     tz = TimeZoneField(use_pytz=True)
     tz_opt = TimeZoneField(blank=True, use_pytz=True)
     tz_opt_default = TimeZoneField(blank=True, default="America/Los_Angeles", use_pytz=True)
-    tz_gmt_offset = TimeZoneField(blank=True, display_GMT_offset=True, use_pytz=True)
 
 
 class _ZIModel(models.Model):
     tz = TimeZoneField(use_pytz=False)
     tz_opt = TimeZoneField(blank=True, use_pytz=False)
     tz_opt_default = TimeZoneField(blank=True, default="America/Los_Angeles", use_pytz=False)
-    tz_gmt_offset = TimeZoneField(blank=True, use_pytz=False)
 
 
 class _TZModelChoice(models.Model):

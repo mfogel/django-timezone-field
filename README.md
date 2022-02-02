@@ -120,6 +120,7 @@ class MySerializer(serializers.Serializer):
 
 #### 5.0 (unreleased!! in development)
 
+* Remove `display_GMT_offset` kwarg (use `choices_display` instead)
 * Drop support for django 3.0, 3.1
 * Drop support for python 3.5, 3.6
 
