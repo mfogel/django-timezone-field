@@ -502,7 +502,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "d0f60ffa963e81989662264aa02ffd196e1915e23da828f5e1a05e29617e1369"
+content-hash = "55e768a70283a97280abbd8da96aaedb2f60b612ca37db1f0e255a00e8dc12b3"
 
 [metadata.files]
 asgiref = [
