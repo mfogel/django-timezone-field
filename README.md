@@ -6,7 +6,8 @@
 [![pypi python support](https://img.shields.io/pypi/pyversions/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
 [![pypi django support](https://img.shields.io/pypi/djversions/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
 
-A Django app providing database, form and serializer fields for [pytz](http://pypi.python.org/pypi/pytz/) timezone objects.
+A Django app providing database, form and serializer fields for [pytz](http://pypi.python.org/pypi/pytz/) timezone
+objects.
 
 ## Examples
 
@@ -87,9 +88,8 @@ poetry run pytest
 ## Django 4 Compatibility
 
 Django 4 switched the timezone support to [`zoneinfo`](https://docs.python.org/3/library/zoneinfo.html). By default,
-when using `TimezoneField` with Django 4+, it will use `zoneinfo` rather than `pytz`.
-If you desire to use `pytz`, this can be specified with the `use_pytz=True` parameter.
-
+when using `TimezoneField` with Django 4+, it will use `zoneinfo` rather than `pytz`. If you desire to use `pytz`, this
+can be specified with the `use_pytz=True` parameter.
 
 ```python
 
@@ -115,94 +115,102 @@ class MySerializer(serializers.Serializer):
     tz = TimeZoneSerializerField(use_pytz=True)
 ```
 
-
 ## Changelog
 
 #### 5.0 (unreleased!! in development)
 
-* Remove `display_GMT_offset` kwarg (use `choices_display` instead)
-* Drop support for django 3.0, 3.1
-* Drop support for python 3.5, 3.6
+- Remove `display_GMT_offset` kwarg (use `choices_display` instead)
+- Drop support for django 3.0, 3.1
+- Drop support for python 3.5, 3.6
 
 #### 4.2.3 (2022-01-13)
 
-* Fix sdist installs ([#78](https://github.com/mfogel/django-timezone-field/issues/78))
-* Officially support python 3.10
+- Fix sdist installs ([#78](https://github.com/mfogel/django-timezone-field/issues/78))
+- Officially support python 3.10
 
 #### 4.2.1 (2021-07-07)
 
-* Reinstate `TimeZoneField.default_choices` ([#76](https://github.com/mfogel/django-timezone-field/issues/76))
+- Reinstate `TimeZoneField.default_choices` ([#76](https://github.com/mfogel/django-timezone-field/issues/76))
 
 #### 4.2 (2021-07-07)
 
-* Officially support django 3.2, python 3.9
-* Fix bug with field deconstruction ([#74](https://github.com/mfogel/django-timezone-field/issues/74))
-* Housekeeping: use poetry, github actions, pytest
+- Officially support django 3.2, python 3.9
+- Fix bug with field deconstruction ([#74](https://github.com/mfogel/django-timezone-field/issues/74))
+- Housekeeping: use poetry, github actions, pytest
 
 #### 4.1.2 (2021-03-17)
 
-* Avoid `NonExistentTimeError` during DST transition ([#70](https://github.com/mfogel/django-timezone-field/issues/70))
+- Avoid `NonExistentTimeError` during DST transition ([#70](https://github.com/mfogel/django-timezone-field/issues/70))
 
 #### 4.1.1 (2020-11-28)
 
-* Don't import `rest_framework` from package root ([#67](https://github.com/mfogel/django-timezone-field/issues/67))
+- Don't import `rest_framework` from package root ([#67](https://github.com/mfogel/django-timezone-field/issues/67))
 
 #### 4.1 (2020-11-28)
 
-* Add Django REST Framework serializer field
-* Add new `choices_display` kwarg with supported values `WITH_GMT_OFFSET` and `STANDARD`
-* Deprecate `display_GMT_offset` kwarg
+- Add Django REST Framework serializer field
+- Add new `choices_display` kwarg with supported values `WITH_GMT_OFFSET` and `STANDARD`
+- Deprecate `display_GMT_offset` kwarg
 
 #### 4.0 (2019-12-03)
 
-* Add support for django 3.0, python 3.8
-* Drop support for django 1.11, 2.0, 2.1, python 2.7, 3.4
+- Add support for django 3.0, python 3.8
+- Drop support for django 1.11, 2.0, 2.1, python 2.7, 3.4
 
 #### 3.1 (2019-10-02)
 
-* Officially support django 2.2 (already worked)
-* Add option to display TZ offsets in form field ([#46](https://github.com/mfogel/django-timezone-field/issues/46))
+- Officially support django 2.2 (already worked)
+- Add option to display TZ offsets in form field ([#46](https://github.com/mfogel/django-timezone-field/issues/46))
 
 #### 3.0 (2018-09-15)
 
-* Support django 1.11, 2.0, 2.1
-* Add support for python 3.7
-* Change default human-readable timezone names to exclude underscores ([#32](https://github.com/mfogel/django-timezone-field/issues/32) & [#37](https://github.com/mfogel/django-timezone-field/issues/37))
+- Support django 1.11, 2.0, 2.1
+- Add support for python 3.7
+- Change default human-readable timezone names to exclude underscores
+  ([#32](https://github.com/mfogel/django-timezone-field/issues/32) &
+  [#37](https://github.com/mfogel/django-timezone-field/issues/37))
 
 #### 2.1 (2018-03-01)
 
-* Add support for django 1.10, 1.11
-* Add support for python 3.6
-* Add wheel support
-* Support bytes in DB fields ([#38](https://github.com/mfogel/django-timezone-field/issues/38) & [#39](https://github.com/mfogel/django-timezone-field/issues/39))
+- Add support for django 1.10, 1.11
+- Add support for python 3.6
+- Add wheel support
+- Support bytes in DB fields ([#38](https://github.com/mfogel/django-timezone-field/issues/38) &
+  [#39](https://github.com/mfogel/django-timezone-field/issues/39))
 
 #### 2.0 (2016-01-31)
 
-* Drop support for django 1.7, add support for django 1.9
-* Drop support for python 3.2, 3.3, add support for python 3.5
-* Remove tests from source distribution
+- Drop support for django 1.7, add support for django 1.9
+- Drop support for python 3.2, 3.3, add support for python 3.5
+- Remove tests from source distribution
 
 #### 1.3 (2015-10-12)
 
-* Drop support for django 1.6, add support for django 1.8
-* Various [bug fixes](https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3)
+- Drop support for django 1.6, add support for django 1.8
+- Various [bug fixes](https://github.com/mfogel/django-timezone-field/issues?q=milestone%3A1.3)
 
 #### 1.2 (2015-02-05)
 
-* For form field, changed default list of accepted timezones from `pytz.all_timezones` to `pytz.common_timezones`, to match DB field behavior.
+- For form field, changed default list of accepted timezones from `pytz.all_timezones` to `pytz.common_timezones`, to
+  match DB field behavior.
 
 #### 1.1 (2014-10-05)
 
-* Django 1.7 compatibility
-* Added support for formatting `choices` kwarg as `[[<str>, <str>], ...]`, in addition to previous format of `[[<pytz.timezone>, <str>], ...]`.
-* Changed default list of accepted timezones from `pytz.all_timezones` to `pytz.common_timezones`. If you have timezones in your DB that are in `pytz.all_timezones` but not in `pytz.common_timezones`, this is a backward-incompatible change. Old behavior can be restored by specifying `choices=[(tz, tz) for tz in pytz.all_timezones]` in your model definition.
+- Django 1.7 compatibility
+- Added support for formatting `choices` kwarg as `[[<str>, <str>], ...]`, in addition to previous format of
+  `[[<pytz.timezone>, <str>], ...]`.
+- Changed default list of accepted timezones from `pytz.all_timezones` to `pytz.common_timezones`. If you have timezones
+  in your DB that are in `pytz.all_timezones` but not in `pytz.common_timezones`, this is a backward-incompatible
+  change. Old behavior can be restored by specifying `choices=[(tz, tz) for tz in pytz.all_timezones]` in your model
+  definition.
 
 #### 1.0 (2013-08-04)
 
-* Initial release as `timezone_field`.
+- Initial release as `timezone_field`.
 
 ## Credits
 
 Originally adapted from [Brian Rosner's django-timezones](https://github.com/brosner/django-timezones).
 
-Made possible thanks to the work of the [contributors](https://github.com/mfogel/django-timezone-field/graphs/contributors).
+Made possible thanks to the work of the
+[contributors](https://github.com/mfogel/django-timezone-field/graphs/contributors).
