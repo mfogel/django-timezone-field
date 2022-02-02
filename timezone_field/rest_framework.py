@@ -4,7 +4,7 @@ from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import Field
 
-from timezone_field import compat
+from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
 
 use_tzinfo = django.VERSION >= (4, 0)
 
@@ -26,8 +26,8 @@ class TimeZoneSerializerField(Field):
                 self.fail("invalid")
         else:
             try:
-                return compat.to_zoneinfo(force_str(data))
-            except compat.ZoneInfoNotFoundError:
+                return ZoneInfo(force_str(data))
+            except ZoneInfoNotFoundError:
                 self.fail("invalid")
 
     def to_representation(self, value):

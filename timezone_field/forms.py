@@ -3,8 +3,8 @@ import pytz
 from django import forms
 from django.core.exceptions import ValidationError
 
-from timezone_field import compat
 from timezone_field.choices import standard, with_gmt_offset
+from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
 
 use_tzinfo = django.VERSION >= (4, 0)
 
@@ -18,8 +18,8 @@ def coerce_to_pytz(val):
 
 def coerce_to_zoneinfo(val):
     try:
-        return compat.to_zoneinfo(val)
-    except compat.ZoneInfoNotFoundError as err:
+        return ZoneInfo(val)
+    except ZoneInfoNotFoundError as err:
         raise ValidationError("Unknown time zone: '%s'" % val) from err
 
 

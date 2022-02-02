@@ -4,15 +4,15 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
 
-from timezone_field import compat
 from timezone_field.choices import standard, with_gmt_offset
-from timezone_field.utils import is_pytz_instance, is_tzinfo_instance
+from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
+from timezone_field.utils import is_pytz_instance
 
 use_tzinfo = django.VERSION >= (4, 0)
 
 default_pytz_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
 default_pytz_choices = standard(default_pytz_tzs)
-default_zoneinfo_tzs = compat.get_default_zoneinfo_tzs()
+default_zoneinfo_tzs = [ZoneInfo(tz) for tz in pytz.common_timezones]
 default_zoneinfo_choices = standard(default_zoneinfo_tzs)
 
 
@@ -73,8 +73,9 @@ class TimeZoneField(models.Field):
             # is the obvious choice.
             if self.use_pytz and not is_pytz_instance(values[0]):
                 values = [pytz.timezone(v) for v in values]
-            elif not self.use_pytz and not is_tzinfo_instance(values[0]):
-                values = [compat.to_zoneinfo(force_str(v)) for v in values]
+            elif not self.use_pytz and not isinstance(values[0], ZoneInfo):
+                # using force_str b/c of https://github.com/mfogel/django-timezone-field/issues/38
+                values = [ZoneInfo(force_str(v)) for v in values]
         else:
             values = self.default_tzs
             displays = None
@@ -93,7 +94,7 @@ class TimeZoneField(models.Field):
         super().__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
-        if (self.use_pytz and not is_pytz_instance(value)) or (not self.use_pytz and not is_tzinfo_instance(value)):
+        if (self.use_pytz and not is_pytz_instance(value)) or (not self.use_pytz and not isinstance(value, ZoneInfo)):
             raise ValidationError("'%s' is not a pytz timezone object" % value)
         super().validate(value, model_instance)
 
@@ -162,10 +163,11 @@ class TimeZoneField(models.Field):
             except pytz.UnknownTimeZoneError:
                 pass
         else:
-            if compat.is_zoneinfo_instance(value):
+            if isinstance(value, ZoneInfo):
                 return (value, value.key)
             try:
-                return (compat.to_zoneinfo(value), force_str(value))
-            except compat.ZoneInfoNotFoundError:
+                # using force_str b/c of https://github.com/mfogel/django-timezone-field/issues/38
+                return (ZoneInfo(force_str(value)), force_str(value))
+            except ZoneInfoNotFoundError:
                 pass
         raise ValidationError("Invalid timezone '%s'" % value)

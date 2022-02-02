@@ -29,10 +29,12 @@ setup(
     long_description_content_type="text/markdown",
     url="http://github.com/mfogel/django-timezone-field/",
     license="BSD",
-    packages=[
-        "timezone_field",
+    packages=["timezone_field"],
+    install_requires=[
+        'backports.zoneinfo>=0.2.1; python_version<"3.9"',
+        "django>=2.2",
+        "pytz",
     ],
-    install_requires=["django>=2.2", "pytz"],
     extras_require={"rest_framework": ["djangorestframework>=3.0.0"]},
     python_requires=">=3.7",
     classifiers=[

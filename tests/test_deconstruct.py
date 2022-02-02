@@ -2,7 +2,8 @@ import pytest
 import pytz
 from django.db.migrations.writer import MigrationWriter
 
-from timezone_field import TimeZoneField, compat
+from timezone_field import TimeZoneField
+from timezone_field.compat import ZoneInfo
 
 
 @pytest.fixture
@@ -47,8 +48,8 @@ def test_deconstruct(fields, use_pytz):
         fields += (
             TimeZoneField(
                 choices=[
-                    (compat.to_zoneinfo("US/Pacific"), "US/Pacific"),
-                    (compat.to_zoneinfo("US/Eastern"), "US/Eastern"),
+                    (ZoneInfo("US/Pacific"), "US/Pacific"),
+                    (ZoneInfo("US/Eastern"), "US/Eastern"),
                 ],
                 use_pytz=use_pytz,
             ),
@@ -76,7 +77,7 @@ def test_from_db_value(use_pytz):
     db.
     """
     field = TimeZoneField(use_pytz=use_pytz)
-    utc = pytz.UTC if use_pytz else compat.to_zoneinfo("UTC")
+    utc = pytz.UTC if use_pytz else ZoneInfo("UTC")
     value = field.from_db_value(b"UTC", None, None)
     assert utc == value
 
