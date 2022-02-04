@@ -1,12 +1,10 @@
-import django
 import pytz
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import Field
 
 from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
-
-use_tzinfo = django.VERSION >= (4, 0)
+from timezone_field.utils import use_pytz_default
 
 
 class TimeZoneSerializerField(Field):
@@ -15,7 +13,7 @@ class TimeZoneSerializerField(Field):
     }
 
     def __init__(self, *args, **kwargs):
-        self.use_pytz = kwargs.pop("use_pytz", not use_tzinfo)
+        self.use_pytz = kwargs.pop("use_pytz", use_pytz_default())
         super().__init__(*args, **kwargs)
 
     def to_internal_value(self, data):

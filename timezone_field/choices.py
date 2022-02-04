@@ -3,6 +3,7 @@ import datetime
 import pytz
 
 from timezone_field.compat import ZoneInfo
+from timezone_field.utils import use_pytz_default
 
 
 def standard(timezones):
@@ -19,7 +20,7 @@ def standard(timezones):
     return choices
 
 
-def with_gmt_offset(timezones, now=None, use_pytz=True):
+def with_gmt_offset(timezones, now=None, use_pytz=None):
     """
     Given a list of timezones (either strings of timezone objects),
     return a list of choices with
@@ -28,6 +29,7 @@ def with_gmt_offset(timezones, now=None, use_pytz=True):
           underscores. For example: "GMT-05:00 America/New York"
         * sorted by their timezone offset
     """
+    use_pytz = use_pytz_default() if use_pytz is None else use_pytz
     if use_pytz:
         utc = pytz.utc
         timezone_func = pytz.timezone
