@@ -24,7 +24,7 @@ setup(
     version=find_version("timezone_field", "__init__.py"),
     author="Mike Fogel",
     author_email="mike@fogel.ca",
-    description=("A Django app providing database and form fields for " "pytz timezone objects."),
+    description="A Django app providing DB, form, and REST framework fields for zoneinfo and pytz timezone objects.",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     url="http://github.com/mfogel/django-timezone-field/",

@@ -79,7 +79,7 @@ class TimeZoneField(models.Field):
 
         self.choices_display = kwargs.pop("choices_display", None)
         if self.choices_display == "WITH_GMT_OFFSET":
-            choices = with_gmt_offset(values)
+            choices = with_gmt_offset(values, use_pytz=self.use_pytz)
         elif self.choices_display == "STANDARD":
             choices = standard(values)
         elif self.choices_display is None:

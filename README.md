@@ -6,66 +6,86 @@
 [![pypi python support](https://img.shields.io/pypi/pyversions/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
 [![pypi django support](https://img.shields.io/pypi/djversions/django-timezone-field.svg)](https://pypi.python.org/pypi/django-timezone-field/)
 
-A Django app providing database, form and serializer fields for [pytz](http://pypi.python.org/pypi/pytz/) timezone
+A Django app providing DB, form, and REST framework fields for
+[`zoneinfo`](https://docs.python.org/3/library/zoneinfo.html) and [`pytz`](http://pypi.python.org/pypi/pytz/) timezone
 objects.
+
+## The transition from `pytz` to `zoneinfo`
+
+Like Django, this app will support both `pytz` and `zoneinfo` objects while the community transitions away from `pytz`
+to `zoneinfo`. All exposed fields and functions that return a timezone object accept an optional boolean kwarg
+`use_pytz`.
+
+If not explicitly specified, the default value used for `use_pytz` will match Django's behavior:
+
+- Django <=3.X: `use_pytz` will default to `True`
+- Django ~=4.X: `use_pytz` will default to the value of
+  [`django.conf.settings.USE_DEPRECATED_PYTZ`](https://docs.djangoproject.com/en/4.0/ref/settings/#use-deprecated-pytz),
+  which itself defaults to `False`
+- Django >=5.X: django plans to drop support for `pytz` altogether, and this app will likely do the same.
 
 ## Examples
 
 ### Database Field
 
-```py
+```python
 import pytz
+import zoneinfo
 from django.db import models
 from timezone_field import TimeZoneField
 
 class MyModel(models.Model):
-    tz1 = TimeZoneField(default='Europe/London')            # defaults supported
-    tz2 = TimeZoneField()                                   # in ModelForm displays like "America/Los Angeles"
-    tz3 = TimeZoneField(choices_display='WITH_GMT_OFFSET')  # in ModelForm displays like "GMT-08:00 America/Los Angeles"
+    tz1 = TimeZoneField(default="Asia/Dubai")               # defaults supported, in ModelForm renders like "Asia/Dubai"
+    tz2 = TimeZoneField(choices_display="WITH_GMT_OFFSET")  # in ModelForm renders like "GMT+04:00 Asia/Dubai"
+    tz3 = TimeZoneField(use_pytz=True)                      # returns pytz timezone objects
+    tz4 = TimeZoneField(use_pytz=False)                     # returns zoneinfo objects
 
 my_model = MyModel(
-    tz1='America/Los_Angeles',    # assignment of a string
-    tz2=pytz.timezone('Turkey'),  # assignment of a pytz.DstTzInfo
-    tz3=pytz.UTC,                 # assignment of pytz.UTC singleton
+    tz2="America/Vancouver",                     # assignment of a string
+    tz3=pytz.timezone("America/Vancouver"),      # assignment of a pytz timezone
+    tz4=zoneinfo.ZoneInfo("America/Vancouver"),  # assignment of a zoneinfo
 )
 my_model.full_clean() # validates against pytz.common_timezones by default
 my_model.save()       # values stored in DB as strings
-my_model.tz1          # values retrieved as pytz objects: <DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>
+my_model.tz3          # value returned as pytz timezone: <DstTzInfo 'America/Vancouver' LMT-1 day, 15:48:00 STD>
+my_model.tz4          # value returned as zoneinfo: zoneinfo.ZoneInfo(key='America/Vancouver')
 ```
 
 ### Form Field
 
-```py
+```python
 from django import forms
 from timezone_field import TimeZoneFormField
 
 class MyForm(forms.Form):
-    tz = TimeZoneFormField()                                    # displays like "America/Los Angeles"
-    tz2 = TimeZoneFormField(choices_display='WITH_GMT_OFFSET')  # displays like "GMT-08:00 America/Los Angeles"
+    tz1 = TimeZoneFormField()                                   # renders like "Asia/Dubai"
+    tz2 = TimeZoneFormField(choices_display="WITH_GMT_OFFSET")  # renders like "GMT+04:00 Asia/Dubai"
+    tz3 = TimeZoneFormField(use_pytz=True)                      # returns pytz timezone objects
+    tz4 = TimeZoneFormField(use_pytz=False)                     # returns zoneinfo objects
 
-my_form = MyForm({'tz': 'America/Los_Angeles'})
-my_form.full_clean()        # validates against pytz.common_timezones by default
-my_form.cleaned_data['tz']  # values retrieved as pytz objects: <DstTzInfo 'America/Los_Angeles' PST-1 day, 16:00:00 STD>
+my_form = MyForm({"tz3": "America/Vancouver", "tz4": "America/Vancouver"})
+my_form.full_clean()         # validates against pytz.common_timezones by default
+my_form.cleaned_data["tz3"]  # value returned as pytz timezone: <DstTzInfo 'America/Vancouver' LMT-1 day, 15:48:00 STD>
+my_form.cleaned_data["tz4"]  # value returned as zoneinfo: zoneinfo.ZoneInfo(key='America/Vancouver')
 ```
 
 ### REST Framework Serializer Field
 
-```py
-import pytz
+```python
 from rest_framework import serializers
 from timezone_field.rest_framework import TimeZoneSerializerField
 
 class MySerializer(serializers.Serializer):
-    tz1 = TimeZoneSerializerField()
-    tz2 = TimeZoneSerializerField()
+    tz1 = TimeZoneSerializerField(use_pytz=True)
+    tz2 = TimeZoneSerializerField(use_pytz=False)
 
 my_serializer = MySerializer(data={
-    'tz1': 'America/Argentina/Buenos_Aires',
-    'tz2': pytz.timezone('America/Argentina/Buenos_Aires'),
+    "tz1": "America/Argentina/Buenos_Aires",
+    "tz2": "America/Argentina/Buenos_Aires",
 })
-my_serializer.is_valid()            # true
-my_serializer.validated_data['tz1'] # <DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>
-my_serializer.validated_data['tz2'] # <DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>
+my_serializer.is_valid()
+my_serializer.validated_data["tz1"]  # <DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>
+my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Vancouver')
 ```
 
 ## Installation
@@ -85,40 +105,11 @@ poetry install
 poetry run pytest
 ```
 
-## Django 4 Compatibility
-
-Django 4 switched the timezone support to [`zoneinfo`](https://docs.python.org/3/library/zoneinfo.html). By default,
-when using `TimezoneField` with Django 4+, it will use `zoneinfo` rather than `pytz`. If you desire to use `pytz`, this
-can be specified with the `use_pytz=True` parameter.
-
-```python
-
-# Models
-from django.db import models
-from timezone_field import TimeZoneField
-
-class MyModel(models.Model):
-    tz = TimeZoneField(default='Europe/London', use_pytz=True)
-
-# Forms
-from django import forms
-from timezone_field import TimeZoneFormField
-
-class MyForm(forms.Form):
-    tz = TimeZoneFormField(use_pytz=True)
-
-# Serializers
-from rest_framework import serializers
-from timezone_field.rest_framework import TimeZoneSerializerField
-
-class MySerializer(serializers.Serializer):
-    tz = TimeZoneSerializerField(use_pytz=True)
-```
-
 ## Changelog
 
 #### 5.0 (unreleased!! in development)
 
+- Add support for `zoneinfo` objects
 - Remove `display_GMT_offset` kwarg (use `choices_display` instead)
 - Drop support for django 3.0, 3.1
 - Drop support for python 3.5, 3.6
