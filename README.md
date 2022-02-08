@@ -12,19 +12,24 @@ objects.
 
 ## The transition from `pytz` to `zoneinfo`
 
-Like Django, this app will support both `pytz` and `zoneinfo` objects while the community transitions away from `pytz`
-to `zoneinfo`. All exposed fields and functions that return a timezone object accept an optional boolean kwarg
-`use_pytz`.
+Like Django, this app supports both `pytz` and `zoneinfo` objects while the community transitions away from `pytz` to
+`zoneinfo`. All exposed fields and functions that return a timezone object accept an optional boolean kwarg `use_pytz`.
 
-If not explicitly specified, the default value used for `use_pytz` will match Django's behavior:
+If not explicitly specified, the default value used for `use_pytz` matches Django's behavior:
 
-- Django <= 3.X: `use_pytz` will default to `True`
-- Django == 4.X: `use_pytz` will default to the value of
+- Django <= 3.X: `use_pytz` defaults to `True`
+- Django == 4.X: `use_pytz` defaults to the value of
   [`django.conf.settings.USE_DEPRECATED_PYTZ`](https://docs.djangoproject.com/en/4.0/ref/settings/#use-deprecated-pytz),
   which itself defaults to `False`
 - Django >= 5.X: django plans to
   [drop support for `pytz` altogether](https://docs.djangoproject.com/en/4.0/releases/4.0/#zoneinfo-default-timezone-implementation),
   and this app will likely do the same.
+
+When switching between `pytz` and `zoneinfo`, in general a
+[data migration](https://docs.djangoproject.com/en/4.0/topics/migrations/#data-migrations) is _not_ needed, as both
+libraries recognize the same set of strings as valid timezones. Exceptions to that include if your local system has an
+unusual set of time zones installed, or if you are using the `Factory` timezone which `zoneinfo` recognizes but `pytz`
+does not.
 
 ## Examples
 
@@ -92,26 +97,31 @@ my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Argentina/
 
 ## Installation
 
-Install from [`pypi`](https://pypi.org/project/django-timezone-field/)
+Releases are hosted on [`pypi`](https://pypi.org/project/django-timezone-field/) and can be installed using various
+python packaging tools.
 
-```sh
+```bash
+# with poetry
+poetry add django-timezone-field
+
+# with pip
 pip install django-timezone-field
 ```
 
 ## Running the tests
 
-From the repository root, with [`poetry`](https://python-poetry.org/)
+From the repository root, with [`poetry`](https://python-poetry.org/):
 
-```sh
+```bash
 poetry install
 poetry run pytest
 ```
 
 ## Changelog
 
-#### 5.0 (unreleased!! in development)
+#### 5.0 (unreleased! in development)
 
-- Add support for `zoneinfo` objects
+- Add support for `zoneinfo` objects ([#79](https://github.com/mfogel/django-timezone-field/issues/79))
 - Add support for django 4.0
 - Remove `display_GMT_offset` kwarg (use `choices_display` instead)
 - Drop support for django 3.0, 3.1
