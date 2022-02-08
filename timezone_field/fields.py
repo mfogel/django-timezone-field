@@ -7,11 +7,6 @@ from timezone_field.choices import standard, with_gmt_offset
 from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
 from timezone_field.utils import is_pytz_instance, use_pytz_default
 
-default_pytz_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
-default_pytz_choices = standard(default_pytz_tzs)
-default_zoneinfo_tzs = [ZoneInfo(tz) for tz in pytz.common_timezones]
-default_zoneinfo_choices = standard(default_zoneinfo_tzs)
-
 
 class TimeZoneField(models.Field):
     """
@@ -42,6 +37,8 @@ class TimeZoneField(models.Field):
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
     default_max_length = 63
+    default_pytz_tzs = [pytz.timezone(tz) for tz in pytz.common_timezones]
+    default_zoneinfo_tzs = [ZoneInfo(tz) for tz in pytz.common_timezones]
 
     def __init__(self, *args, **kwargs):
         # allow some use of positional args up until the args we customize
@@ -49,11 +46,11 @@ class TimeZoneField(models.Field):
         # https://github.com/django/django/blob/1.11.11/django/db/models/fields/__init__.py#L145
         if len(args) > 3:
             raise ValueError("Cannot specify max_length by positional arg")
-        kwargs.setdefault("max_length", self.default_max_length)
-        self.use_pytz = kwargs.pop("use_pytz", use_pytz_default())
 
-        self.default_tzs = default_pytz_tzs if self.use_pytz else default_zoneinfo_tzs
-        self.default_choices = default_pytz_choices if self.use_pytz else default_zoneinfo_choices
+        self.max_length = kwargs.pop("max_length", self.default_max_length)
+        self.use_pytz_explicit = kwargs.pop("use_pytz", None)
+        self.use_pytz = self.use_pytz_explicit if self.use_pytz_explicit is not None else use_pytz_default()
+        self.default_tzs = self.default_pytz_tzs if self.use_pytz else self.default_zoneinfo_tzs
 
         if "choices" in kwargs:
             values, displays = zip(*kwargs["choices"])
@@ -100,26 +97,22 @@ class TimeZoneField(models.Field):
         if kwargs.get("max_length") == self.default_max_length:
             del kwargs["max_length"]
 
+        if self.use_pytz_explicit is not None:
+            kwargs["use_pytz"] = self.use_pytz_explicit
+
         if self.choices_display is not None:
             kwargs["choices_display"] = self.choices_display
 
-        choices = kwargs.get("choices")
-        if choices:
-            if self.choices_display is None:
-                defaults = [default_pytz_choices]
-                if default_zoneinfo_tzs:
-                    defaults += [default_zoneinfo_choices]
-                if choices == self.default_choices:
-                    kwargs.pop("choices")
+        choices = kwargs["choices"]
+        if self.choices_display is None:
+            if choices == standard(self.default_tzs):
+                kwargs.pop("choices")
+        else:
+            values, _ = zip(*choices)
+            if sorted(values, key=str) == sorted(self.default_tzs, key=str):
+                kwargs.pop("choices")
             else:
-                values, _ = zip(*choices)
-                defaults = [default_pytz_tzs]
-                if default_zoneinfo_tzs:
-                    defaults += [default_zoneinfo_tzs]
-                if sorted(values, key=str) in defaults:
-                    kwargs.pop("choices")
-                else:
-                    kwargs["choices"] = [(value, "") for value in values]
+                kwargs["choices"] = [(value, "") for value in values]
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
