@@ -13,62 +13,114 @@ def common_tz_objects(tz_func):
     yield tuple(tz_func(tz) for tz in pytz.common_timezones)
 
 
+class _ZIChoicesDisplayForm(forms.Form):
+    limited_tzs = [
+        "Asia/Tokyo",
+        "Asia/Dubai",
+        "America/Argentina/Buenos_Aires",
+        "Africa/Nairobi",
+    ]
+    limited_choices = [(tz, tz) for tz in limited_tzs]
+
+    tz_none = TimeZoneFormField(use_pytz=False)
+    tz_standard = TimeZoneFormField(choices_display="STANDARD", use_pytz=False)
+    tz_with_gmt_offset = TimeZoneFormField(choices_display="WITH_GMT_OFFSET", use_pytz=False)
+    tz_limited_none = TimeZoneFormField(choices=limited_choices, use_pytz=False)
+    tz_limited_standard = TimeZoneFormField(
+        choices=limited_choices,
+        choices_display="STANDARD",
+        use_pytz=False,
+    )
+    tz_limited_with_gmt_offset = TimeZoneFormField(
+        choices=limited_choices,
+        choices_display="WITH_GMT_OFFSET",
+        use_pytz=False,
+    )
+
+
+class _TZChoicesDisplayForm(forms.Form):
+    limited_tzs = [
+        "Asia/Tokyo",
+        "Asia/Dubai",
+        "America/Argentina/Buenos_Aires",
+        "Africa/Nairobi",
+    ]
+    limited_choices = [(tz, tz) for tz in limited_tzs]
+
+    tz_none = TimeZoneFormField(use_pytz=True)
+    tz_standard = TimeZoneFormField(choices_display="STANDARD", use_pytz=True)
+    tz_with_gmt_offset = TimeZoneFormField(choices_display="WITH_GMT_OFFSET", use_pytz=True)
+    tz_limited_none = TimeZoneFormField(choices=limited_choices, use_pytz=True)
+    tz_limited_standard = TimeZoneFormField(
+        choices=limited_choices,
+        choices_display="STANDARD",
+        use_pytz=True,
+    )
+    tz_limited_with_gmt_offset = TimeZoneFormField(
+        choices=limited_choices,
+        choices_display="WITH_GMT_OFFSET",
+        use_pytz=True,
+    )
+
+
+class _ZIChoicesDisplayModel(models.Model):
+    limited_tzs = [
+        "Asia/Tokyo",
+        "Asia/Dubai",
+        "America/Argentina/Buenos_Aires",
+        "Africa/Nairobi",
+    ]
+    limited_choices = [(tz, tz) for tz in limited_tzs]
+
+    tz_none = TimeZoneField(use_pytz=False)
+    tz_standard = TimeZoneField(choices_display="STANDARD", use_pytz=False)
+    tz_with_gmt_offset = TimeZoneField(choices_display="WITH_GMT_OFFSET", use_pytz=False)
+    tz_limited_none = TimeZoneField(choices=limited_choices, use_pytz=False)
+    tz_limited_standard = TimeZoneField(
+        choices=limited_choices,
+        choices_display="STANDARD",
+        use_pytz=False,
+    )
+    tz_limited_with_gmt_offset = TimeZoneField(
+        choices=limited_choices,
+        choices_display="WITH_GMT_OFFSET",
+        use_pytz=False,
+    )
+
+
+class _TZChoicesDisplayModel(models.Model):
+    limited_tzs = [
+        "Asia/Tokyo",
+        "Asia/Dubai",
+        "America/Argentina/Buenos_Aires",
+        "Africa/Nairobi",
+    ]
+    limited_choices = [(tz, tz) for tz in limited_tzs]
+
+    tz_none = TimeZoneField(use_pytz=True)
+    tz_standard = TimeZoneField(choices_display="STANDARD", use_pytz=True)
+    tz_with_gmt_offset = TimeZoneField(choices_display="WITH_GMT_OFFSET", use_pytz=True)
+    tz_limited_none = TimeZoneField(choices=limited_choices, use_pytz=True)
+    tz_limited_standard = TimeZoneField(
+        choices=limited_choices,
+        choices_display="STANDARD",
+        use_pytz=True,
+    )
+    tz_limited_with_gmt_offset = TimeZoneField(
+        choices=limited_choices,
+        choices_display="WITH_GMT_OFFSET",
+        use_pytz=True,
+    )
+
+
 @pytest.fixture
 def ChoicesDisplayForm(use_pytz):
-    class _ChoicesDisplayForm(forms.Form):
-        limited_tzs = [
-            "Asia/Tokyo",
-            "Asia/Dubai",
-            "America/Argentina/Buenos_Aires",
-            "Africa/Nairobi",
-        ]
-        limited_choices = [(tz, tz) for tz in limited_tzs]
-
-        tz_none = TimeZoneFormField(use_pytz=use_pytz)
-        tz_standard = TimeZoneFormField(choices_display="STANDARD", use_pytz=use_pytz)
-        tz_with_gmt_offset = TimeZoneFormField(choices_display="WITH_GMT_OFFSET", use_pytz=use_pytz)
-        tz_limited_none = TimeZoneFormField(choices=limited_choices, use_pytz=use_pytz)
-        tz_limited_standard = TimeZoneFormField(
-            choices=limited_choices,
-            choices_display="STANDARD",
-            use_pytz=use_pytz,
-        )
-        tz_limited_with_gmt_offset = TimeZoneFormField(
-            choices=limited_choices,
-            choices_display="WITH_GMT_OFFSET",
-            use_pytz=use_pytz,
-        )
-
-    yield _ChoicesDisplayForm
+    yield _TZChoicesDisplayForm if use_pytz else _ZIChoicesDisplayForm
 
 
 @pytest.fixture
 def ChoicesDisplayModel(use_pytz):
-    class _ChoicesDisplayModel(models.Model):
-        limited_tzs = [
-            "Asia/Tokyo",
-            "Asia/Dubai",
-            "America/Argentina/Buenos_Aires",
-            "Africa/Nairobi",
-        ]
-        limited_choices = [(tz, tz) for tz in limited_tzs]
-
-        tz_none = TimeZoneField(use_pytz=use_pytz)
-        tz_standard = TimeZoneField(choices_display="STANDARD", use_pytz=use_pytz)
-        tz_with_gmt_offset = TimeZoneField(choices_display="WITH_GMT_OFFSET", use_pytz=use_pytz)
-        tz_limited_none = TimeZoneField(choices=limited_choices, use_pytz=use_pytz)
-        tz_limited_standard = TimeZoneField(
-            choices=limited_choices,
-            choices_display="STANDARD",
-            use_pytz=use_pytz,
-        )
-        tz_limited_with_gmt_offset = TimeZoneField(
-            choices=limited_choices,
-            choices_display="WITH_GMT_OFFSET",
-            use_pytz=use_pytz,
-        )
-
-    yield _ChoicesDisplayModel
+    yield _TZChoicesDisplayModel if use_pytz else _ZIChoicesDisplayModel
 
 
 @pytest.fixture
