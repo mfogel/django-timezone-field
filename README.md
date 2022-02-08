@@ -110,6 +110,7 @@ poetry run pytest
 #### 5.0 (unreleased!! in development)
 
 - Add support for `zoneinfo` objects
+- Add support for django 4.0
 - Remove `display_GMT_offset` kwarg (use `choices_display` instead)
 - Drop support for django 3.0, 3.1
 - Drop support for python 3.5, 3.6
