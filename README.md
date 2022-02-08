@@ -18,19 +18,21 @@ to `zoneinfo`. All exposed fields and functions that return a timezone object ac
 
 If not explicitly specified, the default value used for `use_pytz` will match Django's behavior:
 
-- Django <=3.X: `use_pytz` will default to `True`
-- Django ~=4.X: `use_pytz` will default to the value of
+- Django <= 3.X: `use_pytz` will default to `True`
+- Django == 4.X: `use_pytz` will default to the value of
   [`django.conf.settings.USE_DEPRECATED_PYTZ`](https://docs.djangoproject.com/en/4.0/ref/settings/#use-deprecated-pytz),
   which itself defaults to `False`
-- Django >=5.X: django plans to drop support for `pytz` altogether, and this app will likely do the same.
+- Django >= 5.X: django plans to
+  [drop support for `pytz` altogether](https://docs.djangoproject.com/en/4.0/releases/4.0/#zoneinfo-default-timezone-implementation),
+  and this app will likely do the same.
 
 ## Examples
 
 ### Database Field
 
 ```python
-import pytz
 import zoneinfo
+import pytz
 from django.db import models
 from timezone_field import TimeZoneField
 
@@ -63,10 +65,10 @@ class MyForm(forms.Form):
     tz3 = TimeZoneFormField(use_pytz=True)                      # returns pytz timezone objects
     tz4 = TimeZoneFormField(use_pytz=False)                     # returns zoneinfo objects
 
-my_form = MyForm({"tz3": "America/Vancouver", "tz4": "America/Vancouver"})
+my_form = MyForm({"tz3": "Europe/Berlin", "tz4": "Europe/Berlin"})
 my_form.full_clean()         # validates against pytz.common_timezones by default
-my_form.cleaned_data["tz3"]  # value returned as pytz timezone: <DstTzInfo 'America/Vancouver' LMT-1 day, 15:48:00 STD>
-my_form.cleaned_data["tz4"]  # value returned as zoneinfo: zoneinfo.ZoneInfo(key='America/Vancouver')
+my_form.cleaned_data["tz3"]  # value returned as pytz timezone: <DstTzInfo 'Europe/Berlin' LMT+0:53:00 STD>
+my_form.cleaned_data["tz4"]  # value returned as zoneinfo: zoneinfo.ZoneInfo(key='Europe/Berlin')
 ```
 
 ### REST Framework Serializer Field
@@ -85,7 +87,7 @@ my_serializer = MySerializer(data={
 })
 my_serializer.is_valid()
 my_serializer.validated_data["tz1"]  # <DstTzInfo 'America/Argentina/Buenos_Aires' LMT-1 day, 20:06:00 STD>
-my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Vancouver')
+my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Argentina/Buenos_Aires')
 ```
 
 ## Installation
