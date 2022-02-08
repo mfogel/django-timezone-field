@@ -11,14 +11,14 @@ def coerce_to_pytz(val):
     try:
         return pytz.timezone(val)
     except pytz.UnknownTimeZoneError as err:
-        raise ValidationError("Unknown time zone: '%s'" % val) from err
+        raise ValidationError(f"Unknown time zone: '{val}'") from err
 
 
 def coerce_to_zoneinfo(val):
     try:
         return ZoneInfo(val)
     except ZoneInfoNotFoundError as err:
-        raise ValidationError("Unknown time zone: '%s'" % val) from err
+        raise ValidationError(f"Unknown time zone: '{val}'") from err
 
 
 class TimeZoneFormField(forms.TypedChoiceField):
@@ -41,7 +41,7 @@ class TimeZoneFormField(forms.TypedChoiceField):
         elif choices_display is None:
             choices = zip(values, displays) if displays else standard(values)
         else:
-            raise ValueError("Unrecognized value for kwarg 'choices_display' of '" + choices_display + "'")
+            raise ValueError(f"Unrecognized value for kwarg 'choices_display' of '{choices_display}'")
 
         kwargs["choices"] = choices
         super().__init__(*args, **kwargs)

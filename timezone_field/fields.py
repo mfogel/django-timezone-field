@@ -85,14 +85,14 @@ class TimeZoneField(models.Field):
         elif self.choices_display is None:
             choices = zip(values, displays) if displays else standard(values)
         else:
-            raise ValueError("Unrecognized value for kwarg 'choices_display' of '" + self.choices_display + "'")
+            raise ValueError(f"Unrecognized value for kwarg 'choices_display' of '{self.choices_display}'")
 
         kwargs["choices"] = choices
         super().__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
         if (self.use_pytz and not is_pytz_instance(value)) or (not self.use_pytz and not isinstance(value, ZoneInfo)):
-            raise ValidationError("'%s' is not a pytz timezone object" % value)
+            raise ValidationError(f"'{value}' is not a pytz timezone object")
         super().validate(value, model_instance)
 
     def deconstruct(self):
@@ -167,4 +167,4 @@ class TimeZoneField(models.Field):
                 return (ZoneInfo(force_str(value)), force_str(value))
             except ZoneInfoNotFoundError:
                 pass
-        raise ValidationError("Invalid timezone '%s'" % value)
+        raise ValidationError(f"Invalid timezone '{value}'")
