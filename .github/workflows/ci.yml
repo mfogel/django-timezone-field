@@ -10,40 +10,40 @@ jobs:
     name: Lint
 
     steps:
-    - name: Git checkout
-      uses: actions/checkout@v2
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v2
-      with:
-        path: .venv
-        key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ hashFiles('poetry.lock') }}
 
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
 
-    - name: Lint with black
-      run: poetry run black --check --diff .
+      - name: Lint with black
+        run: poetry run black --check --diff .
 
-    - name: Lint with flake8
-      run: poetry run flake8 --exclude .venv
+      - name: Lint with flake8
+        run: poetry run flake8 --exclude .venv
 
-    - name: Lint with isort
-      run: poetry run isort --check --diff .
+      - name: Lint with isort
+        run: poetry run isort --check --diff .
 
-    - name: Lint with pylint
-      run: poetry run pylint tests timezone_field setup.py
+      - name: Lint with pylint
+        run: poetry run pylint tests timezone_field setup.py
 
   test:
     runs-on: ubuntu-latest
@@ -77,57 +77,54 @@ jobs:
           - 5432:5432
         # Set health checks to wait until postgres has started
         options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - name: Git checkout
-      uses: actions/checkout@v2
+      - name: Git checkout
+        uses: actions/checkout@v2
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1
-      with:
-        virtualenvs-create: true
-        virtualenvs-in-project: true
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v2
-      with:
-        path: .venv
-        key: venv-py${{ matrix.python-version}}-dj${{ matrix.django-version }}-${{ hashFiles('poetry.lock') }}
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-py${{ matrix.python-version}}-dj${{ matrix.django-version }}-${{ hashFiles('poetry.lock') }}
 
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-interaction --no-root
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
 
-    - name: Install django ${{ matrix.django-version }}
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: |
-        source .venv/bin/activate
-        pip install "Django~=${{ matrix.django-version }}"
+      - name: Install django ${{ matrix.django-version }}
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: |
+          source .venv/bin/activate
+          pip install "Django~=${{ matrix.django-version }}"
 
-    - name: Test with coverage
-      env:
-        POSTGRES_HOST: localhost
-        POSTGRES_PORT: 5432
-        POSTGRES_DB: postgres
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-      run: poetry run pytest --cov=timezone_field
+      - name: Test with coverage
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        run: poetry run pytest --cov=timezone_field
 
-    - name: Generate coverage report
-      run: poetry run coverage xml
+      - name: Generate coverage report
+        run: poetry run coverage xml
 
-    - name: Upload coverage report to codecov
-      uses: codecov/codecov-action@v2
-      with:
-        env_vars: PYTHON_VERSION,DJANGO_VERSION,DB_ENGINE
-        fail_ci_if_error: true
+      - name: Upload coverage report to codecov
+        uses: codecov/codecov-action@v2
+        with:
+          env_vars: PYTHON_VERSION,DJANGO_VERSION,DB_ENGINE
+          fail_ci_if_error: true
