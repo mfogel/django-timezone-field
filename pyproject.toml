@@ -16,7 +16,21 @@ line_length = 120
 name = "django-timezone-field"
 version = "5.0"
 description = "A Django app providing DB, form, and REST framework fields for zoneinfo and pytz timezone objects."
+license = "BSD-2-Clause"
 authors = ["Mike Fogel <mike@fogel.ca>"]
+readme = "README.md"
+repository = "https://github.com/mfogel/django-timezone-field/"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities",
+]
 packages = [
     { include = "timezone_field" },
 ]
