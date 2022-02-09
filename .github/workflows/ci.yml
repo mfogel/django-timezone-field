@@ -128,3 +128,34 @@ jobs:
         with:
           env_vars: PYTHON_VERSION,DJANGO_VERSION,DB_ENGINE
           fail_ci_if_error: true
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v2
+        with:
+          path: .venv
+          key: venv-${{ hashFiles('poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Build with poetry
+        run: poetry build
