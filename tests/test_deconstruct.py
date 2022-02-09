@@ -108,13 +108,16 @@ def test_specifying_defaults_not_frozen():
     ],
 )
 def test_deconstruct_when_using_choices(choices, use_pytz):
-    field = TimeZoneField(choices=choices)
-    _name, _path, args, kwargs = field.deconstruct()
+    field = TimeZoneField(choices=choices, use_pytz=use_pytz)
+    _name, _path, _args, kwargs = field.deconstruct()
     assert kwargs == {
-        "choices": [
-            ("US/Pacific", "US/Pacific"),
-            ("US/Eastern", "US/Eastern"),
-        ]
+        **{
+            "choices": [
+                ("US/Pacific", "US/Pacific"),
+                ("US/Eastern", "US/Eastern"),
+            ]
+        },
+        **({"use_pytz": use_pytz} if use_pytz is not None else {}),
     }
 
 

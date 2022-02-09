@@ -46,8 +46,8 @@ class TimeZoneField(models.Field):
         # https://github.com/django/django/blob/1.11.11/django/db/models/fields/__init__.py#L145
         if len(args) > 3:
             raise ValueError("Cannot specify max_length by positional arg")
+        kwargs.setdefault("max_length", self.default_max_length)
 
-        self.max_length = kwargs.pop("max_length", self.default_max_length)
         self.use_pytz_explicit = kwargs.pop("use_pytz", None)
         self.use_pytz = self.use_pytz_explicit if self.use_pytz_explicit is not None else use_pytz_default()
         self.default_tzs = self.default_pytz_tzs if self.use_pytz else self.default_zoneinfo_tzs
