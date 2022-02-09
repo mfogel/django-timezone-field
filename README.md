@@ -25,11 +25,23 @@ If not explicitly specified, the default value used for `use_pytz` matches Djang
   [drop support for `pytz` altogether](https://docs.djangoproject.com/en/4.0/releases/4.0/#zoneinfo-default-timezone-implementation),
   and this app will likely do the same.
 
-When switching between `pytz` and `zoneinfo`, in general a
-[data migration](https://docs.djangoproject.com/en/4.0/topics/migrations/#data-migrations) is _not_ needed, as both
-libraries recognize the same set of strings as valid timezones. Exceptions to that include if your local system has an
-unusual set of time zones installed, or if you are using the `Factory` timezone which `zoneinfo` recognizes but `pytz`
-does not.
+### Differences in recognized timezones between `pytz` and `zoneinfo`
+
+`pytz` and `zoneinfo` search for timezone data differently.
+
+- `pytz` bundles and searches within its own copy of the [IANA timezone DB](https://www.iana.org/time-zones)
+- `zoneinfo` first searches the local system's timezone DB for a match. If no match is found, it then searches within
+  the [`tzdata`](https://pypi.org/project/tzdata/) package if it is installed. The `tzdata` package contains a copy of
+  the IANA timezone DB.
+
+If the local system's timezone DB doesn't cover the entire IANA timezone DB and the `tzdata` package is not installed,
+you may run across errors like `ZoneInfoNotFoundError: 'No time zone found with key Pacific/Kanton'` for seemingly valid
+timezones when transitioning from `pytz` to `zoneinfo`. The easy fix is to add `tzdata` to your project with
+`poetry add tzdata` or `pip install tzdata`.
+
+Assuming you have the `tzdata` package installed if needed, no
+[data migration](https://docs.djangoproject.com/en/4.0/topics/migrations/#data-migrations) should be necessary when
+switching from `pytz` to `zoneinfo`.
 
 ## Examples
 
