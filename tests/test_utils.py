@@ -1,9 +1,11 @@
+import random
 import warnings
 
 import pytest
+import pytz
 from django import VERSION
 
-from timezone_field.utils import use_pytz_default
+from timezone_field.utils import create_timezone_choices, use_pytz_default
 
 
 def test_use_pytz_default_USE_DEPRECATED_PYTZ_unset():
@@ -19,3 +21,10 @@ def test_use_pytz_default_USE_DEPRECATED_PYTZ_set(settings, value):
         warnings.simplefilter("ignore", category=RemovedInDjango50Warning)
         settings.USE_DEPRECATED_PYTZ = value
     assert use_pytz_default() is value
+
+
+def test_create_timezone_choices():
+    country_code = random.choice(list(pytz.country_names.keys()))
+    choices = create_timezone_choices(country_code)
+    assert isinstance(choices, list)
+    assert len(choices) > 0
