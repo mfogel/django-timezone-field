@@ -34,5 +34,6 @@ class TimeZoneMiddlewareTest(TestCase):
         self.request = request
 
     def test_current_timezone(self):
-        self.middleware(self.request)
+        response = self.middleware(self.request)
+        self.assertIsInstance(response, HttpResponse)
         self.assertEqual(self.timezone, str(get_current_timezone()))
