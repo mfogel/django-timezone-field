@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class TimeZoneMiddleware:
     """
-    Set timezone for the current thread from the value in user instance.
+    Set time zone for the current thread from the value in `request.user`.
     """
 
     user_property_not_defined = (
