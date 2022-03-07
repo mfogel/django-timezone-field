@@ -1,9 +1,9 @@
 import random
 
+import pytest
 import pytz
 from django.contrib.auth.models import AbstractUser
 from django.http import HttpRequest, HttpResponse
-from django.test import TestCase
 from django.utils.timezone import get_current_timezone
 
 from timezone_field import TimeZoneField
@@ -20,20 +20,15 @@ class User(AbstractUser):
         return getattr(cls, "TIMEZONE_FIELD", "timezone")
 
 
-class TimeZoneMiddlewareTest(TestCase):
-    middleware = TimeZoneMiddleware(lambda request: HttpResponse())
+@pytest.mark.django_db
+def test_current_timezone():
     timezone = random.choice(pytz.all_timezones)
-
-    def setUp(self):
-        user = User(username="test_user", email="test@example.com", timezone=self.timezone)
-        user.set_password("test_password")
-        user.save()
-        request = HttpRequest()
-        request.user = user
-        self.user = user
-        self.request = request
-
-    def test_current_timezone(self):
-        response = self.middleware(self.request)
-        self.assertIsInstance(response, HttpResponse)
-        self.assertEqual(self.timezone, str(get_current_timezone()))
+    middleware = TimeZoneMiddleware(lambda request: HttpResponse())
+    user = User(username="test_user", email="test@example.com", timezone=timezone)
+    user.set_password("test_password")
+    user.save()
+    request = HttpRequest()
+    request.user = user
+    response = middleware(request)
+    assert isinstance(response, HttpResponse)
+    assert timezone == str(get_current_timezone())
