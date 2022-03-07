@@ -107,6 +107,54 @@ my_serializer.validated_data["tz1"]  # <DstTzInfo 'America/Argentina/Buenos_Aire
 my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Argentina/Buenos_Aires')
 ```
 
+### Middleware
+
+Add `"timezone_field.middleware.TimeZoneMiddleware"` to your
+[`INSTALLED_APPS`](https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-INSTALLED_APPS) setting.
+
+```python
+    INSTALLED_APPS = [
+        ...
+        "timezone_field.middleware.TimeZoneMiddleware",
+    ]
+```
+
+Implement `get_timezone_field_name()` in your [`User`](https://docs.djangoproject.com/en/4.0/ref/settings/#auth-user-model) model.
+Must be a method returning the time zone field name.
+
+Example 1:
+
+```python
+# Based on Django User.get_email_field_name class method
+
+class CustomUser(AbstractUser):
+    TIMEZONE_FIELD = "timezone"
+
+    timezone = TimeZoneField()
+
+    @classmethod
+    def get_timezone_field_name(cls) -> str:
+        return getattr(cls, "TIMEZONE_FIELD", "timezone")
+```
+
+Example 2:
+
+```python
+class CustomUser(AbstractUser):
+    timezone = TimeZoneField()
+
+    def get_timezone_field_name(self) -> str:
+        return "timezone"
+```
+
+Now for every request, the user time zone will be activated for the current thread.
+
+The TimeZoneMiddleware checks for instances of Python [`tzinfo`](https://docs.python.org/3/library/datetime.html#tzinfo-objects)
+or `str` in order to activate the time zone.
+Any other type will set the default time zone
+([`TIME_ZONE`](https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-TIME_ZONE) and
+[`USE_TZ`](https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-USE_TZ) settings).
+
 ## Installation
 
 Releases are hosted on [`pypi`](https://pypi.org/project/django-timezone-field/) and can be installed using various
