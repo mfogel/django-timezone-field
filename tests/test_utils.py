@@ -1,10 +1,12 @@
 import random
 import warnings
+from datetime import tzinfo
 
 import pytest
 import pytz
 from django import VERSION
 
+from timezone_field import TimeZoneFormField
 from timezone_field.utils import create_timezone_choices, use_pytz_default
 
 
@@ -28,3 +30,12 @@ def test_create_timezone_choices():
     choices = create_timezone_choices(country_code)
     assert isinstance(choices, list)
     assert len(choices) > 0
+    assert isinstance(choices[0][0], tzinfo)
+    assert isinstance(choices[0][1], str)
+
+
+def test_create_timezone_choices_with_field():
+    country_code = random.choice(list(pytz.country_names.keys()))
+    choices = create_timezone_choices(country_code)
+    form_field = TimeZoneFormField(choices=choices)
+    assert choices == form_field.choices
