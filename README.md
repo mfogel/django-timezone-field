@@ -109,7 +109,8 @@ my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Argentina/
 
 ### Middleware
 
-Add `"timezone_field.middleware.TimeZoneMiddleware"` to your `INSTALLED_APPS` setting.
+Add `"timezone_field.middleware.TimeZoneMiddleware"` to your
+[`INSTALLED_APPS`](https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-INSTALLED_APPS) setting.
 
 ```python
     INSTALLED_APPS = [
@@ -118,27 +119,28 @@ Add `"timezone_field.middleware.TimeZoneMiddleware"` to your `INSTALLED_APPS` se
     ]
 ```
 
-Implement `get_timezone_field_name()` to your `User` model.
+Implement `get_timezone_field_name()` in your [`User`](https://docs.djangoproject.com/en/4.0/ref/settings/#auth-user-model) model.
 Must be a method returning the time zone field name.
 
-- Example 1:
+Example 1:
 
 ```python
-class User(AbstractUser):
+# Based on Django User.get_email_field_name class method
+
+class CustomUser(AbstractUser):
     TIMEZONE_FIELD = "timezone"
 
     timezone = TimeZoneField()
 
     @classmethod
     def get_timezone_field_name(cls) -> str:
-        # Based on Django User.get_email_field_name class method
         return getattr(cls, "TIMEZONE_FIELD", "timezone")
 ```
 
-- Example 2:
+Example 2:
 
 ```python
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     timezone = TimeZoneField()
 
     def get_timezone_field_name(self) -> str:
@@ -147,8 +149,11 @@ class User(AbstractUser):
 
 Now for every request, the user time zone will be activated for the current thread.
 
-The TimeZoneMiddleware checks for instances of Python `tzinfo` or `str` in order to activate the time zone.
-Any other type will set the default time zone (`TIME_ZONE` and `USE_TZ` settings).
+The TimeZoneMiddleware checks for instances of Python [`tzinfo`](https://docs.python.org/3/library/datetime.html#tzinfo-objects)
+or `str` in order to activate the time zone.
+Any other type will set the default time zone
+([`TIME_ZONE`](https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-TIME_ZONE) and
+[`USE_TZ`](https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-USE_TZ) settings).
 
 ## Installation
 
