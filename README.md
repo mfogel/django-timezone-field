@@ -135,7 +135,8 @@ poetry run pytest
 
 - Add support for `zoneinfo` objects ([#79](https://github.com/mfogel/django-timezone-field/issues/79))
 - Add support for django 4.0
-- Remove `display_GMT_offset` kwarg (use `choices_display` instead)
+- Remove `timezone_field.utils.add_gmt_offset_to_choices`, `display_GMT_offset` kwarg (use `choices_display` instead)
+
 - Drop support for django 3.0, 3.1
 - Drop support for python 3.5, 3.6
 
