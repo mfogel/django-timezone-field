@@ -51,15 +51,17 @@ jobs:
 
     strategy:
       matrix:
-        # https://docs.djangoproject.com/en/4.0/faq/install/#what-python-version-can-i-use-with-django
+        # https://docs.djangoproject.com/en/4.1/faq/install/#what-python-version-can-i-use-with-django
         python-version: ["3.7", "3.8", "3.9", "3.10"]
-        django-version: ["2.2", "3.2", "4.0"]
+        django-version: ["2.2", "3.2", "4.0", "4.1"]
         db-engine: [sqlite, postgres]
         exclude:
           - python-version: "3.10"
             django-version: "2.2"
           - python-version: "3.7"
             django-version: "4.0"
+          - python-version: "3.7"
+            django-version: "4.1"
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}

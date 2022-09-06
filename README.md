@@ -131,6 +131,10 @@ poetry run pytest
 
 ## Changelog
 
+#### `main` (unreleased)
+
+- Explicitly support django 4.1
+
 #### 5.0 (2022-02-08)
 
 - Add support for `zoneinfo` objects ([#79](https://github.com/mfogel/django-timezone-field/issues/79))
