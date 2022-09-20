@@ -35,7 +35,7 @@ class TimeZoneField(models.Field):
     Valid inputs:
         * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
         * the pytz.UTC singleton
-        * any string that validates against pytz.common_timezones. pytz will
+        * any string that validates against pytz.all_timezones. pytz will
           be used to build a timezone object from the string.
         * None and the empty string both represent 'no timezone'
 
