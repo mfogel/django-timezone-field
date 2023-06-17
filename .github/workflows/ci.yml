@@ -43,7 +43,7 @@ jobs:
         run: poetry run isort --check --diff .
 
       - name: Lint with pylint
-        run: poetry run pylint tests timezone_field setup.py
+        run: poetry run pylint tests timezone_field
 
   test:
     runs-on: ubuntu-latest
