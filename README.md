@@ -133,6 +133,8 @@ poetry run pytest
 
 #### `main` (unreleased)
 
+- Add django as a dependency of this package, with correct version constraints
+  ([#90](https://github.com/mfogel/django-timezone-field/issues/90))
 - Add support for django 4.1, 4.2
 - Add support for python 3.11
 
