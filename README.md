@@ -131,7 +131,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 5.1 (2023-06-18)
 
 - Add django as a dependency of this package, with correct version constraints
   ([#90](https://github.com/mfogel/django-timezone-field/issues/90))
