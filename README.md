@@ -133,7 +133,8 @@ poetry run pytest
 
 #### `main` (unreleased)
 
-- Explicitly support django 4.1, 4.2
+- Add support for django 4.1, 4.2
+- Add support for python 3.11
 
 #### 5.0 (2022-02-08)
 
