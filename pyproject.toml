@@ -38,16 +38,13 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
+Django = "^2.2 || ^3.2 || ^4.0"
 python = "^3.7"
 pytz = "*"
 "backports.zoneinfo" = { version = "^0.2.1", python = "<3.9" }
 
 [tool.poetry.dev-dependencies]
 coverage = {extras = ["toml"], version = "^6.2"}
-Django = [
-    { version = "^2.2 || ^3.2", python = "~3.7" },
-    { version = "^2.2 || ^3.2 || ^4.0", python = "^3.8" },
-]
 djangorestframework = "^3.13.1"
 flake8 = "^5.0.4"
 psycopg2-binary = "^2.9.3"
