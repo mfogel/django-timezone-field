@@ -17,16 +17,19 @@ class TimeZoneSerializerField(Field):
         super().__init__(*args, **kwargs)
 
     def to_internal_value(self, data):
+        data_str = force_str(data)
         if self.use_pytz:
             try:
-                return pytz.timezone(force_str(data))
+                return pytz.timezone(data_str)
             except pytz.UnknownTimeZoneError:
                 self.fail("invalid")
         else:
-            try:
-                return ZoneInfo(force_str(data))
-            except ZoneInfoNotFoundError:
-                self.fail("invalid")
+            if data_str:
+                try:
+                    return ZoneInfo(data_str)
+                except ZoneInfoNotFoundError:
+                    pass
+            self.fail("invalid")
 
     def to_representation(self, value):
         return str(value)
