@@ -116,21 +116,24 @@ class TimeZoneField(models.Field):
         if self.choices_display is not None:
             kwargs["choices_display"] = self.choices_display
 
-        choices = kwargs["choices"]
-        if self.choices_display is None:
-            if choices == standard(self.default_tzs):
-                kwargs.pop("choices")
-        else:
-            values, _ = zip(*choices)
-            if sorted(values, key=str) == sorted(self.default_tzs, key=str):
-                kwargs.pop("choices")
+        # don't assume super().deconstruct() will pass us back our kwargs["choices"]
+        # https://github.com/mfogel/django-timezone-field/issues/96
+        if "choices" in kwargs:
+            if self.choices_display is None:
+                if kwargs["choices"] == standard(self.default_tzs):
+                    kwargs.pop("choices")
             else:
-                kwargs["choices"] = [(value, "") for value in values]
+                values, _ = zip(*kwargs["choices"])
+                if sorted(values, key=str) == sorted(self.default_tzs, key=str):
+                    kwargs.pop("choices")
+                else:
+                    kwargs["choices"] = [(value, "") for value in values]
 
         # django can't decontruct pytz objects, so transform choices
         # to [<str>, <str>] format for writing out to the migration
         if "choices" in kwargs:
             kwargs["choices"] = [(str(tz), n) for tz, n in kwargs["choices"]]
+
         return name, path, args, kwargs
 
     def get_internal_type(self):
