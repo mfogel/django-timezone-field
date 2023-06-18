@@ -19,7 +19,7 @@ def test_invalid_str(TimeZoneSerializer, invalid_tz):
 
 
 # https://github.com/mfogel/django-timezone-field/issues/86
-def test_empty_str(TimeZoneSerializer, invalid_tz):
+def test_empty_str(TimeZoneSerializer):
     serializer = TimeZoneSerializer(data={"tz": ""})
     assert not serializer.is_valid()
 
