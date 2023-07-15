@@ -131,6 +131,11 @@ poetry run pytest
 
 ## Changelog
 
+#### in development (main)
+
+- Drop support for django 2.2, 4.0
+- Drop support for python 3.7
+
 #### 5.1 (2023-06-18)
 
 - Add django as a dependency of this package, with correct version constraints

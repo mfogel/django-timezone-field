@@ -16,8 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          # held back by using a version pylint that supports py3.7
-          python-version: "3.10"
+          python-version: "3.11"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -30,7 +29,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          key: venv-py3.11-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -53,26 +52,15 @@ jobs:
     name: Test with py${{ matrix.python-version }}, dj${{ matrix.django-version }}, ${{ matrix.db-engine }}
 
     strategy:
+      fail-fast: false
       matrix:
         # https://docs.djangoproject.com/en/4.1/faq/install/#what-python-version-can-i-use-with-django
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-        django-version: ["2.2", "3.2", "4.0", "4.1", "4.2"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
+        django-version: ["3.2", "4.1", "4.2"]
         db-engine: [sqlite, postgres]
         exclude:
-          - django-version: "2.2"
-            python-version: "3.10"
-          - django-version: "2.2"
-            python-version: "3.11"
           - django-version: "3.2"
             python-version: "3.11"
-          - django-version: "4.0"
-            python-version: "3.7"
-          - django-version: "4.0"
-            python-version: "3.11"
-          - django-version: "4.1"
-            python-version: "3.7"
-          - django-version: "4.2"
-            python-version: "3.7"
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -152,6 +140,8 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -164,7 +154,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .venv
-          key: venv-${{ hashFiles('poetry.lock') }}
+          key: venv-py3.11-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
