@@ -1,3 +1,5 @@
+import os
+
 import pytest
 import pytz
 from django import forms
@@ -93,7 +95,7 @@ class _ZIModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-@pytest.fixture(params=[True, False])
+@pytest.fixture(params=[bool(os.environ["USE_PYTZ"])] if "USE_PYTZ" in os.environ else [True, False])
 def use_pytz(request):
     yield request.param
 

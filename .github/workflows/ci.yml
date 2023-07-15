@@ -58,14 +58,18 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         django-version: ["3.2", "4.1", "4.2"]
         db-engine: [sqlite, postgres]
+        use-pytz: [True, False]
         exclude:
           - django-version: "3.2"
             python-version: "3.11"
+          - django-version: "3.2"
+            use-pytz: False
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       DJANGO_VERSION: ${{ matrix.django-version }}
       DB_ENGINE: ${{ matrix.db-engine }}
+      USE_PYTZ: ${{ matrix.use-pytz }}
 
     services:
       postgres:
