@@ -99,9 +99,9 @@ class _ZIModelForm(forms.ModelForm):
         fields = "__all__"
 
 
-@pytest.fixture(params=[bool(os.environ["USE_PYTZ"])] if "USE_PYTZ" in os.environ else [True, False])
+@pytest.fixture(params=[(os.environ["TZ_ENGINE"])] if "TZ_ENGINE" in os.environ else ["pytz", "zoneinfo"])
 def use_pytz(request):
-    yield request.param
+    yield request.param == "pytz"
 
 
 @pytest.fixture

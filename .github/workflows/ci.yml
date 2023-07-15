@@ -69,7 +69,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       DJANGO_VERSION: ${{ matrix.django-version }}
       DB_ENGINE: ${{ matrix.db-engine }}
-      USE_PYTZ: ${{ matrix.tz-engine }} == pytz
+      TZ_ENGINE: ${{ matrix.tz-engine }}
 
     services:
       postgres:
@@ -117,13 +117,13 @@ jobs:
           pip install "Django~=${{ matrix.django-version }}"
 
       - name: Install pytz
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz_engine == pytz
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz_engine == 'pytz'
         run: |
           source .venv/bin/activate
           pip install pytz
 
       - name: Remove pytz
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz-engine != pytz
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz-engine != 'pytz'
         run: |
           source .venv/bin/activate
           pip uninstall --yes pytz
