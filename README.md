@@ -131,8 +131,10 @@ poetry run pytest
 
 ## Changelog
 
-#### in development (main)
+#### vNEXT (main)
 
+- BREAKING: `pytz` removed from dependencies. If you use this package with `use_pytz=True`, you'll need to install
+  `pytz` yourself.
 - Drop support for django 2.2, 4.0
 - Drop support for python 3.7
 
