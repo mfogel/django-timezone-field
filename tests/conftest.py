@@ -5,12 +5,16 @@ from django import forms
 from django.db import models
 
 try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
+
+try:
     import pytz
 except ImportError:
     pytz = None
 
-from timezone_field import TimeZoneField
-from timezone_field.compat import ZoneInfo
+from timezone_field import TimeZoneField, compat
 
 USA_TZS = [
     "US/Alaska",
@@ -76,12 +80,12 @@ class _TZModelOldChoiceFormat(models.Model):
 
 class _ZIModelOldChoiceFormat(models.Model):
     tz_superset = TimeZoneField(
-        choices=[(ZoneInfo(tz), tz) for tz in getattr(pytz, "all_timezones", [])],
+        choices=[(zoneinfo.ZoneInfo(tz), tz) for tz in getattr(pytz, "all_timezones", [])],
         blank=True,
         use_pytz=False,
     )
     tz_subset = TimeZoneField(
-        choices=[(ZoneInfo(tz), tz) for tz in USA_TZS],
+        choices=[(zoneinfo.ZoneInfo(tz), tz) for tz in USA_TZS],
         blank=True,
         use_pytz=False,
     )
@@ -105,8 +109,18 @@ def use_pytz(request):
 
 
 @pytest.fixture
-def tz_func(use_pytz):
-    yield pytz.timezone if use_pytz else ZoneInfo
+def to_tzobj(use_pytz):
+    yield lambda value: compat.to_tzobj(value, use_pytz)
+
+
+@pytest.fixture
+def utc_tzobj(use_pytz):
+    yield compat.get_utc_tzobj(use_pytz)
+
+
+@pytest.fixture
+def base_tzstrs(use_pytz):
+    yield compat.get_base_tzstrs(use_pytz)
 
 
 @pytest.fixture
@@ -136,7 +150,7 @@ def pst():
 
 @pytest.fixture
 def pst_tz(use_pytz, pst):
-    yield (pytz.timezone(pst) if use_pytz else ZoneInfo(pst))  # pytz.tzinfo.DstTzInfo
+    yield (pytz.timezone(pst) if use_pytz else zoneinfo.ZoneInfo(pst))  # pytz.tzinfo.DstTzInfo
 
 
 @pytest.fixture
@@ -146,7 +160,7 @@ def gmt():
 
 @pytest.fixture
 def gmt_tz(use_pytz, gmt):
-    yield (pytz.timezone(gmt) if use_pytz else ZoneInfo(gmt))  # pytz.tzinfo.StaticTzInfo
+    yield (pytz.timezone(gmt) if use_pytz else zoneinfo.ZoneInfo(gmt))  # pytz.tzinfo.StaticTzInfo
 
 
 @pytest.fixture
@@ -156,12 +170,13 @@ def utc():
 
 @pytest.fixture
 def utc_tz(use_pytz, utc):
-    yield (pytz.timezone(utc) if use_pytz else ZoneInfo(utc))  # pytz.utc singleton
+    yield (pytz.timezone(utc) if use_pytz else zoneinfo.ZoneInfo(utc))  # pytz.utc singleton
 
 
 @pytest.fixture
-def uncommon_tz():
-    yield "Singapore"
+def uncommon_tz(use_pytz):
+    # there are no Zoneinfo "uncommon" tzs
+    yield "Singapore" if use_pytz else "foobar"
 
 
 @pytest.fixture

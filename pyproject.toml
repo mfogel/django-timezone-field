@@ -53,6 +53,7 @@ pytest-cov = "^3.0.0"
 black = "^23.3.0"
 isort = "^5.11.5"
 pylint = "^2.13.9"
+tzdata = "^2023.3"
 
 [tool.pylint.'MESSAGES CONTROL']
 max-line-length = 120

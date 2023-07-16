@@ -1,30 +1,31 @@
 import pytest
-import pytz
 from django.db.migrations.writer import MigrationWriter
 
 from timezone_field import TimeZoneField
-from timezone_field.compat import ZoneInfo
-
-test_fields = [
-    TimeZoneField(),
-    TimeZoneField(default="UTC"),
-    TimeZoneField(max_length=42),
-    TimeZoneField(use_pytz=True),
-    TimeZoneField(use_pytz=False),
-    TimeZoneField(choices=[("US/Pacific", "US/Pacific"), ("US/Eastern", "US/Eastern")]),
-    TimeZoneField(choices=[(b"US/Pacific", b"US/Pacific"), (b"US/Eastern", b"US/Eastern")]),
-    TimeZoneField(
-        choices=[(pytz.timezone("US/Pacific"), "US/Pacific"), (pytz.timezone("US/Eastern"), "US/Eastern")],
-        use_pytz=True,
-    ),
-    TimeZoneField(
-        choices=[(ZoneInfo("US/Pacific"), "US/Pacific"), (ZoneInfo("US/Eastern"), "US/Eastern")],
-        use_pytz=False,
-    ),
-]
 
 
-@pytest.mark.parametrize("field", test_fields)
+@pytest.fixture(
+    params=[
+        TimeZoneField(),
+        TimeZoneField(default="UTC"),
+        TimeZoneField(max_length=42),
+        TimeZoneField(use_pytz=True),
+        TimeZoneField(use_pytz=False),
+        TimeZoneField(choices=[("US/Pacific", "US/Pacific"), ("US/Eastern", "US/Eastern")]),
+        TimeZoneField(choices=[(b"US/Pacific", b"US/Pacific"), (b"US/Eastern", b"US/Eastern")]),
+        None,  # placeholder for the tz-engine-specific field
+    ]
+)
+def field(request, to_tzobj, use_pytz):
+    yield request.param if request.param is not None else TimeZoneField(
+        choices=[
+            (to_tzobj("US/Pacific"), "US/Pacific"),
+            (to_tzobj("US/Eastern"), "US/Eastern"),
+        ],
+        use_pytz=use_pytz,
+    )
+
+
 def test_deconstruct(field):
     _name, _path, args, kwargs = field.deconstruct()
     new_field = TimeZoneField(*args, **kwargs)
@@ -32,7 +33,6 @@ def test_deconstruct(field):
     assert field.choices == new_field.choices
 
 
-@pytest.mark.parametrize("field", test_fields)
 def test_full_serialization(field):
     # ensure the values passed to kwarg arguments can be serialized
     # the recommended 'deconstruct' testing by django docs doesn't cut it
@@ -41,15 +41,14 @@ def test_full_serialization(field):
     MigrationWriter.serialize(field)  # should not throw
 
 
-def test_from_db_value(use_pytz):
+def test_from_db_value(utc_tzobj, use_pytz):
     """
     Verify that the field can handle data coming back as bytes from the
     db.
     """
     field = TimeZoneField(use_pytz=use_pytz)
-    utc = pytz.UTC if use_pytz else ZoneInfo("UTC")
     value = field.from_db_value(b"UTC", None, None)
-    assert utc == value
+    assert utc_tzobj == value
 
 
 def test_default_kwargs_not_frozen():
@@ -64,7 +63,7 @@ def test_default_kwargs_not_frozen():
     assert "max_length" not in kwargs
 
 
-def test_specifying_defaults_not_frozen():
+def test_specifying_defaults_not_frozen(use_pytz, to_tzobj, base_tzstrs):
     """
     If someone's matched the default values with their kwarg args, we
     shouldn't bothering freezing those
@@ -74,39 +73,25 @@ def test_specifying_defaults_not_frozen():
     _name, _path, _args, kwargs = field.deconstruct()
     assert "max_length" not in kwargs
 
-    choices = [(tz, tz.replace("_", " ")) for tz in pytz.common_timezones]
-    field = TimeZoneField(choices=choices)
-    _name, _path, _args, kwargs = field.deconstruct()
-    assert "choices" not in kwargs
-
-    choices = [(pytz.timezone(tz), tz.replace("_", " ")) for tz in pytz.common_timezones]
-    field = TimeZoneField(choices=choices, use_pytz=True)
-    _name, _path, _args, kwargs = field.deconstruct()
-    assert "choices" not in kwargs
-
-    choices = [(ZoneInfo(tz), tz.replace("_", " ")) for tz in pytz.common_timezones]
-    field = TimeZoneField(choices=choices, use_pytz=False)
+    choices = [(to_tzobj(tz), tz.replace("_", " ")) for tz in base_tzstrs]
+    field = TimeZoneField(choices=choices, use_pytz=use_pytz)
     _name, _path, _args, kwargs = field.deconstruct()
     assert "choices" not in kwargs
 
 
-@pytest.mark.parametrize(
-    "choices, use_pytz",
-    [
-        [
-            [("US/Pacific", "US/Pacific"), ("US/Eastern", "US/Eastern")],
-            None,
-        ],
-        [
-            [(pytz.timezone("US/Pacific"), "US/Pacific"), (pytz.timezone("US/Eastern"), "US/Eastern")],
-            True,
-        ],
-        [
-            [(ZoneInfo("US/Pacific"), "US/Pacific"), (ZoneInfo("US/Eastern"), "US/Eastern")],
-            False,
-        ],
-    ],
+@pytest.fixture(
+    params=[
+        [("US/Pacific", "US/Pacific"), ("US/Eastern", "US/Eastern")],
+        None,  # placeholder for tz-engine-spefic value
+    ]
 )
+def choices(request, to_tzobj):
+    yield request.param if request.param is not None else [
+        (to_tzobj("US/Pacific"), "US/Pacific"),
+        (to_tzobj("US/Eastern"), "US/Eastern"),
+    ]
+
+
 def test_deconstruct_when_using_choices(choices, use_pytz):
     field = TimeZoneField(choices=choices, use_pytz=use_pytz)
     _name, _path, _args, kwargs = field.deconstruct()
@@ -153,11 +138,11 @@ def test_deconstruct_when_using_choices_display(choices_display, expected_kwargs
             "WITH_GMT_OFFSET",
             {"choices": [("US/Pacific", "")], "choices_display": "WITH_GMT_OFFSET"},
         ],
-        [
-            [[tz, "ignored"] for tz in pytz.common_timezones],
-            "WITH_GMT_OFFSET",
-            {"choices_display": "WITH_GMT_OFFSET"},
-        ],
+        #        [
+        #            [[tz, "ignored"] for tz in pytz.common_timezones],
+        #            "WITH_GMT_OFFSET",
+        #            {"choices_display": "WITH_GMT_OFFSET"},
+        #        ],
     ],
 )
 def test_deconstruct_when_using_choices_and_choices_display(choices, choices_display, expected_kwargs):

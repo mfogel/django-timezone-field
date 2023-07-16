@@ -56,16 +56,16 @@ def test_with_gmt_offset_using_timezone_names(tzs1, use_pytz):
     ]
 
 
-def test_with_gmt_offset_using_timezone_objects(tzs1, use_pytz, tz_func):
-    tz_objects = [tz_func(name) for name in tzs1]
+def test_with_gmt_offset_using_timezone_objects(tzs1, use_pytz, to_tzobj):
+    tz_objects = [to_tzobj(name) for name in tzs1]
     assert with_gmt_offset(tz_objects, use_pytz=use_pytz) == [
         (
-            tz_func("America/Argentina/Buenos_Aires"),
+            to_tzobj("America/Argentina/Buenos_Aires"),
             "GMT-03:00 America/Argentina/Buenos Aires",
         ),
-        (tz_func("Asia/Qatar"), "GMT+03:00 Asia/Qatar"),
-        (tz_func("Asia/Kolkata"), "GMT+05:30 Asia/Kolkata"),
-        (tz_func("Asia/Kathmandu"), "GMT+05:45 Asia/Kathmandu"),
+        (to_tzobj("Asia/Qatar"), "GMT+03:00 Asia/Qatar"),
+        (to_tzobj("Asia/Kolkata"), "GMT+05:30 Asia/Kolkata"),
+        (to_tzobj("Asia/Kathmandu"), "GMT+05:45 Asia/Kathmandu"),
     ]
 
 
@@ -109,6 +109,6 @@ def test_standard_using_timezone_names(tzs3_names, tzs3_standard_displays):
     assert standard(tzs3_names) == list(zip(tzs3_names, tzs3_standard_displays))
 
 
-def test_standard_using_timezone_objects(tzs3_names, tzs3_standard_displays, tz_func):
-    tzs3_objects = [tz_func(tz) for tz in tzs3_names]
+def test_standard_using_timezone_objects(tzs3_names, tzs3_standard_displays, to_tzobj):
+    tzs3_objects = [to_tzobj(tz) for tz in tzs3_names]
     assert standard(tzs3_objects) == list(zip(tzs3_objects, tzs3_standard_displays))

@@ -44,11 +44,15 @@ def test_form_valid2(Form, gmt, gmt_tz, utc, utc_tz):
     [
         [lazy_fixture("invalid_tz"), None],
         [None, lazy_fixture("invalid_tz")],
-        [lazy_fixture("uncommon_tz"), None],
     ],
 )
 def test_form_invalid(Form, tz, tz_invalid_choice):
     form = Form({"tz": tz, "tz_invalid_choice": tz_invalid_choice})
+    assert not form.is_valid()
+
+
+def test_form_uncommon(Form, uncommon_tz):
+    form = Form({"tz": uncommon_tz})
     assert not form.is_valid()
 
 

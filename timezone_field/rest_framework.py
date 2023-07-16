@@ -1,9 +1,8 @@
-import pytz
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import Field
 
-from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
+from timezone_field.compat import TimeZoneNotFoundError, to_tzobj
 from timezone_field.utils import use_pytz_default
 
 
@@ -18,17 +17,9 @@ class TimeZoneSerializerField(Field):
 
     def to_internal_value(self, data):
         data_str = force_str(data)
-        if self.use_pytz:
-            try:
-                return pytz.timezone(data_str)
-            except pytz.UnknownTimeZoneError:
-                self.fail("invalid")
-        else:
-            if data_str:
-                try:
-                    return ZoneInfo(data_str)
-                except ZoneInfoNotFoundError:
-                    pass
+        try:
+            return to_tzobj(data_str, self.use_pytz)
+        except TimeZoneNotFoundError:
             self.fail("invalid")
 
     def to_representation(self, value):
