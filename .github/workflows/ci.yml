@@ -117,7 +117,7 @@ jobs:
           pip install "Django~=${{ matrix.django-version }}"
 
       - name: Install pytz
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz_engine == 'pytz'
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz-engine == 'pytz'
         run: |
           source .venv/bin/activate
           pip install pytz
@@ -138,7 +138,7 @@ jobs:
         run: poetry run pytest --cov=timezone_field --ignore=tests/test_serializer_field.py
 
       - name: Test serializer fiels with coverage
-        if: matrix.tz_engine == 'pytz'
+        if: matrix.tz-engine == 'pytz'
         env:
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
