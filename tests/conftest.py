@@ -149,8 +149,8 @@ def pst():
 
 
 @pytest.fixture
-def pst_tz(use_pytz, pst):
-    yield (pytz.timezone(pst) if use_pytz else zoneinfo.ZoneInfo(pst))  # pytz.tzinfo.DstTzInfo
+def pst_tz(to_tzobj, pst):
+    yield to_tzobj(pst)  # for pytz: pytz.tzinfo.DstTzInfo
 
 
 @pytest.fixture
@@ -159,8 +159,8 @@ def gmt():
 
 
 @pytest.fixture
-def gmt_tz(use_pytz, gmt):
-    yield (pytz.timezone(gmt) if use_pytz else zoneinfo.ZoneInfo(gmt))  # pytz.tzinfo.StaticTzInfo
+def gmt_tz(to_tzobj, gmt):
+    yield to_tzobj(gmt)  # for pytz: pytz.tzinfo.StaticTzInfo
 
 
 @pytest.fixture
@@ -169,8 +169,8 @@ def utc():
 
 
 @pytest.fixture
-def utc_tz(use_pytz, utc):
-    yield (pytz.timezone(utc) if use_pytz else zoneinfo.ZoneInfo(utc))  # pytz.utc singleton
+def utc_tz(utc_tzobj):
+    yield utc_tzobj  # for pytz: pytz.utc singleton
 
 
 @pytest.fixture
