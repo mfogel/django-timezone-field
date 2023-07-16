@@ -1,16 +1,10 @@
 import os
-import warnings
 
 import pytest
 from django import forms
 from django.db import models
 
 from timezone_field import TimeZoneField, compat
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 USA_TZS = [
     "US/Alaska",
