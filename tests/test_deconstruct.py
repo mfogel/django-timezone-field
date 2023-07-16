@@ -9,21 +9,20 @@ from timezone_field import TimeZoneField
         TimeZoneField(),
         TimeZoneField(default="UTC"),
         TimeZoneField(max_length=42),
-        TimeZoneField(use_pytz=True),
-        TimeZoneField(use_pytz=False),
         TimeZoneField(choices=[("US/Pacific", "US/Pacific"), ("US/Eastern", "US/Eastern")]),
         TimeZoneField(choices=[(b"US/Pacific", b"US/Pacific"), (b"US/Eastern", b"US/Eastern")]),
-        None,  # placeholder for the tz-engine-specific field
+        "use_pytz_1",  # placeholder
+        "use_pytz_2",  # placeholder
     ]
 )
 def field(request, to_tzobj, use_pytz):
-    yield request.param if request.param is not None else TimeZoneField(
+    yield TimeZoneField(use_pytz=use_pytz) if request.param == "use_pytz_1" else TimeZoneField(
         choices=[
             (to_tzobj("US/Pacific"), "US/Pacific"),
             (to_tzobj("US/Eastern"), "US/Eastern"),
         ],
         use_pytz=use_pytz,
-    )
+    ) if request.param == "use_pytz_2" else request.param
 
 
 def test_deconstruct(field):
@@ -138,11 +137,6 @@ def test_deconstruct_when_using_choices_display(choices_display, expected_kwargs
             "WITH_GMT_OFFSET",
             {"choices": [("US/Pacific", "")], "choices_display": "WITH_GMT_OFFSET"},
         ],
-        #        [
-        #            [[tz, "ignored"] for tz in pytz.common_timezones],
-        #            "WITH_GMT_OFFSET",
-        #            {"choices_display": "WITH_GMT_OFFSET"},
-        #        ],
     ],
 )
 def test_deconstruct_when_using_choices_and_choices_display(choices, choices_display, expected_kwargs):
@@ -151,15 +145,14 @@ def test_deconstruct_when_using_choices_and_choices_display(choices, choices_dis
     assert kwargs == expected_kwargs
 
 
-@pytest.mark.parametrize(
-    "use_pytz, expected_kwargs",
-    [
-        [None, {}],
-        [True, {"use_pytz": True}],
-        [False, {"use_pytz": False}],
-    ],
-)
-def test_deconstruct_when_using_use_pytz(use_pytz, expected_kwargs):
+def test_deconstruct_when_using_choices_and_choices_display_base_tzstrs(base_tzstrs):
+    choices = [[tz, "ignored"] for tz in base_tzstrs]
+    field = TimeZoneField(choices=choices, choices_display="WITH_GMT_OFFSET")
+    _name, _path, _args, kwargs = field.deconstruct()
+    assert kwargs == {"choices_display": "WITH_GMT_OFFSET"}
+
+
+def test_deconstruct_when_using_use_pytz(use_pytz):
     field = TimeZoneField(use_pytz=use_pytz)
     _name, _path, _args, kwargs = field.deconstruct()
-    assert kwargs == expected_kwargs
+    assert kwargs == {"use_pytz": use_pytz}
