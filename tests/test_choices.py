@@ -1,7 +1,6 @@
 from datetime import datetime
 
 import pytest
-import pytz
 
 from timezone_field.choices import standard, with_gmt_offset
 
@@ -69,8 +68,8 @@ def test_with_gmt_offset_using_timezone_objects(tzs1, use_pytz, to_tzobj):
     ]
 
 
-def test_with_gmt_offset_in_northern_summer(tzs2, use_pytz):
-    now = datetime(2020, 7, 15, tzinfo=pytz.utc)
+def test_with_gmt_offset_in_northern_summer(tzs2, use_pytz, utc_tzobj):
+    now = datetime(2020, 7, 15, tzinfo=utc_tzobj)
     assert with_gmt_offset(tzs2, now=now, use_pytz=use_pytz) == [
         ("America/Los_Angeles", "GMT-07:00 America/Los Angeles"),
         ("America/Santiago", "GMT-04:00 America/Santiago"),
@@ -79,8 +78,8 @@ def test_with_gmt_offset_in_northern_summer(tzs2, use_pytz):
     ]
 
 
-def test_with_gmt_offset_in_northern_winter(tzs2, use_pytz):
-    now = datetime(2020, 1, 15, tzinfo=pytz.utc)
+def test_with_gmt_offset_in_northern_winter(tzs2, use_pytz, utc_tzobj):
+    now = datetime(2020, 1, 15, tzinfo=utc_tzobj)
     assert with_gmt_offset(tzs2, now=now, use_pytz=use_pytz) == [
         ("America/Los_Angeles", "GMT-08:00 America/Los Angeles"),
         ("Canada/Newfoundland", "GMT-03:30 Canada/Newfoundland"),
@@ -89,18 +88,18 @@ def test_with_gmt_offset_in_northern_winter(tzs2, use_pytz):
     ]
 
 
-def test_with_gmt_offset_transition_forward(use_pytz):
+def test_with_gmt_offset_transition_forward(use_pytz, utc_tzobj):
     tz_names = ["Europe/London"]
-    before = datetime(2021, 3, 28, 0, 59, 59, 999999, tzinfo=pytz.utc)
-    after = datetime(2021, 3, 28, 1, 0, 0, 0, tzinfo=pytz.utc)
+    before = datetime(2021, 3, 28, 0, 59, 59, 999999, tzinfo=utc_tzobj)
+    after = datetime(2021, 3, 28, 1, 0, 0, 0, tzinfo=utc_tzobj)
     assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [("Europe/London", "GMT+00:00 Europe/London")]
     assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [("Europe/London", "GMT+01:00 Europe/London")]
 
 
-def test_with_gmt_offset_transition_backward(use_pytz):
+def test_with_gmt_offset_transition_backward(use_pytz, utc_tzobj):
     tz_names = ["Europe/London"]
-    before = datetime(2021, 10, 31, 0, 59, 59, 999999, tzinfo=pytz.utc)
-    after = datetime(2021, 10, 31, 1, 0, 0, 0, tzinfo=pytz.utc)
+    before = datetime(2021, 10, 31, 0, 59, 59, 999999, tzinfo=utc_tzobj)
+    after = datetime(2021, 10, 31, 1, 0, 0, 0, tzinfo=utc_tzobj)
     assert with_gmt_offset(tz_names, now=before, use_pytz=use_pytz) == [("Europe/London", "GMT+01:00 Europe/London")]
     assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [("Europe/London", "GMT+00:00 Europe/London")]
 

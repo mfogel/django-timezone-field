@@ -21,6 +21,10 @@ def get_utc_tzobj(use_pytz=USE_PYTZ_DEFAULT):
     return pytz.utc if use_pytz else zoneinfo.ZoneInfo("UTC")
 
 
+def get_all_tzstrs(use_pytz=USE_PYTZ_DEFAULT):
+    return pytz.all_timezones if use_pytz else zoneinfo.available_timezones()
+
+
 def get_base_tzstrs(use_pytz=USE_PYTZ_DEFAULT):
     return pytz.common_timezones if use_pytz else zoneinfo.available_timezones()
 

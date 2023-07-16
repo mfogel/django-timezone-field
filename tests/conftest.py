@@ -41,7 +41,7 @@ class _ZIModel(models.Model):
 
 class _TZModelChoice(models.Model):
     tz_superset = TimeZoneField(
-        choices=[(tz, tz) for tz in getattr(pytz, "all_timezones", [])],
+        choices=[(tz, tz) for tz in pytz.all_timezones],
         blank=True,
         use_pytz=True,
     )
@@ -54,7 +54,7 @@ class _TZModelChoice(models.Model):
 
 class _ZIModelChoice(models.Model):
     tz_superset = TimeZoneField(
-        choices=[(tz, tz) for tz in getattr(pytz, "all_timezones", [])],
+        choices=[(tz, tz) for tz in pytz.all_timezones],
         blank=True,
         use_pytz=False,
     )
@@ -67,7 +67,7 @@ class _ZIModelChoice(models.Model):
 
 class _TZModelOldChoiceFormat(models.Model):
     tz_superset = TimeZoneField(
-        choices=[(pytz.timezone(tz), tz) for tz in getattr(pytz, "all_timezones", [])],
+        choices=[(pytz.timezone(tz), tz) for tz in pytz.all_timezones],
         blank=True,
         use_pytz=True,
     )
@@ -80,7 +80,7 @@ class _TZModelOldChoiceFormat(models.Model):
 
 class _ZIModelOldChoiceFormat(models.Model):
     tz_superset = TimeZoneField(
-        choices=[(zoneinfo.ZoneInfo(tz), tz) for tz in getattr(pytz, "all_timezones", [])],
+        choices=[(zoneinfo.ZoneInfo(tz), tz) for tz in pytz.all_timezones],
         blank=True,
         use_pytz=False,
     )
@@ -116,6 +116,11 @@ def to_tzobj(use_pytz):
 @pytest.fixture
 def utc_tzobj(use_pytz):
     yield compat.get_utc_tzobj(use_pytz=use_pytz)
+
+
+@pytest.fixture
+def all_tzstrs(use_pytz):
+    yield compat.get_all_tzstrs(use_pytz=use_pytz)
 
 
 @pytest.fixture
