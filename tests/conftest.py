@@ -110,17 +110,17 @@ def use_pytz(request):
 
 @pytest.fixture
 def to_tzobj(use_pytz):
-    yield lambda value: compat.to_tzobj(value, use_pytz)
+    yield lambda value: compat.to_tzobj(value, use_pytz=use_pytz)
 
 
 @pytest.fixture
 def utc_tzobj(use_pytz):
-    yield compat.get_utc_tzobj(use_pytz)
+    yield compat.get_utc_tzobj(use_pytz=use_pytz)
 
 
 @pytest.fixture
 def base_tzstrs(use_pytz):
-    yield compat.get_base_tzstrs(use_pytz)
+    yield compat.get_base_tzstrs(use_pytz=use_pytz)
 
 
 @pytest.fixture
