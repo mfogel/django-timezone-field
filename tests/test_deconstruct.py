@@ -145,11 +145,11 @@ def test_deconstruct_when_using_choices_and_choices_display(choices, choices_dis
     assert kwargs == expected_kwargs
 
 
-def test_deconstruct_when_using_choices_and_choices_display_base_tzstrs(base_tzstrs):
+def test_deconstruct_when_using_choices_and_choices_display_base_tzstrs(base_tzstrs, use_pytz):
     choices = [[tz, "ignored"] for tz in base_tzstrs]
-    field = TimeZoneField(choices=choices, choices_display="WITH_GMT_OFFSET")
+    field = TimeZoneField(choices=choices, choices_display="WITH_GMT_OFFSET", use_pytz=use_pytz)
     _name, _path, _args, kwargs = field.deconstruct()
-    assert kwargs == {"choices_display": "WITH_GMT_OFFSET"}
+    assert kwargs == {"choices_display": "WITH_GMT_OFFSET", "use_pytz": use_pytz}
 
 
 def test_deconstruct_when_using_use_pytz(use_pytz):

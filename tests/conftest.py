@@ -80,7 +80,7 @@ def ModelOldChoiceFormat(use_pytz, all_tzstrs, to_tzobj):
 
 
 @pytest.fixture
-def ModelForm(use_pytz, Model):
+def ModelForm(Model):
     class _ModelForm(forms.ModelForm):
         class Meta:
             model = Model
