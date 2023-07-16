@@ -135,7 +135,17 @@ jobs:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        run: poetry run pytest --cov=timezone_field
+        run: poetry run pytest --cov=timezone_field --ignore=tests/test_serializer_field.py
+
+      - name: Test serializer fiels with coverage
+        if: matrix.tz_engine == 'pytz'
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        run: poetry run pytest --cov=timezone_field tests/test_serializer_field.py
 
       - name: Generate coverage report
         run: poetry run coverage xml
