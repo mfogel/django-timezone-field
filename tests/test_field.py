@@ -4,6 +4,8 @@ from pytest_lazyfixture import lazy_fixture
 
 from timezone_field import TimeZoneField
 
+pytestmark = pytest.mark.filterwarnings("ignore:Model 'tests._model.*' was already registered.")
+
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
