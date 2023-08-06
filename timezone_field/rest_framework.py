@@ -2,7 +2,7 @@ from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from rest_framework.fields import Field
 
-from timezone_field.compat import TimeZoneNotFoundError, to_tzobj
+from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 
 
 class TimeZoneSerializerField(Field):
@@ -12,12 +12,13 @@ class TimeZoneSerializerField(Field):
 
     def __init__(self, *args, **kwargs):
         self.use_pytz = kwargs.pop("use_pytz", None)
+        self.tz_backend = get_tz_backend(use_pytz=self.use_pytz)
         super().__init__(*args, **kwargs)
 
     def to_internal_value(self, data):
         data_str = force_str(data)
         try:
-            return to_tzobj(data_str, use_pytz=self.use_pytz)
+            return self.tz_backend.to_tzobj(data_str)
         except TimeZoneNotFoundError:
             self.fail("invalid")
 

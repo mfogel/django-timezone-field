@@ -2,8 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
 
+from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
-from timezone_field.compat import TimeZoneNotFoundError, get_base_tzstrs, is_tzobj, to_tzobj
 
 
 class TimeZoneField(models.Field):
@@ -45,7 +45,8 @@ class TimeZoneField(models.Field):
         kwargs.setdefault("max_length", self.default_max_length)
 
         self.use_pytz = kwargs.pop("use_pytz", None)
-        self.default_tzs = [to_tzobj(v, use_pytz=self.use_pytz) for v in get_base_tzstrs(use_pytz=self.use_pytz)]
+        self.tz_backend = get_tz_backend(use_pytz=self.use_pytz)
+        self.default_tzs = [self.tz_backend.to_tzobj(v) for v in self.tz_backend.base_tzstrs]
 
         if "choices" in kwargs:
             values, displays = zip(*kwargs["choices"])
@@ -60,9 +61,9 @@ class TimeZoneField(models.Field):
             # can't deconstruct pytz.timezone objects, migration files must
             # use an alternate format. Representing the timezones as strings
             # is the obvious choice.
-            if not is_tzobj(values[0], use_pytz=self.use_pytz):
+            if not self.tz_backend.is_tzobj(values[0]):
                 # using force_str b/c of https://github.com/mfogel/django-timezone-field/issues/38
-                values = [to_tzobj(force_str(v), use_pytz=self.use_pytz) for v in values]
+                values = [self.tz_backend.to_tzobj(force_str(v)) for v in values]
         else:
             values = self.default_tzs
             displays = None
@@ -81,7 +82,7 @@ class TimeZoneField(models.Field):
         super().__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
-        if not is_tzobj(value, use_pytz=self.use_pytz):
+        if not self.tz_backend.is_tzobj(value):
             raise ValidationError(f"'{value}' is not a pytz timezone object")
         super().validate(value, model_instance)
 
@@ -141,9 +142,9 @@ class TimeZoneField(models.Field):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == "":
             return (None, "")
-        if is_tzobj(value, use_pytz=self.use_pytz):
+        if self.tz_backend.is_tzobj(value):
             return (value, str(value))
         try:
-            return (to_tzobj(force_str(value), use_pytz=self.use_pytz), force_str(value))
+            return (self.tz_backend.to_tzobj(force_str(value)), force_str(value))
         except TimeZoneNotFoundError as err:
             raise ValidationError(f"Invalid timezone '{value}'") from err
