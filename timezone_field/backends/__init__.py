@@ -4,12 +4,11 @@ from .base import TimeZoneNotFoundError
 
 USE_PYTZ_DEFAULT = getattr(conf.settings, "USE_DEPRECATED_PYTZ", VERSION < (4, 0))
 
-_cached_tz_backend = None
+tz_backend_cache = {}
 
 
 def get_tz_backend(use_pytz=USE_PYTZ_DEFAULT):
-    global _cached_tz_backend
-    if _cached_tz_backend is None:
+    if use_pytz not in tz_backend_cache:
         if use_pytz:
             from .pytz import PYTZBackend
 
@@ -18,8 +17,8 @@ def get_tz_backend(use_pytz=USE_PYTZ_DEFAULT):
             from .zoneinfo import ZoneInfoBackend
 
             klass = ZoneInfoBackend
-        _cached_tz_backend = klass()
-    return _cached_tz_backend
+        tz_backend_cache[use_pytz] = klass()
+    return tz_backend_cache[use_pytz]
 
 
 __all__ = ["TimeZoneNotFoundError", "get_tz_backend"]
