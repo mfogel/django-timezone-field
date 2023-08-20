@@ -1,5 +1,4 @@
 import pytest
-import pytz
 from django import forms
 from pytest_lazyfixture import lazy_fixture
 
@@ -16,11 +15,9 @@ def Form(use_pytz):
 
 
 @pytest.fixture
-def FormInvalidChoice(use_pytz, invalid_tz):
+def FormInvalidChoice(all_tzstrs, invalid_tz, use_pytz):
     class _FormInvalidChoice(forms.Form):
-        tz = TimeZoneFormField(
-            choices=([(tz, tz) for tz in pytz.all_timezones] + [(invalid_tz, pytz.utc)]), use_pytz=use_pytz
-        )
+        tz = TimeZoneFormField(choices=([(tz, tz) for tz in all_tzstrs] + [(invalid_tz, "UTC")]), use_pytz=use_pytz)
 
     yield _FormInvalidChoice
 
@@ -44,11 +41,15 @@ def test_form_valid2(Form, gmt, gmt_tz, utc, utc_tz):
     [
         [lazy_fixture("invalid_tz"), None],
         [None, lazy_fixture("invalid_tz")],
-        [lazy_fixture("uncommon_tz"), None],
     ],
 )
 def test_form_invalid(Form, tz, tz_invalid_choice):
     form = Form({"tz": tz, "tz_invalid_choice": tz_invalid_choice})
+    assert not form.is_valid()
+
+
+def test_form_uncommon(Form, uncommon_tz):
+    form = Form({"tz": uncommon_tz})
     assert not form.is_valid()
 
 

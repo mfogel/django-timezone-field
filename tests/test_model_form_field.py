@@ -1,6 +1,8 @@
 import pytest
 from pytest_lazyfixture import lazy_fixture
 
+pytestmark = pytest.mark.filterwarnings("ignore:Model 'tests._model.*' was already registered.")
+
 
 @pytest.mark.django_db
 def test_valid_with_defaults(Model, ModelForm, pst_tz, gmt, gmt_tz):

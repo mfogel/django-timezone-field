@@ -49,7 +49,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    name: Test with py${{ matrix.python-version }}, dj${{ matrix.django-version }}, ${{ matrix.db-engine }}
+    name: Test py${{ matrix.python-version }}, dj${{ matrix.django-version }}, ${{ matrix.tz-engine}}, ${{ matrix.db-engine }}
 
     strategy:
       fail-fast: false
@@ -58,14 +58,18 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         django-version: ["3.2", "4.1", "4.2"]
         db-engine: [sqlite, postgres]
+        tz-engine: [pytz, zoneinfo]
         exclude:
           - django-version: "3.2"
             python-version: "3.11"
+          - django-version: "3.2"
+            tz-engine: zoneinfo
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       DJANGO_VERSION: ${{ matrix.django-version }}
       DB_ENGINE: ${{ matrix.db-engine }}
+      TZ_ENGINE: ${{ matrix.tz-engine }}
 
     services:
       postgres:
@@ -100,7 +104,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: .venv
-          key: venv-py${{ matrix.python-version}}-dj${{ matrix.django-version }}-${{ hashFiles('poetry.lock') }}
+          key: venv-py${{ matrix.python-version}}-dj${{ matrix.django-version }}-${{ matrix.tz-engine }}-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -112,6 +116,18 @@ jobs:
           source .venv/bin/activate
           pip install "Django~=${{ matrix.django-version }}"
 
+      - name: Install pytz
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz-engine == 'pytz'
+        run: |
+          source .venv/bin/activate
+          pip install pytz
+
+      - name: Remove pytz
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz-engine != 'pytz'
+        run: |
+          source .venv/bin/activate
+          pip uninstall --yes pytz
+
       - name: Test with coverage
         env:
           POSTGRES_HOST: localhost
@@ -119,7 +135,17 @@ jobs:
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        run: poetry run pytest --cov=timezone_field
+        run: poetry run pytest --cov=timezone_field --ignore=tests/test_serializer_field.py
+
+      - name: Test serializer fiels with coverage
+        if: matrix.tz-engine == 'pytz'
+        env:
+          POSTGRES_HOST: localhost
+          POSTGRES_PORT: 5432
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        run: poetry run pytest --cov=timezone_field tests/test_serializer_field.py
 
       - name: Generate coverage report
         run: poetry run coverage xml

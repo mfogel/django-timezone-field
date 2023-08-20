@@ -1,9 +1,6 @@
 import datetime
 
-import pytz
-
-from timezone_field.compat import ZoneInfo
-from timezone_field.utils import use_pytz_default
+from timezone_field.backends import get_tz_backend
 
 
 def standard(timezones):
@@ -29,19 +26,13 @@ def with_gmt_offset(timezones, now=None, use_pytz=None):
           underscores. For example: "GMT-05:00 America/New York"
         * sorted by their timezone offset
     """
-    use_pytz = use_pytz_default() if use_pytz is None else use_pytz
-    if use_pytz:
-        utc = pytz.utc
-        timezone_func = pytz.timezone
-    else:
-        utc = ZoneInfo("UTC")
-        timezone_func = ZoneInfo
-    now = now or datetime.datetime.now(utc)
+    tz_backend = get_tz_backend(use_pytz=use_pytz)
+    now = now or datetime.datetime.now(tz_backend.utc_tzobj)
     _choices = []
     for tz in timezones:
         tz_str = str(tz)
-        now_tz = now.astimezone(timezone_func(tz_str))
-        delta = now_tz.replace(tzinfo=utc) - now
+        now_tz = now.astimezone(tz_backend.to_tzobj(tz_str))
+        delta = now_tz.replace(tzinfo=tz_backend.utc_tzobj) - now
         display = "GMT{sign}{gmt_diff} {timezone}".format(
             sign="+" if delta == abs(delta) else "-",
             gmt_diff=str(abs(delta)).zfill(8)[:-3],

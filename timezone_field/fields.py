@@ -1,11 +1,9 @@
-import pytz
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
 
+from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
-from timezone_field.compat import ZoneInfo, ZoneInfoNotFoundError
-from timezone_field.utils import is_pytz_instance, use_pytz_default
 
 
 class TimeZoneField(models.Field):
@@ -13,23 +11,28 @@ class TimeZoneField(models.Field):
     Provides database store for pytz timezone objects.
 
     Valid inputs:
-        * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
-        * the pytz.UTC singleton
-        * any string that validates against pytz.common_timezones. pytz will
-          be used to build a timezone object from the string.
+        * use_pytz=True:
+            * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
+            * the pytz.UTC singleton
+            * any string that validates against pytz.common_timezones. pytz will
+              be used to build a timezone object from the string.
+        * use_pytz=False:
+            * any instance of zoneinfo.ZoneInfo
+            * any string that validates against zoneinfo.available_timezones().
         * None and the empty string both represent 'no timezone'
 
     Valid outputs:
         * None
-        * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
-        * the pytz.UTC singleton
+        * use_pytz=True: instances of pytz.tzinfo.DstTzInfo,
+          pytz.tzinfo.StaticTzInfo and the pytz.UTC singleton
+        * use_pytz=False: instances of zoneinfo.ZoneInfo
 
     Blank values are stored in the DB as the empty string. Timezones are stored
     in their string representation.
 
     The `choices` kwarg can be specified as a list of either
-    [<pytz.timezone>, <str>] or [<str>, <str>]. Internally, it is stored as
-    [<pytz.timezone>, <str>].
+    [<timezone object>, <str>] or [<str>, <str>]. Internally in memory, it is
+    stored as [<timezone object>, <str>].
     """
 
     description = "A timezone object"
@@ -37,21 +40,6 @@ class TimeZoneField(models.Field):
     # NOTE: these defaults are excluded from migrations. If these are changed,
     #       existing migration files will need to be accomodated.
     default_max_length = 63
-
-    @staticmethod
-    def get_default_pytz_tzs():
-        return [pytz.timezone(tz) for tz in pytz.common_timezones]
-
-    @staticmethod
-    def get_default_zoneinfo_tzs():
-        default_zoneinfo_tzs = []
-        for tz in pytz.common_timezones:
-            try:
-                default_zoneinfo_tzs.append(ZoneInfo(tz))
-            except ZoneInfoNotFoundError:
-                # ZoneInfo does not yet exist for this timezone
-                pass
-        return default_zoneinfo_tzs
 
     def __init__(self, *args, **kwargs):
         # allow some use of positional args up until the args we customize
@@ -61,16 +49,16 @@ class TimeZoneField(models.Field):
             raise ValueError("Cannot specify max_length by positional arg")
         kwargs.setdefault("max_length", self.default_max_length)
 
-        self.use_pytz_explicit = kwargs.pop("use_pytz", None)
-        self.use_pytz = self.use_pytz_explicit if self.use_pytz_explicit is not None else use_pytz_default()
-        self.default_tzs = self.get_default_pytz_tzs() if self.use_pytz else self.get_default_zoneinfo_tzs()
+        self.use_pytz = kwargs.pop("use_pytz", None)
+        self.tz_backend = get_tz_backend(use_pytz=self.use_pytz)
+        self.default_tzs = [self.tz_backend.to_tzobj(v) for v in self.tz_backend.base_tzstrs]
 
         if "choices" in kwargs:
             values, displays = zip(*kwargs["choices"])
             # Choices can be specified in two forms: either
-            # [<pytz.timezone>, <str>] or [<str>, <str>]
+            # [<timezone object>, <str>] or [<str>, <str>]
             #
-            # The [<pytz.timezone>, <str>] format is the one we actually
+            # The [<timezone object>, <str>] format is the one we actually
             # store the choices in memory because of
             # https://github.com/mfogel/django-timezone-field/issues/24
             #
@@ -78,11 +66,9 @@ class TimeZoneField(models.Field):
             # can't deconstruct pytz.timezone objects, migration files must
             # use an alternate format. Representing the timezones as strings
             # is the obvious choice.
-            if self.use_pytz and not is_pytz_instance(values[0]):
-                values = [pytz.timezone(v) for v in values]
-            elif not self.use_pytz and not isinstance(values[0], ZoneInfo):
+            if not self.tz_backend.is_tzobj(values[0]):
                 # using force_str b/c of https://github.com/mfogel/django-timezone-field/issues/38
-                values = [ZoneInfo(force_str(v)) for v in values]
+                values = [self.tz_backend.to_tzobj(force_str(v)) for v in values]
         else:
             values = self.default_tzs
             displays = None
@@ -101,7 +87,7 @@ class TimeZoneField(models.Field):
         super().__init__(*args, **kwargs)
 
     def validate(self, value, model_instance):
-        if (self.use_pytz and not is_pytz_instance(value)) or (not self.use_pytz and not isinstance(value, ZoneInfo)):
+        if not self.tz_backend.is_tzobj(value):
             raise ValidationError(f"'{value}' is not a pytz timezone object")
         super().validate(value, model_instance)
 
@@ -110,8 +96,8 @@ class TimeZoneField(models.Field):
         if kwargs.get("max_length") == self.default_max_length:
             del kwargs["max_length"]
 
-        if self.use_pytz_explicit is not None:
-            kwargs["use_pytz"] = self.use_pytz_explicit
+        if self.use_pytz is not None:
+            kwargs["use_pytz"] = self.use_pytz
 
         if self.choices_display is not None:
             kwargs["choices_display"] = self.choices_display
@@ -161,19 +147,9 @@ class TimeZoneField(models.Field):
         "Returns a tuple of (python representation, db representation)"
         if value is None or value == "":
             return (None, "")
-        if self.use_pytz:
-            if is_pytz_instance(value):
-                return (value, value.zone)
-            try:
-                return (pytz.timezone(force_str(value)), force_str(value))
-            except pytz.UnknownTimeZoneError:
-                pass
-        else:
-            if isinstance(value, ZoneInfo):
-                return (value, value.key)
-            try:
-                # using force_str b/c of https://github.com/mfogel/django-timezone-field/issues/38
-                return (ZoneInfo(force_str(value)), force_str(value))
-            except ZoneInfoNotFoundError:
-                pass
-        raise ValidationError(f"Invalid timezone '{value}'")
+        if self.tz_backend.is_tzobj(value):
+            return (value, str(value))
+        try:
+            return (self.tz_backend.to_tzobj(force_str(value)), force_str(value))
+        except TimeZoneNotFoundError as err:
+            raise ValidationError(f"Invalid timezone '{value}'") from err

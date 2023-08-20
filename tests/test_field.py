@@ -1,32 +1,10 @@
-from unittest import mock
-
 import pytest
-import pytz
 from django.core.exceptions import ValidationError
 from pytest_lazyfixture import lazy_fixture
 
 from timezone_field import TimeZoneField
 
-
-def test_get_default_pytz_tzs():
-    default_pytz_tzs = TimeZoneField().get_default_pytz_tzs()
-    assert [str(tz) for tz in default_pytz_tzs] == pytz.common_timezones
-
-
-@pytest.mark.parametrize(
-    "pytz_common_tzs, output_tzs",
-    [
-        [pytz.common_timezones, pytz.common_timezones],
-        # covers when ZoneInfo can't handle something in pytz.common_timezones
-        # https://github.com/mfogel/django-timezone-field/pull/95/files
-        [pytz.common_timezones + ["DNE"], pytz.common_timezones],
-    ],
-)
-def test_get_default_zoneinfo_tzs(pytz_common_tzs, output_tzs):
-    with mock.patch("pytz.common_timezones") as mock_common_timezones:
-        mock_common_timezones.__iter__.return_value = iter(pytz_common_tzs)
-        default_zoneinfo_tzs = TimeZoneField.get_default_zoneinfo_tzs()
-        assert [str(tz) for tz in default_zoneinfo_tzs] == output_tzs
+pytestmark = pytest.mark.filterwarnings("ignore:Model 'tests._model.*' was already registered.")
 
 
 @pytest.mark.django_db

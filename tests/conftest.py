@@ -1,10 +1,10 @@
+import os
+
 import pytest
-import pytz
 from django import forms
 from django.db import models
 
-from timezone_field import TimeZoneField
-from timezone_field.compat import ZoneInfo
+from timezone_field import TimeZoneField, backends
 
 USA_TZS = [
     "US/Alaska",
@@ -17,110 +17,105 @@ USA_TZS = [
 ]
 
 
-class _TZModel(models.Model):
-    tz = TimeZoneField(use_pytz=True)
-    tz_opt = TimeZoneField(blank=True, use_pytz=True)
-    tz_opt_default = TimeZoneField(blank=True, default="America/Los_Angeles", use_pytz=True)
+# we have to define these Models at import time, so django will create the DB table
+# we then redefine-the model at runtime to customize the fields further
+class _Model(models.Model):
+    tz = TimeZoneField()
+    tz_opt = TimeZoneField()
+    tz_opt_default = TimeZoneField()
 
 
-class _ZIModel(models.Model):
-    tz = TimeZoneField(use_pytz=False)
-    tz_opt = TimeZoneField(blank=True, use_pytz=False)
-    tz_opt_default = TimeZoneField(blank=True, default="America/Los_Angeles", use_pytz=False)
+class _ModelChoice(models.Model):
+    tz_superset = TimeZoneField()
+    tz_subset = TimeZoneField()
 
 
-class _TZModelChoice(models.Model):
-    tz_superset = TimeZoneField(
-        choices=[(tz, tz) for tz in pytz.all_timezones],
-        blank=True,
-        use_pytz=True,
-    )
-    tz_subset = TimeZoneField(
-        choices=[(tz, tz) for tz in USA_TZS],
-        blank=True,
-        use_pytz=True,
-    )
-
-
-class _ZIModelChoice(models.Model):
-    tz_superset = TimeZoneField(
-        choices=[(tz, tz) for tz in pytz.all_timezones],
-        blank=True,
-        use_pytz=False,
-    )
-    tz_subset = TimeZoneField(
-        choices=[(tz, tz) for tz in USA_TZS],
-        blank=True,
-        use_pytz=False,
-    )
-
-
-class _TZModelOldChoiceFormat(models.Model):
-    tz_superset = TimeZoneField(
-        choices=[(pytz.timezone(tz), tz) for tz in pytz.all_timezones],
-        blank=True,
-        use_pytz=True,
-    )
-    tz_subset = TimeZoneField(
-        choices=[(pytz.timezone(tz), tz) for tz in USA_TZS],
-        blank=True,
-        use_pytz=True,
-    )
-
-
-class _ZIModelOldChoiceFormat(models.Model):
-    tz_superset = TimeZoneField(
-        choices=[(ZoneInfo(tz), tz) for tz in pytz.all_timezones],
-        blank=True,
-        use_pytz=False,
-    )
-    tz_subset = TimeZoneField(
-        choices=[(ZoneInfo(tz), tz) for tz in USA_TZS],
-        blank=True,
-        use_pytz=False,
-    )
-
-
-class _TZModelForm(forms.ModelForm):
-    class Meta:
-        model = _TZModel
-        fields = "__all__"
-
-
-class _ZIModelForm(forms.ModelForm):
-    class Meta:
-        model = _ZIModel
-        fields = "__all__"
-
-
-@pytest.fixture(params=[True, False])
-def use_pytz(request):
-    yield request.param
-
-
-@pytest.fixture
-def tz_func(use_pytz):
-    yield pytz.timezone if use_pytz else ZoneInfo
+class _ModelOldChoiceFormat(models.Model):
+    tz_superset = TimeZoneField()
+    tz_subset = TimeZoneField()
 
 
 @pytest.fixture
 def Model(use_pytz):
-    yield _TZModel if use_pytz else _ZIModel
+    class _Model(models.Model):
+        tz = TimeZoneField(use_pytz=use_pytz)
+        tz_opt = TimeZoneField(blank=True, use_pytz=use_pytz)
+        tz_opt_default = TimeZoneField(blank=True, default="America/Los_Angeles", use_pytz=use_pytz)
+
+    yield _Model
 
 
 @pytest.fixture
-def ModelChoice(use_pytz):
-    yield _TZModelChoice if use_pytz else _ZIModelChoice
+def ModelChoice(use_pytz, all_tzstrs):
+    class _ModelChoice(models.Model):
+        tz_superset = TimeZoneField(
+            choices=[(tz, tz) for tz in all_tzstrs],
+            blank=True,
+            use_pytz=use_pytz,
+        )
+        tz_subset = TimeZoneField(
+            choices=[(tz, tz) for tz in USA_TZS],
+            blank=True,
+            use_pytz=use_pytz,
+        )
+
+    yield _ModelChoice
 
 
 @pytest.fixture
-def ModelOldChoiceFormat(use_pytz):
-    yield _TZModelOldChoiceFormat if use_pytz else _ZIModelOldChoiceFormat
+def ModelOldChoiceFormat(use_pytz, all_tzstrs, to_tzobj):
+    class _ModelOldChoiceFormat(models.Model):
+        tz_superset = TimeZoneField(
+            choices=[(to_tzobj(tz), tz) for tz in all_tzstrs],
+            blank=True,
+            use_pytz=use_pytz,
+        )
+        tz_subset = TimeZoneField(
+            choices=[(to_tzobj(tz), tz) for tz in USA_TZS],
+            blank=True,
+            use_pytz=use_pytz,
+        )
+
+    yield _ModelOldChoiceFormat
 
 
 @pytest.fixture
-def ModelForm(use_pytz):
-    yield _TZModelForm if use_pytz else _ZIModelForm
+def ModelForm(Model):
+    class _ModelForm(forms.ModelForm):
+        class Meta:
+            model = Model
+            fields = "__all__"
+
+    yield _ModelForm
+
+
+@pytest.fixture(params=[(os.environ["TZ_ENGINE"])] if "TZ_ENGINE" in os.environ else ["pytz", "zoneinfo"])
+def use_pytz(request):
+    yield request.param == "pytz"
+
+
+@pytest.fixture
+def to_tzobj(use_pytz):
+    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    yield tz_backend.to_tzobj
+
+
+@pytest.fixture
+def utc_tzobj(use_pytz):
+    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    yield tz_backend.utc_tzobj
+
+
+@pytest.fixture
+def all_tzstrs(use_pytz):
+    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    yield tz_backend.all_tzstrs
+
+
+@pytest.fixture
+def base_tzstrs(use_pytz):
+    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    yield tz_backend.base_tzstrs
 
 
 @pytest.fixture
@@ -129,8 +124,8 @@ def pst():
 
 
 @pytest.fixture
-def pst_tz(use_pytz, pst):
-    yield (pytz.timezone(pst) if use_pytz else ZoneInfo(pst))  # pytz.tzinfo.DstTzInfo
+def pst_tz(to_tzobj, pst):
+    yield to_tzobj(pst)  # for pytz: pytz.tzinfo.DstTzInfo
 
 
 @pytest.fixture
@@ -139,8 +134,8 @@ def gmt():
 
 
 @pytest.fixture
-def gmt_tz(use_pytz, gmt):
-    yield (pytz.timezone(gmt) if use_pytz else ZoneInfo(gmt))  # pytz.tzinfo.StaticTzInfo
+def gmt_tz(to_tzobj, gmt):
+    yield to_tzobj(gmt)  # for pytz: pytz.tzinfo.StaticTzInfo
 
 
 @pytest.fixture
@@ -149,13 +144,14 @@ def utc():
 
 
 @pytest.fixture
-def utc_tz(use_pytz, utc):
-    yield (pytz.timezone(utc) if use_pytz else ZoneInfo(utc))  # pytz.utc singleton
+def utc_tz(utc_tzobj):
+    yield utc_tzobj  # for pytz: pytz.utc singleton
 
 
 @pytest.fixture
-def uncommon_tz():
-    yield "Singapore"
+def uncommon_tz(use_pytz):
+    # there are no Zoneinfo "uncommon" tzs
+    yield "Singapore" if use_pytz else "foobar"
 
 
 @pytest.fixture
