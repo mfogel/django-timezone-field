@@ -11,23 +11,28 @@ class TimeZoneField(models.Field):
     Provides database store for pytz timezone objects.
 
     Valid inputs:
-        * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
-        * the pytz.UTC singleton
-        * any string that validates against pytz.common_timezones. pytz will
-          be used to build a timezone object from the string.
+        * use_pytz=True:
+            * any instance of pytz.tzinfo.DstTzInfo or pytz.tzinfo.StaticTzInfo
+            * the pytz.UTC singleton
+            * any string that validates against pytz.common_timezones. pytz will
+              be used to build a timezone object from the string.
+        * use_pytz=False:
+            * any instance of zoneinfo.ZoneInfo
+            * any string that validates against zoneinfo.available_timezones().
         * None and the empty string both represent 'no timezone'
 
     Valid outputs:
         * None
-        * instances of pytz.tzinfo.DstTzInfo and pytz.tzinfo.StaticTzInfo
-        * the pytz.UTC singleton
+        * use_pytz=True: instances of pytz.tzinfo.DstTzInfo,
+          pytz.tzinfo.StaticTzInfo and the pytz.UTC singleton
+        * use_pytz=False: instances of zoneinfo.ZoneInfo
 
     Blank values are stored in the DB as the empty string. Timezones are stored
     in their string representation.
 
     The `choices` kwarg can be specified as a list of either
-    [<pytz.timezone>, <str>] or [<str>, <str>]. Internally, it is stored as
-    [<pytz.timezone>, <str>].
+    [<timezone object>, <str>] or [<str>, <str>]. Internally in memory, it is
+    stored as [<timezone object>, <str>].
     """
 
     description = "A timezone object"
@@ -51,9 +56,9 @@ class TimeZoneField(models.Field):
         if "choices" in kwargs:
             values, displays = zip(*kwargs["choices"])
             # Choices can be specified in two forms: either
-            # [<pytz.timezone>, <str>] or [<str>, <str>]
+            # [<timezone object>, <str>] or [<str>, <str>]
             #
-            # The [<pytz.timezone>, <str>] format is the one we actually
+            # The [<timezone object>, <str>] format is the one we actually
             # store the choices in memory because of
             # https://github.com/mfogel/django-timezone-field/issues/24
             #
