@@ -25,13 +25,16 @@ If not explicitly specified, the default value used for `use_pytz` matches Djang
   [drop support for `pytz` altogether](https://docs.djangoproject.com/en/4.0/releases/4.0/#zoneinfo-default-timezone-implementation),
   and this app will likely do the same.
 
+Note that this app does _not_ declare `pytz` to be a dependency, so if you're using this app with `use_pytz=True`, you'll need
+to ensure `pytz` is included in the environment yourself.
+
 ### Differences in recognized timezones between `pytz` and `zoneinfo`
 
 `pytz` and `zoneinfo` search for timezone data differently.
 
 - `pytz` bundles and searches within its own copy of the [IANA timezone DB](https://www.iana.org/time-zones)
 - `zoneinfo` first searches the local system's timezone DB for a match. If no match is found, it then searches within
-  the [`tzdata`](https://pypi.org/project/tzdata/) package if it is installed. The `tzdata` package contains a copy of
+  the [`tzdata`](https://pypi.org/project/tzdata/) package _if it is installed_. The `tzdata` package contains a copy of
   the IANA timezone DB.
 
 If the local system's timezone DB doesn't cover the entire IANA timezone DB and the `tzdata` package is not installed,
