@@ -134,7 +134,7 @@ poetry run pytest
 
 ## Changelog
 
-#### vNEXT (main)
+#### 6.0 (2023-08-20)
 
 - BREAKING: `pytz` removed from dependencies. If you use this package with `use_pytz=True`, you'll need to install
   `pytz` yourself.
