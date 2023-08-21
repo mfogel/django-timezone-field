@@ -37,7 +37,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-Django = ">=3.2,<5.0,!=4.0.*"
+Django = ">=3.2,<5.0"
 python = "^3.8"
 "backports.zoneinfo" = { version = "^0.2.1", python = "<3.9" }
 
