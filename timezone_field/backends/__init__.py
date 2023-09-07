@@ -7,7 +7,8 @@ USE_PYTZ_DEFAULT = getattr(conf.settings, "USE_DEPRECATED_PYTZ", VERSION < (4, 0
 tz_backend_cache = {}
 
 
-def get_tz_backend(use_pytz=USE_PYTZ_DEFAULT):
+def get_tz_backend(use_pytz):
+    use_pytz = USE_PYTZ_DEFAULT if use_pytz is None else use_pytz
     if use_pytz not in tz_backend_cache:
         if use_pytz:
             from .pytz import PYTZBackend

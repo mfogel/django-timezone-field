@@ -8,4 +8,4 @@ def test_use_pytz_default_USE_DEPRECATED_PYTZ_unset():
 
 
 def test_get_tz_backend_when_use_pytz_is_none():
-    assert get_tz_backend(use_pytz=None) is USE_PYTZ_DEFAULT
+    assert get_tz_backend(None) is USE_PYTZ_DEFAULT

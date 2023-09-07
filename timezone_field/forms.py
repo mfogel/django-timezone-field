@@ -18,7 +18,7 @@ def get_coerce(tz_backend):
 class TimeZoneFormField(forms.TypedChoiceField):
     def __init__(self, *args, **kwargs):
         self.use_pytz = kwargs.pop("use_pytz", None)
-        self.tz_backend = get_tz_backend(use_pytz=self.use_pytz)
+        self.tz_backend = get_tz_backend(self.use_pytz)
         kwargs.setdefault("coerce", get_coerce(self.tz_backend))
         kwargs.setdefault("empty_value", None)
 

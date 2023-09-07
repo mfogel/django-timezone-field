@@ -26,7 +26,7 @@ def with_gmt_offset(timezones, now=None, use_pytz=None):
           underscores. For example: "GMT-05:00 America/New York"
         * sorted by their timezone offset
     """
-    tz_backend = get_tz_backend(use_pytz=use_pytz)
+    tz_backend = get_tz_backend(use_pytz)
     now = now or datetime.datetime.now(tz_backend.utc_tzobj)
     _choices = []
     for tz in timezones:
