@@ -50,7 +50,7 @@ class TimeZoneField(models.Field):
         kwargs.setdefault("max_length", self.default_max_length)
 
         self.use_pytz = kwargs.pop("use_pytz", None)
-        self.tz_backend = get_tz_backend(use_pytz=self.use_pytz)
+        self.tz_backend = get_tz_backend(self.use_pytz)
         self.default_tzs = [self.tz_backend.to_tzobj(v) for v in self.tz_backend.base_tzstrs]
 
         if "choices" in kwargs:

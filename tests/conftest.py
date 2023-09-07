@@ -96,25 +96,25 @@ def use_pytz(request):
 
 @pytest.fixture
 def to_tzobj(use_pytz):
-    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    tz_backend = backends.get_tz_backend(use_pytz)
     yield tz_backend.to_tzobj
 
 
 @pytest.fixture
 def utc_tzobj(use_pytz):
-    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    tz_backend = backends.get_tz_backend(use_pytz)
     yield tz_backend.utc_tzobj
 
 
 @pytest.fixture
 def all_tzstrs(use_pytz):
-    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    tz_backend = backends.get_tz_backend(use_pytz)
     yield tz_backend.all_tzstrs
 
 
 @pytest.fixture
 def base_tzstrs(use_pytz):
-    tz_backend = backends.get_tz_backend(use_pytz=use_pytz)
+    tz_backend = backends.get_tz_backend(use_pytz)
     yield tz_backend.base_tzstrs
 
 
