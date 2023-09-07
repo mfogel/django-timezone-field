@@ -134,6 +134,10 @@ poetry run pytest
 
 ## Changelog
 
+#### `main` (not yet released to pypi)
+
+- Use correct default backend when running with django 3.X ([#109](https://github.com/mfogel/django-timezone-field/issues/109))
+
 #### 6.0 (2023-08-20)
 
 - BREAKING: `pytz` removed from dependencies. If you use this package with `use_pytz=True`, you'll need to install
