@@ -20,7 +20,7 @@ try:
     from timezone_field.backends.pytz import PYTZBackend
 except ImportError:
     pass
-finally:
+else:
 
     def test_get_tz_backend_when_use_pytz_is_true():
         assert isinstance(get_tz_backend(True), PYTZBackend)
