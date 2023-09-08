@@ -134,7 +134,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (not yet released to pypi)
+#### 6.0.1 (2023-09-07)
 
 - Use correct default backend when running with django 3.X ([#109](https://github.com/mfogel/django-timezone-field/issues/109))
 
