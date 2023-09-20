@@ -56,16 +56,22 @@ jobs:
       matrix:
         # https://docs.djangoproject.com/en/4.1/faq/install/#what-python-version-can-i-use-with-django
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        django-version: ["3.2", "4.0", "4.1", "4.2"]
+        django-version: ["3.2", "4.0", "4.1", "4.2", "5.0a"]
         db-engine: [sqlite, postgres]
         tz-engine: [pytz, zoneinfo]
         exclude:
           - django-version: "3.2"
             python-version: "3.11"
-          - django-version: "4.0"
-            python-version: "3.11"
           - django-version: "3.2"
             tz-engine: zoneinfo
+          - django-version: "4.0"
+            python-version: "3.11"
+          - django-version: "5.0a"
+            python-version: "3.8"
+          - django-version: "5.0a"
+            python-version: "3.9"
+          - django-version: "5.0a"
+            tz-engine: pytz
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -116,7 +122,7 @@ jobs:
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           source .venv/bin/activate
-          pip install "Django~=${{ matrix.django-version }}"
+          pip install --pre "Django~=${{ matrix.django-version }}"
 
       - name: Install pytz
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true' && matrix.tz-engine == 'pytz'
