@@ -62,10 +62,16 @@ jobs:
         exclude:
           - django-version: "3.2"
             python-version: "3.11"
-          - django-version: "4.0"
-            python-version: "3.11"
           - django-version: "3.2"
             tz-engine: zoneinfo
+          - django-version: "4.0"
+            python-version: "3.11"
+          - django-version: "5.0a"
+            python-version: "3.8"
+          - django-version: "5.0a"
+            python-version: "3.9"
+          - django-version: "5.0a"
+            tz-engine: pytz
 
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
