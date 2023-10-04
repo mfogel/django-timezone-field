@@ -137,6 +137,7 @@ poetry run pytest
 #### `main` (unreleased!)
 
 - Add support for django 5.0
+- Fix issue with `Factory` timezone on some BSD systems ([#114](https://github.com/mfogel/django-timezone-field/issues/114))
 
 #### 6.0.1 (2023-09-07)
 
