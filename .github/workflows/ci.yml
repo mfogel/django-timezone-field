@@ -16,7 +16,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -29,7 +29,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: venv-py3.11-${{ hashFiles('poetry.lock') }}
+          key: venv-py3.12-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
@@ -55,22 +55,28 @@ jobs:
       fail-fast: false
       matrix:
         # https://docs.djangoproject.com/en/4.1/faq/install/#what-python-version-can-i-use-with-django
-        python-version: ["3.8", "3.9", "3.10", "3.11"]
-        django-version: ["3.2", "4.0", "4.1", "4.2", "5.0a"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        django-version: ["3.2", "4.0", "4.1", "4.2", "5.0rc1"]
         db-engine: [sqlite, postgres]
         tz-engine: [pytz, zoneinfo]
         exclude:
           - django-version: "3.2"
             python-version: "3.11"
           - django-version: "3.2"
+            python-version: "3.12"
+          - django-version: "3.2"
             tz-engine: zoneinfo
           - django-version: "4.0"
             python-version: "3.11"
-          - django-version: "5.0a"
+          - django-version: "4.0"
+            python-version: "3.12"
+          - django-version: "4.1"
+            python-version: "3.12"
+          - django-version: "5.0rc1"
             python-version: "3.8"
-          - django-version: "5.0a"
+          - django-version: "5.0rc1"
             python-version: "3.9"
-          - django-version: "5.0a"
+          - django-version: "5.0rc1"
             tz-engine: pytz
 
     env:
@@ -175,7 +181,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v3
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1
@@ -188,7 +194,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: .venv
-          key: venv-py3.11-${{ hashFiles('poetry.lock') }}
+          key: venv-py3.12-${{ hashFiles('poetry.lock') }}
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
