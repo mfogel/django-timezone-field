@@ -134,7 +134,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased!)
+#### 6.1.0 (2023-11-25)
 
 - Add support for django 5.0
 - Add support for python 3.12
