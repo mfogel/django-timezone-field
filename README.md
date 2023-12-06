@@ -21,9 +21,9 @@ If not explicitly specified, the default value used for `use_pytz` matches Djang
 - Django == 4.X: `use_pytz` defaults to the value of
   [`django.conf.settings.USE_DEPRECATED_PYTZ`](https://docs.djangoproject.com/en/4.0/ref/settings/#use-deprecated-pytz),
   which itself defaults to `False`
-- Django >= 5.X: django plans to
-  [drop support for `pytz` altogether](https://docs.djangoproject.com/en/4.0/releases/4.0/#zoneinfo-default-timezone-implementation),
-  and this app will likely do the same.
+- Django >= 5.X: 
+  [drops support for `pytz` altogether](https://docs.djangoproject.com/en/5.0/releases/5.0/#features-removed-in-5-0),
+  and this app has done the same.
 
 Note that this app does _not_ declare `pytz` to be a dependency, so if you're using this app with `use_pytz=True`, you'll need
 to ensure `pytz` is included in the environment yourself.
