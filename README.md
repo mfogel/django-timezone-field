@@ -71,6 +71,10 @@ my_model.full_clean() # validates against pytz.common_timezones by default
 my_model.save()       # values stored in DB as strings
 my_model.tz3          # value returned as pytz timezone: <DstTzInfo 'America/Vancouver' LMT-1 day, 15:48:00 STD>
 my_model.tz4          # value returned as zoneinfo: zoneinfo.ZoneInfo(key='America/Vancouver')
+
+my_model.tz1 = "UTC"  # assignment of a string, immediately converted to timezone object
+my_model.tz1          # zoneinfo.ZoneInfo(key='UTC') or pytz.utc, depending on use_pytz default
+my_model.tz2 = "Invalid/Not_A_Zone"  # immediately raises ValidationError
 ```
 
 ### Form Field
@@ -133,6 +137,14 @@ poetry run pytest
 ```
 
 ## Changelog
+
+#### `main` (unreleased)
+
+- Convert string value to timezone object immediately on creation/assignment.
+  Accessing a TimeZoneField will _always_ return a timezone or None (never a string).
+  (Potentially BREAKING: Unknown timezone names now raise `ValidationError` at time of assignment.
+  Previously, conversion was delayed until model `full_clean` or `save`.) 
+  ([#57](https://github.com/mfogel/django-timezone-field/issues/57))
 
 #### 6.1.0 (2023-11-25)
 

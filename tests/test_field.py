@@ -61,11 +61,30 @@ def test_string_value_lookup(Model, pst, filter_tz):
     assert qs.count() == 1
 
 
+@pytest.mark.parametrize(
+    "input_tz, output_tz",
+    [
+        [lazy_fixture("pst"), lazy_fixture("pst_tz")],
+        [lazy_fixture("pst_tz"), lazy_fixture("pst_tz")],
+        ["", None],
+        [None, None],
+    ],
+)
+def test_string_value_assignment_without_save(Model, utc, input_tz, output_tz):
+    m = Model(tz=utc, tz_opt=utc)
+    m.tz_opt = input_tz
+    assert m.tz_opt == output_tz
+
+
 @pytest.mark.parametrize("tz", [None, "", "not-a-tz", 4, object()])
 def test_invalid_input(Model, tz):
-    m = Model(tz=tz)
     with pytest.raises(ValidationError):
-        m.full_clean()
+        # Most invalid values are detected at creation/assignment.
+        # Invalid blank values aren't detected until clean/save.
+        m = Model(tz=tz)
+        if tz is None or tz == "":
+            assert m.tz is None
+            m.full_clean()
 
 
 def test_three_positional_args_does_not_throw():
@@ -92,8 +111,8 @@ def test_with_limited_choices_valid_choice(ModelChoice, pst, pst_tz):
 
 @pytest.mark.parametrize("kwargs", [{"tz_superset": "not a tz"}, {"tz_subset": "Europe/Brussels"}])
 def test_with_limited_choices_invalid_choice(ModelChoice, kwargs):
-    m = ModelChoice(**kwargs)
     with pytest.raises(ValidationError):
+        m = ModelChoice(**kwargs)
         m.full_clean()
 
 
@@ -107,6 +126,6 @@ def test_with_limited_choices_old_format_valid_choice(ModelOldChoiceFormat, pst,
 
 @pytest.mark.parametrize("kwargs", [{"tz_superset": "not a tz"}, {"tz_subset": "Europe/Brussels"}])
 def test_with_limited_choices_old_format_invalid_choice(ModelOldChoiceFormat, kwargs):
-    m = ModelOldChoiceFormat(**kwargs)
     with pytest.raises(ValidationError):
+        m = ModelOldChoiceFormat(**kwargs)
         m.full_clean()

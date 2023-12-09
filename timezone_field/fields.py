@@ -4,6 +4,7 @@ from django.utils.encoding import force_str
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
+from timezone_field.utils import AutoDeserializedAttribute
 
 
 class TimeZoneField(models.Field):
@@ -34,6 +35,8 @@ class TimeZoneField(models.Field):
     [<timezone object>, <str>] or [<str>, <str>]. Internally in memory, it is
     stored as [<timezone object>, <str>].
     """
+
+    descriptor_class = AutoDeserializedAttribute
 
     description = "A timezone object"
 
