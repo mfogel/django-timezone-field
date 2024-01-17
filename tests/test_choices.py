@@ -38,11 +38,20 @@ def tzs3_names():
 
 
 @pytest.fixture
+def tzs3_names_sorted():
+    yield [
+        "America/Argentina/Buenos_Aires",
+        "America/Los_Angeles",
+        "Europe/London",
+    ]
+
+
+@pytest.fixture
 def tzs3_standard_displays():
     yield [
+        "America/Argentina/Buenos Aires",
         "America/Los Angeles",
         "Europe/London",
-        "America/Argentina/Buenos Aires",
     ]
 
 
@@ -104,10 +113,11 @@ def test_with_gmt_offset_transition_backward(use_pytz, utc_tzobj):
     assert with_gmt_offset(tz_names, now=after, use_pytz=use_pytz) == [("Europe/London", "GMT+00:00 Europe/London")]
 
 
-def test_standard_using_timezone_names(tzs3_names, tzs3_standard_displays):
-    assert standard(tzs3_names) == list(zip(tzs3_names, tzs3_standard_displays))
+def test_standard_using_timezone_names(tzs3_names, tzs3_names_sorted, tzs3_standard_displays):
+    assert standard(tzs3_names) == list(zip(tzs3_names_sorted, tzs3_standard_displays))
 
 
-def test_standard_using_timezone_objects(tzs3_names, tzs3_standard_displays, to_tzobj):
+def test_standard_using_timezone_objects(tzs3_names, tzs3_names_sorted, tzs3_standard_displays, to_tzobj):
     tzs3_objects = [to_tzobj(tz) for tz in tzs3_names]
-    assert standard(tzs3_objects) == list(zip(tzs3_objects, tzs3_standard_displays))
+    tzs3_objects_sorted = [to_tzobj(tz) for tz in tzs3_names_sorted]
+    assert standard(tzs3_objects) == list(zip(tzs3_objects_sorted, tzs3_standard_displays))
