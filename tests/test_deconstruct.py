@@ -63,7 +63,7 @@ def test_default_kwargs_not_frozen():
     assert "max_length" not in kwargs
 
 
-def test_specifying_defaults_not_frozen(use_pytz, to_tzobj, base_tzstrs):
+def test_specifying_defaults_not_frozen(use_pytz, base_tzstrs):
     """
     If someone's matched the default values with their kwarg args, we
     shouldn't bothering freezing those
