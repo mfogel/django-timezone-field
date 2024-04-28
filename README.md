@@ -140,6 +140,7 @@ poetry run pytest
 
 #### `main` (unreleased)
 
+- Better default sorting of `choices` ([#116](https://github.com/mfogel/django-timezone-field/issues/116)), ([#123](https://github.com/mfogel/django-timezone-field/issues/123))
 - Convert string value to timezone object immediately on creation/assignment.
   Accessing a TimeZoneField will _always_ return a timezone or None (never a string).
   (Potentially BREAKING: Unknown timezone names now raise `ValidationError` at time of assignment.

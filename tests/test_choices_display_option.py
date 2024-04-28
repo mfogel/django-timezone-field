@@ -1,3 +1,5 @@
+from collections import Counter
+
 import pytest
 from django import forms
 from django.db import models
@@ -104,7 +106,7 @@ def test_form_field_invalid_choices_display(use_pytz):
 def test_form_field_none(ChoicesDisplayForm, base_tzstrs):
     form = ChoicesDisplayForm()
     values, displays = zip(*form.fields["tz_none"].choices)
-    assert values == tuple(base_tzstrs)
+    assert sorted(values) == sorted(base_tzstrs)
     assert displays[values.index("America/Los_Angeles")] == "America/Los Angeles"
     assert displays[values.index("Asia/Kolkata")] == "Asia/Kolkata"
 
@@ -136,10 +138,10 @@ def test_form_field_limited_none(ChoicesDisplayForm):
 def test_form_field_limited_standard(ChoicesDisplayForm):
     form = ChoicesDisplayForm()
     assert form.fields["tz_limited_standard"].choices == [
-        ("Asia/Tokyo", "Asia/Tokyo"),
-        ("Asia/Dubai", "Asia/Dubai"),
-        ("America/Argentina/Buenos_Aires", "America/Argentina/Buenos Aires"),
         ("Africa/Nairobi", "Africa/Nairobi"),
+        ("America/Argentina/Buenos_Aires", "America/Argentina/Buenos Aires"),
+        ("Asia/Dubai", "Asia/Dubai"),
+        ("Asia/Tokyo", "Asia/Tokyo"),
     ]
 
 
@@ -156,7 +158,7 @@ def test_form_field_limited_with_gmt_offset(ChoicesDisplayForm):
 def test_model_form_field_none(ChoicesDisplayModelForm, to_tzobj, base_tzobjs):
     form = ChoicesDisplayModelForm()
     values, displays = zip(*form.fields["tz_none"].choices)
-    assert values == ("",) + tuple(base_tzobjs)
+    assert Counter(values) == Counter(("",) + tuple(base_tzobjs))
     assert displays[values.index(to_tzobj("America/Los_Angeles"))] == "America/Los Angeles"
     assert displays[values.index(to_tzobj("Asia/Kolkata"))] == "Asia/Kolkata"
 
@@ -192,10 +194,10 @@ def test_moel_form_field_limited_standard(ChoicesDisplayModelForm, to_tzobj):
     form = ChoicesDisplayModelForm()
     assert form.fields["tz_limited_standard"].choices == [
         ("", "---------"),
-        (to_tzobj("Asia/Tokyo"), "Asia/Tokyo"),
-        (to_tzobj("Asia/Dubai"), "Asia/Dubai"),
-        (to_tzobj("America/Argentina/Buenos_Aires"), "America/Argentina/Buenos Aires"),
         (to_tzobj("Africa/Nairobi"), "Africa/Nairobi"),
+        (to_tzobj("America/Argentina/Buenos_Aires"), "America/Argentina/Buenos Aires"),
+        (to_tzobj("Asia/Dubai"), "Asia/Dubai"),
+        (to_tzobj("Asia/Tokyo"), "Asia/Tokyo"),
     ]
 
 

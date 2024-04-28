@@ -2,6 +2,7 @@ import pytest
 from django.db.migrations.writer import MigrationWriter
 
 from timezone_field import TimeZoneField
+from timezone_field.choices import standard
 
 
 @pytest.fixture(
@@ -62,7 +63,7 @@ def test_default_kwargs_not_frozen():
     assert "max_length" not in kwargs
 
 
-def test_specifying_defaults_not_frozen(use_pytz, to_tzobj, base_tzstrs):
+def test_specifying_defaults_not_frozen(use_pytz, base_tzstrs):
     """
     If someone's matched the default values with their kwarg args, we
     shouldn't bothering freezing those
@@ -72,7 +73,7 @@ def test_specifying_defaults_not_frozen(use_pytz, to_tzobj, base_tzstrs):
     _name, _path, _args, kwargs = field.deconstruct()
     assert "max_length" not in kwargs
 
-    choices = [(to_tzobj(tz), tz.replace("_", " ")) for tz in base_tzstrs]
+    choices = standard(base_tzstrs)
     field = TimeZoneField(choices=choices, use_pytz=use_pytz)
     _name, _path, _args, kwargs = field.deconstruct()
     assert "choices" not in kwargs

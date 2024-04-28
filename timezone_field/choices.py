@@ -3,6 +3,28 @@ import datetime
 from timezone_field.backends import get_tz_backend
 
 
+def normalize_standard(tztuple):
+    """Normalize timezone names by replacing special characters with space.
+
+    For proper sorting, using spaces makes comparisons more consistent.
+
+    :param str tztuple: tuple of timezone and representation
+    """
+    return tztuple[1].translate(str.maketrans({"-": " ", "_": " "}))
+
+
+def normalize_gmt(tztuple):
+    """Normalize timezone GMT names for sorting.
+
+    For proper sorting, using GMT values as a positive or negative number.
+
+    :param str tztuple: tuple of timezone and representation
+    """
+    gmt = tztuple[1].split()[0]
+    cmp = gmt.replace("GMT", "").replace(":", "")
+    return int(cmp)
+
+
 def standard(timezones):
     """
     Given a list of timezones (either strings of timezone objects),
@@ -14,7 +36,7 @@ def standard(timezones):
     for tz in timezones:
         tz_str = str(tz)
         choices.append((tz, tz_str.replace("_", " ")))
-    return choices
+    return sorted(choices, key=normalize_standard)
 
 
 def with_gmt_offset(timezones, now=None, use_pytz=None):
@@ -41,4 +63,4 @@ def with_gmt_offset(timezones, now=None, use_pytz=None):
         _choices.append((delta, tz, display))
     _choices.sort(key=lambda x: x[0])
     choices = [(one, two) for zero, one, two in _choices]
-    return choices
+    return sorted(choices, key=normalize_gmt)
