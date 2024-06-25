@@ -26,7 +26,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-py3.12-${{ hashFiles('poetry.lock') }}
@@ -56,7 +56,7 @@ jobs:
       matrix:
         # https://docs.djangoproject.com/en/4.1/faq/install/#what-python-version-can-i-use-with-django
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        django-version: ["3.2", "4.0", "4.1", "4.2", "5.0"]
+        django-version: ["3.2", "4.0", "4.1", "4.2", "5.0", "5.1a1"]
         db-engine: [sqlite, postgres]
         tz-engine: [pytz, zoneinfo]
         exclude:
@@ -77,6 +77,12 @@ jobs:
           - django-version: "5.0"
             python-version: "3.9"
           - django-version: "5.0"
+            tz-engine: pytz
+          - django-version: "5.1a1"
+            python-version: "3.8"
+          - django-version: "5.1a1"
+            python-version: "3.9"
+          - django-version: "5.1a1"
             tz-engine: pytz
 
     env:
@@ -115,7 +121,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-py${{ matrix.python-version}}-dj${{ matrix.django-version }}-${{ matrix.tz-engine }}-${{ hashFiles('poetry.lock') }}
@@ -192,7 +198,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-py3.12-${{ hashFiles('poetry.lock') }}
