@@ -26,7 +26,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-py3.12-${{ hashFiles('poetry.lock') }}
@@ -115,7 +115,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-py${{ matrix.python-version}}-dj${{ matrix.django-version }}-${{ matrix.tz-engine }}-${{ hashFiles('poetry.lock') }}
@@ -165,7 +165,7 @@ jobs:
         run: poetry run coverage xml
 
       - name: Upload coverage report to codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           env_vars: PYTHON_VERSION,DJANGO_VERSION,DB_ENGINE
@@ -192,7 +192,7 @@ jobs:
 
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-py3.12-${{ hashFiles('poetry.lock') }}
