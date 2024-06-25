@@ -171,11 +171,11 @@ jobs:
         run: poetry run coverage xml
 
       - name: Upload coverage report to codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           env_vars: PYTHON_VERSION,DJANGO_VERSION,DB_ENGINE
-          fail_ci_if_error: false  # TODO: Add secrets.CODECOV_TOKEN
+          fail_ci_if_error: true
 
   build:
     runs-on: ubuntu-latest
