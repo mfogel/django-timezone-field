@@ -17,13 +17,21 @@ from timezone_field.choices import standard
     ]
 )
 def field(request, to_tzobj, use_pytz):
-    yield TimeZoneField(use_pytz=use_pytz) if request.param == "use_pytz_1" else TimeZoneField(
-        choices=[
-            (to_tzobj("US/Pacific"), "US/Pacific"),
-            (to_tzobj("US/Eastern"), "US/Eastern"),
-        ],
-        use_pytz=use_pytz,
-    ) if request.param == "use_pytz_2" else request.param
+    yield (
+        TimeZoneField(use_pytz=use_pytz)
+        if request.param == "use_pytz_1"
+        else (
+            TimeZoneField(
+                choices=[
+                    (to_tzobj("US/Pacific"), "US/Pacific"),
+                    (to_tzobj("US/Eastern"), "US/Eastern"),
+                ],
+                use_pytz=use_pytz,
+            )
+            if request.param == "use_pytz_2"
+            else request.param
+        )
+    )
 
 
 def test_deconstruct(field):
@@ -86,10 +94,14 @@ def test_specifying_defaults_not_frozen(use_pytz, base_tzstrs):
     ]
 )
 def choices(request, to_tzobj):
-    yield request.param if request.param is not None else [
-        (to_tzobj("US/Pacific"), "US/Pacific"),
-        (to_tzobj("US/Eastern"), "US/Eastern"),
-    ]
+    yield (
+        request.param
+        if request.param is not None
+        else [
+            (to_tzobj("US/Pacific"), "US/Pacific"),
+            (to_tzobj("US/Eastern"), "US/Eastern"),
+        ]
+    )
 
 
 def test_deconstruct_when_using_choices(choices, use_pytz):
