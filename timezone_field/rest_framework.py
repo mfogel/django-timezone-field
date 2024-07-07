@@ -1,11 +1,11 @@
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from rest_framework.fields import Field
+from rest_framework.fields import CharField
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 
 
-class TimeZoneSerializerField(Field):
+class TimeZoneSerializerField(CharField):
     default_error_messages = {
         "invalid": _("A valid timezone is required."),
     }
