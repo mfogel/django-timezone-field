@@ -12,6 +12,7 @@ def TimeZoneSerializer(use_pytz):
 
     yield _TimeZoneSerializer
 
+
 @pytest.fixture
 def TimeZoneSerializerEmpties(use_pytz):
     class _TimeZoneSerializer(serializers.Serializer):
@@ -70,11 +71,13 @@ def test_valid_empties(TimeZoneSerializerEmpties):
 
 
 def test_invalid_empties(TimeZoneSerializerEmpties):
-    serializer = TimeZoneSerializerEmpties(data={
-        "tz_allow_null": "",
-        "tz_allow_blank": None,
-        "tz_not_required": None,
-    })
+    serializer = TimeZoneSerializerEmpties(
+        data={
+            "tz_allow_null": "",
+            "tz_allow_blank": None,
+            "tz_not_required": None,
+        }
+    )
     assert not serializer.is_valid()
     assert serializer.data == {"tz_allow_null": "", "tz_allow_blank": None, "tz_not_required": None}
     assert serializer.validated_data == {}
