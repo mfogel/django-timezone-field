@@ -146,6 +146,8 @@ poetry run pytest
   (Potentially BREAKING: Unknown timezone names now raise `ValidationError` at time of assignment.
   Previously, conversion was delayed until model `full_clean` or `save`.) 
   ([#57](https://github.com/mfogel/django-timezone-field/issues/57))
+- Add support for django 5.1
+- Drop support for django 3.2, 4.0, 4.1
 
 #### 6.1.0 (2023-11-25)
 
