@@ -138,7 +138,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 7.0 (2024-07-07)
 
 - Better default sorting of `choices` ([#116](https://github.com/mfogel/django-timezone-field/issues/116)), ([#123](https://github.com/mfogel/django-timezone-field/issues/123))
 - Convert string value to timezone object immediately on creation/assignment.
