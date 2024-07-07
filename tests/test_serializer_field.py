@@ -18,6 +18,7 @@ def TimeZoneSerializerEmpties(use_pytz):
         # pylint: disable=abstract-method
         tz_allow_null = TimeZoneSerializerField(use_pytz=use_pytz, allow_null=True)
         tz_allow_blank = TimeZoneSerializerField(use_pytz=use_pytz, allow_blank=True)
+        tz_not_required = TimeZoneSerializerField(use_pytz=use_pytz, required=False)
 
     yield _TimeZoneSerializer
 
@@ -69,7 +70,11 @@ def test_valid_empties(TimeZoneSerializerEmpties):
 
 
 def test_invalid_empties(TimeZoneSerializerEmpties):
-    serializer = TimeZoneSerializerEmpties(data={"tz_allow_null": "", "tz_allow_blank": None})
+    serializer = TimeZoneSerializerEmpties(data={
+        "tz_allow_null": "",
+        "tz_allow_blank": None,
+        "tz_not_required": None,
+    })
     assert not serializer.is_valid()
-    assert serializer.data == {"tz_allow_null": "", "tz_allow_blank": None}
+    assert serializer.data == {"tz_allow_null": "", "tz_allow_blank": None, "tz_not_required": None}
     assert serializer.validated_data == {}
