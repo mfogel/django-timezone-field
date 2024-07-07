@@ -148,7 +148,7 @@ poetry run pytest
   ([#57](https://github.com/mfogel/django-timezone-field/issues/57))
 - Add support for django 5.1
 - Drop support for django 3.2, 4.0, 4.1
-- Change subclass of `TimeZoneSerializerField` from DJRF's `Field` to `CharField` ([#137](https://github.com/mfogel/django-timezone-field/issues/137))
+- Change base class of `TimeZoneSerializerField` from DJRF's `Field` to `CharField` ([#137](https://github.com/mfogel/django-timezone-field/issues/137))
 
 #### 6.1.0 (2023-11-25)
 
