@@ -1,6 +1,6 @@
 import pytest
 from django import forms
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from timezone_field import TimeZoneFormField
 
