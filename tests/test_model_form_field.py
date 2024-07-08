@@ -1,5 +1,5 @@
 import pytest
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 pytestmark = pytest.mark.filterwarnings("ignore:Model 'tests._model.*' was already registered.")
 
