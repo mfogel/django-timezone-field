@@ -138,6 +138,10 @@ poetry run pytest
 
 ## Changelog
 
+#### `main` (unreleased)
+
+- Add support for python 3.13
+
 #### 7.0 (2024-07-07)
 
 - Better default sorting of `choices` ([#116](https://github.com/mfogel/django-timezone-field/issues/116)), ([#123](https://github.com/mfogel/django-timezone-field/issues/123))
