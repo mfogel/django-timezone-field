@@ -138,7 +138,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 7.1 (2025-01-11)
 
 - Add support for python 3.13
 
