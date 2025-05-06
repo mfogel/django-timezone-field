@@ -55,9 +55,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # https://docs.djangoproject.com/en/5.1/faq/install/#what-python-version-can-i-use-with-django
+        # https://docs.djangoproject.com/en/5.2/faq/install/#what-python-version-can-i-use-with-django
         python-version: ["3.8", "3.9", "3.10", "3.11", "3.12", "3.13"]
-        django-version: ["4.2", "5.0", "5.1"]
+        django-version: ["4.2", "5.0", "5.1", "5.2"]
         db-engine: [sqlite, postgres]
         tz-engine: [pytz, zoneinfo]
         exclude:
@@ -76,6 +76,12 @@ jobs:
           - django-version: "5.1"
             python-version: "3.9"
           - django-version: "5.1"
+            tz-engine: pytz
+          - django-version: "5.2"
+            python-version: "3.8"
+          - django-version: "5.2"
+            python-version: "3.9"
+          - django-version: "5.2"
             tz-engine: pytz
 
     env:
