@@ -140,7 +140,8 @@ poetry run pytest
 
 #### `main` (unreleased)
 
-- Add support for django 5.2
+- Add support for django 6,0, 5.2
+- Add support for python 3.14
 
 #### 7.1 (2025-01-11)
 
