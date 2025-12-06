@@ -138,6 +138,10 @@ poetry run pytest
 
 ## Changelog
 
+#### 7.2.1 (2025-12-06)
+
+- Add missing python classifier to package metadata
+
 #### 7.2 (2025-12-06)
 
 - Add support for django 6,0, 5.2
