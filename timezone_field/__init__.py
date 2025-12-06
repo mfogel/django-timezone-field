@@ -1,5 +1,5 @@
 from timezone_field.fields import TimeZoneField
 from timezone_field.forms import TimeZoneFormField
 
-__version__ = "7.1"
+__version__ = "7.2"
 __all__ = ["TimeZoneField", "TimeZoneFormField"]

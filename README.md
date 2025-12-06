@@ -138,7 +138,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 7.2 (2025-12-06)
 
 - Add support for django 6,0, 5.2
 - Add support for python 3.14
