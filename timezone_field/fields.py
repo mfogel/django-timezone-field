@@ -1,6 +1,9 @@
+from functools import cached_property
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
+from django.utils.functional import SimpleLazyObject
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
@@ -44,6 +47,10 @@ class TimeZoneField(models.Field):
     #       existing migration files will need to be accomodated.
     default_max_length = 63
 
+    @cached_property
+    def default_tzs(self):
+        return [self.tz_backend.to_tzobj(v) for v in self.tz_backend.base_tzstrs]
+
     def __init__(self, *args, **kwargs):
         # allow some use of positional args up until the args we customize
         # https://github.com/mfogel/django-timezone-field/issues/42
@@ -54,10 +61,21 @@ class TimeZoneField(models.Field):
 
         self.use_pytz = kwargs.pop("use_pytz", None)
         self.tz_backend = get_tz_backend(self.use_pytz)
-        self.default_tzs = [self.tz_backend.to_tzobj(v) for v in self.tz_backend.base_tzstrs]
+        self.choices_display = kwargs.pop("choices_display", None)
+        if self.choices_display not in (None, "WITH_GMT_OFFSET", "STANDARD"):
+            raise ValueError(f"Unrecognized value for kwarg 'choices_display' of '{self.choices_display}'")
 
         if "choices" in kwargs:
-            values, displays = zip(*kwargs["choices"])
+            self._raw_choices = list(kwargs["choices"])
+        else:
+            self._raw_choices = None
+
+        kwargs["choices"] = SimpleLazyObject(self._build_choices)
+        super().__init__(*args, **kwargs)
+
+    def _build_choices(self):
+        if self._raw_choices is not None:
+            values, displays = zip(*self._raw_choices)
             # Choices can be specified in two forms: either
             # [<timezone object>, <str>] or [<str>, <str>]
             #
@@ -76,18 +94,15 @@ class TimeZoneField(models.Field):
             values = self.default_tzs
             displays = None
 
-        self.choices_display = kwargs.pop("choices_display", None)
         if self.choices_display == "WITH_GMT_OFFSET":
             choices = with_gmt_offset(values, use_pytz=self.use_pytz)
         elif self.choices_display == "STANDARD":
             choices = standard(values)
         elif self.choices_display is None:
-            choices = zip(values, displays) if displays else standard(values)
+            choices = list(zip(values, displays)) if displays else standard(values)
         else:
             raise ValueError(f"Unrecognized value for kwarg 'choices_display' of '{self.choices_display}'")
-
-        kwargs["choices"] = choices
-        super().__init__(*args, **kwargs)
+        return choices
 
     def validate(self, value, model_instance):
         if not self.tz_backend.is_tzobj(value):
