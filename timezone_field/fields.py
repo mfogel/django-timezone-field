@@ -1,9 +1,7 @@
-from functools import cached_property
-
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
-from django.utils.functional import lazy
+from django.utils.functional import lazy, cached_property
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
