@@ -3,7 +3,7 @@ from functools import cached_property
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.encoding import force_str
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import lazy
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
@@ -70,10 +70,11 @@ class TimeZoneField(models.Field):
         else:
             self._raw_choices = None
 
-        kwargs["choices"] = SimpleLazyObject(self._build_choices)
+        kwargs["choices"] = lazy(lambda: self._computed_choices, list)()
         super().__init__(*args, **kwargs)
 
-    def _build_choices(self):
+    @cached_property
+    def _computed_choices(self):
         if self._raw_choices is not None:
             values, displays = zip(*self._raw_choices)
             # Choices can be specified in two forms: either

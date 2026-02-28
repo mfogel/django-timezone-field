@@ -1,7 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
-
-from django.utils.functional import SimpleLazyObject
+from django.utils.functional import lazy, cached_property
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 from timezone_field.choices import standard, with_gmt_offset
@@ -35,10 +34,11 @@ class TimeZoneFormField(forms.TypedChoiceField):
                 f"Unrecognized value for kwarg 'choices_display' of '{self._choices_display}'"
             )
 
-        kwargs["choices"] = SimpleLazyObject(self._build_choices)
+        kwargs["choices"] = lazy(lambda: self._computed_choices, list)()
         super().__init__(*args, **kwargs)
 
-    def _build_choices(self):
+    @cached_property
+    def _computed_choices(self):
         if self._raw_choices is not None:
             values, displays = zip(*self._raw_choices)
         else:

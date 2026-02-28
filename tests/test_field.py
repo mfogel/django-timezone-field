@@ -1,8 +1,12 @@
+from unittest.mock import patch
+
 import pytest
+import zoneinfo
 from django.core.exceptions import ValidationError
 from pytest_lazy_fixtures import lf as lazy_fixture
 
 from timezone_field import TimeZoneField
+from timezone_field.backends.zoneinfo import ZoneInfoBackend
 
 pytestmark = pytest.mark.filterwarnings("ignore:Model 'tests._model.*' was already registered.")
 
@@ -129,3 +133,22 @@ def test_with_limited_choices_old_format_invalid_choice(ModelOldChoiceFormat, kw
     with pytest.raises(ValidationError):
         m = ModelOldChoiceFormat(**kwargs)
         m.full_clean()
+
+
+def test_lazy_timezone_loading():
+    """TimeZoneField construction should not call available_timezones()."""
+    # Use a fresh backend instance so cached_property hasn't fired
+    backend = ZoneInfoBackend()
+
+    with (
+        patch.object(
+            zoneinfo, "available_timezones", wraps=zoneinfo.available_timezones
+        ) as mock_at,
+        patch("timezone_field.fields.get_tz_backend", return_value=backend),
+    ):
+        field = TimeZoneField()
+        assert mock_at.call_count == 0, "available_timezones() called during TimeZoneField construction"
+
+        # Accessing choices should trigger the lazy load
+        list(field.choices)
+        assert mock_at.call_count > 0, "available_timezones() should be called after accessing choices"
