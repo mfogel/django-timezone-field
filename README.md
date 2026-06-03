@@ -138,6 +138,10 @@ poetry run pytest
 
 ## Changelog
 
+#### `main` (unreleased)
+
+- Test aginst django 6.1 pre-release
+
 #### 7.2.1 (2025-12-06)
 
 - Add missing python classifier to package metadata
