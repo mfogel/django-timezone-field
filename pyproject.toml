@@ -29,7 +29,6 @@ classifiers = [
     "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
-    "Framework :: Django :: 6.1",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Topic :: Utilities",
@@ -39,7 +38,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-Django = ">=4.2,<6.2"
+Django = ">=3.2,<6.1"
 python = "^3.8"
 "backports.zoneinfo" = { version = "^0.2.1", python = "<3.9" }
 
