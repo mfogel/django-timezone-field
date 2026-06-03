@@ -1,12 +1,18 @@
 from collections import Counter
 
 import pytest
+from django import VERSION as DJANGO_VERSION
 from django import forms
 from django.db import models
 
 from timezone_field import TimeZoneField, TimeZoneFormField
 
 pytestmark = pytest.mark.filterwarnings("ignore:Model 'tests._choicesdisplaymodel' was already registered.")
+
+if DJANGO_VERSION < (6, 1):
+    BLANK_OPTION = ("", "---------")
+else:
+    BLANK_OPTION = ("", "- Select an option -")
 
 
 @pytest.fixture
@@ -182,7 +188,7 @@ def test_model_form_field_with_gmt_offset(ChoicesDisplayModelForm, to_tzobj, bas
 def test_model_form_field_limited_none(ChoicesDisplayModelForm, to_tzobj):
     form = ChoicesDisplayModelForm()
     assert form.fields["tz_limited_none"].choices == [
-        ("", "---------"),
+        BLANK_OPTION,
         (to_tzobj("Asia/Tokyo"), "Asia/Tokyo"),
         (to_tzobj("Asia/Dubai"), "Asia/Dubai"),
         (to_tzobj("America/Argentina/Buenos_Aires"), "America/Argentina/Buenos_Aires"),
@@ -193,7 +199,7 @@ def test_model_form_field_limited_none(ChoicesDisplayModelForm, to_tzobj):
 def test_moel_form_field_limited_standard(ChoicesDisplayModelForm, to_tzobj):
     form = ChoicesDisplayModelForm()
     assert form.fields["tz_limited_standard"].choices == [
-        ("", "---------"),
+        BLANK_OPTION,
         (to_tzobj("Africa/Nairobi"), "Africa/Nairobi"),
         (to_tzobj("America/Argentina/Buenos_Aires"), "America/Argentina/Buenos Aires"),
         (to_tzobj("Asia/Dubai"), "Asia/Dubai"),
@@ -204,7 +210,7 @@ def test_moel_form_field_limited_standard(ChoicesDisplayModelForm, to_tzobj):
 def test_model_form_field_limited_with_gmt_offset(ChoicesDisplayModelForm, to_tzobj):
     form = ChoicesDisplayModelForm()
     assert form.fields["tz_limited_with_gmt_offset"].choices == [
-        ("", "---------"),
+        BLANK_OPTION,
         (
             to_tzobj("America/Argentina/Buenos_Aires"),
             "GMT-03:00 America/Argentina/Buenos Aires",
