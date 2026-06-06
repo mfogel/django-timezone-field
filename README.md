@@ -138,7 +138,7 @@ poetry run pytest
 
 ## Changelog
 
-#### `main` (unreleased)
+#### 7.2.2 (2026-06-05)
 
 - Test aginst django 6.1 pre-release
 
