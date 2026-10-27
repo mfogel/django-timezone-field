@@ -23,5 +23,5 @@ class ZoneInfoBackend(TimeZoneBackend):
             raise TimeZoneNotFoundError
         try:
             return zoneinfo.ZoneInfo(tzstr)
-        except zoneinfo.ZoneInfoNotFoundError as err:
+        except (zoneinfo.ZoneInfoNotFoundError, OSError) as err:
             raise TimeZoneNotFoundError from err

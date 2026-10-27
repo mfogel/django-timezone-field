@@ -24,8 +24,9 @@ def TimeZoneSerializerEmpties(use_pytz):
     yield _TimeZoneSerializer
 
 
-def test_invalid_str(TimeZoneSerializer, invalid_tz):
-    serializer = TimeZoneSerializer(data={"tz": invalid_tz})
+@pytest.mark.parametrize("tz", ["not-a-tz", "x" * 300])
+def test_invalid_str(TimeZoneSerializer, tz):
+    serializer = TimeZoneSerializer(data={"tz": tz})
     assert not serializer.is_valid()
 
 

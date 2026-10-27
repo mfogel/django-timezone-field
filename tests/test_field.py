@@ -76,7 +76,7 @@ def test_string_value_assignment_without_save(Model, utc, input_tz, output_tz):
     assert m.tz_opt == output_tz
 
 
-@pytest.mark.parametrize("tz", [None, "", "not-a-tz", 4, object()])
+@pytest.mark.parametrize("tz", [None, "", "not-a-tz", "x" * 300, 4, object()])
 def test_invalid_input(Model, tz):
     with pytest.raises(ValidationError):
         # Most invalid values are detected at creation/assignment.
