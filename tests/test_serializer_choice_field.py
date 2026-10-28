@@ -1,3 +1,5 @@
+import json
+
 import pytest
 from rest_framework import generics, serializers
 from rest_framework.test import APIRequestFactory
@@ -80,17 +82,27 @@ def test_serializer_roundtrip(use_pytz, pst, pst_tz):
     assert serializer.data == {"tz": pst}
 
 
-def test_options_metadata(use_pytz, pst):
+@pytest.mark.parametrize("choice_kind", ["strings", "objects", "grouped_objects"])
+def test_options_metadata(use_pytz, pst, pst_tz, choice_kind):
+    choices = [(pst, "Pacific time")]
+    if choice_kind == "objects":
+        choices = [(pst_tz, "Pacific time")]
+    elif choice_kind == "grouped_objects":
+        choices = [("America", [(pst_tz, "Pacific time")])]
+
     class TimeZoneSerializer(serializers.Serializer):
         # pylint: disable=abstract-method
-        tz = TimeZoneSerializerChoiceField(choices=[(pst, "Pacific time")], use_pytz=use_pytz)
+        tz = TimeZoneSerializerChoiceField(choices=choices, use_pytz=use_pytz)
 
     class TimeZoneView(generics.CreateAPIView):
         serializer_class = TimeZoneSerializer
 
-    response = TimeZoneView.as_view()(APIRequestFactory().options("/timezones/"))
+    response = TimeZoneView.as_view()(APIRequestFactory().options("/timezones/", HTTP_ACCEPT="application/json"))
     assert response.status_code == 200
-    assert response.data["actions"]["POST"]["tz"]["choices"] == [{"value": pst, "display_name": "Pacific time"}]
+    response.render()
+    assert json.loads(response.content)["actions"]["POST"]["tz"]["choices"] == [
+        {"value": pst, "display_name": "Pacific time"}
+    ]
 
 
 def test_original_field_stays_unrestricted(use_pytz, pst, pst_tz):

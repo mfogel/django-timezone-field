@@ -1,6 +1,6 @@
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from rest_framework.fields import CharField, ChoiceField
+from rest_framework.fields import CharField, ChoiceField, to_choices_dict
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 
@@ -26,6 +26,14 @@ class TimeZoneSerializerField(CharField):
         return str(value)
 
 
+def _stringify_choices(choices):
+    # OPTIONS metadata must expose JSON-serializable keys, including in groups.
+    return [
+        (force_str(value), _stringify_choices(label.items()) if isinstance(label, dict) else label)
+        for value, label in to_choices_dict(choices).items()
+    ]
+
+
 class TimeZoneSerializerChoiceField(ChoiceField):
     """A timezone field exposing all or a subset of timezones as DRF choices."""
 
@@ -33,7 +41,7 @@ class TimeZoneSerializerChoiceField(ChoiceField):
         self._timezone_field = TimeZoneSerializerField(use_pytz=kwargs.pop("use_pytz", None))
         if choices is None:
             choices = sorted(self._timezone_field.tz_backend.base_tzstrs)
-        super().__init__(choices=choices, **kwargs)
+        super().__init__(choices=_stringify_choices(choices), **kwargs)
 
     def to_internal_value(self, data):
         value = super().to_internal_value(force_str(data))
