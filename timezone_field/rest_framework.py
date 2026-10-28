@@ -1,6 +1,6 @@
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from rest_framework.fields import CharField
+from rest_framework.fields import CharField, ChoiceField
 
 from timezone_field.backends import TimeZoneNotFoundError, get_tz_backend
 
@@ -24,3 +24,24 @@ class TimeZoneSerializerField(CharField):
 
     def to_representation(self, value):
         return str(value)
+
+
+class TimeZoneSerializerChoiceField(ChoiceField):
+    """A timezone field exposing all or a subset of timezones as DRF choices."""
+
+    def __init__(self, choices=None, **kwargs):
+        self._timezone_field = TimeZoneSerializerField(use_pytz=kwargs.pop("use_pytz", None))
+        if choices is None:
+            choices = sorted(self._timezone_field.tz_backend.base_tzstrs)
+        super().__init__(choices=choices, **kwargs)
+
+    def to_internal_value(self, data):
+        value = super().to_internal_value(force_str(data))
+        if value == "":
+            return value
+        return self._timezone_field.to_internal_value(value)
+
+    def to_representation(self, value):
+        if value is None or value == "":
+            return value
+        return self._timezone_field.to_representation(value)
