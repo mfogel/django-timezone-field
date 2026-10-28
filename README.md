@@ -114,6 +114,26 @@ my_serializer.validated_data["tz1"]  # <DstTzInfo 'America/Argentina/Buenos_Aire
 my_serializer.validated_data["tz2"]  # zoneinfo.ZoneInfo(key='America/Argentina/Buenos_Aires')
 ```
 
+Use `TimeZoneSerializerChoiceField` to expose timezone choices in the browsable API
+and `OPTIONS` responses. By default it offers the backend's standard timezone
+choices. Supply `choices` to restrict the accepted timezones or customize their labels:
+
+```python
+from rest_framework import serializers
+from timezone_field.rest_framework import TimeZoneSerializerChoiceField
+
+class MySerializer(serializers.Serializer):
+    tz = TimeZoneSerializerChoiceField(
+        use_pytz=False,
+        choices=[("America/Los_Angeles", "Pacific time"), ("Europe/London", "London")],
+    )
+```
+
+Like `TimeZoneSerializerField`, it returns timezone objects in `validated_data`
+and timezone names in serialized output. It also supports DRF's `allow_null`,
+`allow_blank`, and `required` options. The existing `TimeZoneSerializerField`
+continues to accept valid timezones without restricting them to a list of choices.
+
 ## Installation
 
 Releases are hosted on [`pypi`](https://pypi.org/project/django-timezone-field/) and can be installed using various
