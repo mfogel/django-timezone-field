@@ -1,3 +1,5 @@
+from django.utils.functional import cached_property
+
 try:
     import zoneinfo
 except ImportError:
@@ -7,13 +9,21 @@ from .base import TimeZoneBackend, TimeZoneNotFoundError
 
 
 class ZoneInfoBackend(TimeZoneBackend):
-    utc_tzobj = zoneinfo.ZoneInfo("UTC")
-    all_tzstrs = zoneinfo.available_timezones()
-    base_tzstrs = zoneinfo.available_timezones()
-    # Remove the "Factory" timezone as it can cause ValueError exceptions on
-    # some systems, e.g. FreeBSD, if the system zoneinfo database is used.
-    all_tzstrs.discard("Factory")
-    base_tzstrs.discard("Factory")
+    @cached_property
+    def utc_tzobj(self):
+        return zoneinfo.ZoneInfo("UTC")
+
+    @cached_property
+    def all_tzstrs(self):
+        tzstrs = zoneinfo.available_timezones()
+        # Remove the "Factory" timezone as it can cause ValueError exceptions on
+        # some systems, e.g. FreeBSD, if the system zoneinfo database is used.
+        tzstrs.discard("Factory")
+        return tzstrs
+
+    @cached_property
+    def base_tzstrs(self):
+        return self.all_tzstrs
 
     def is_tzobj(self, value):
         return isinstance(value, zoneinfo.ZoneInfo)
