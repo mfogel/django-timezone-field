@@ -24,7 +24,7 @@ class TimeZoneFormField(forms.TypedChoiceField):
         kwargs.setdefault("empty_value", None)
 
         if "choices" in kwargs:
-            self._raw_choices = list(kwargs["choices"])
+            self._raw_choices = kwargs["choices"]
         else:
             self._raw_choices = None
 
